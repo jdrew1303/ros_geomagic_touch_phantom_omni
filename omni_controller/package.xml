@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package>
+  <name>omni_controller</name>
+  <version>0.0.1</version>
+  <description>The omni_controller package</description>
+
+  <maintainer email="brunogbv@poli.ufrj.br">Bruno Guilhermo de Barros Valerio</maintainer>
+
+  <license>BSD</license>
+
+  <author email="brunogbv@poli.ufrj.br">Bruno Guilhermo de Barros Valerio</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <build_depend>message_generation</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>keyboard</build_depend>
+  
+  <run_depend>message_runtime</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>keyboard</run_depend>
+</package>
