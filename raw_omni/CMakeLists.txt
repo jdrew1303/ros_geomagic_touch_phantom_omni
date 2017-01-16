@@ -6,7 +6,6 @@ project(raw_omni)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
-  omni_description
   roscpp
   std_msgs
   tf
@@ -72,6 +71,7 @@ catkin_package(
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  include
   "/usr/include/eigen3"
   ../omni_controller/include
 )
