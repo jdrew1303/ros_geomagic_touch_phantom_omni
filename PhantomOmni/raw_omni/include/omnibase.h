@@ -6,6 +6,13 @@
 #include <boost/thread.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+#include <ros/ros.h>
+#include <std_msgs/Bool.h>
+#include <geometry_msgs/Vector3.h>
+#include <sensor_msgs/JointState.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <raw_omni/OmniButtonEvent.h>
+#include <raw_omni_driver.h>
 
 class OmniBase
 {
@@ -34,6 +41,30 @@ private:
     boost::shared_mutex mutex_state;
     OmniState state;
 
+    RawOmniDriver driver_;
+
+    std::string name_;
+    std::string topic_name;
+
+    ros::NodeHandlePtr node;
+
+    ros::Subscriber torque_sub;
+
+    ros::Publisher joint_pub_;
+    sensor_msgs::JointState joint_state_;
+
+    ros::Publisher pose_pub_;
+    geometry_msgs::PoseStamped pose_stamped_;
+
+    ros::Publisher button_pub_;
+    raw_omni::OmniButtonEvent button_event_;
+
+    ros::Subscriber enable_control_sub_;
+
+    ros::Timer timer_;
+
+    bool last_buttons[2];
+
 protected:
     typedef boost::unique_lock<boost::shared_mutex>            LockUnique;
     typedef boost::shared_lock<boost::shared_mutex>            LockShared;
@@ -61,6 +92,9 @@ protected:
      */
     void driverCallback(void *data);
 
+    void driverCallbackRead(void *data);
+    void driverCallbackWrite(void *data);
+
     /**
      * @brief Implementation specific callback function called from {@link driverCallback}.
      *
@@ -70,6 +104,11 @@ protected:
      * @param state The current robot's state.
      */
     virtual void callback(OmniState *state) = 0;
+
+    virtual void callbackRead(OmniState *state) = 0;
+    virtual void callbackWrite(OmniState *state) = 0;
+
+
 
     /**
      * @brief Gets the robot's state.
@@ -81,7 +120,7 @@ protected:
     }
 
 public:
-    OmniBase();
+    OmniBase(const std::string &name, const std::string &serial);
 
     /**
      * @brief Attempts to connect to the robot.
@@ -109,7 +148,7 @@ public:
      * @brief Gets the current force acting on the tip.
      * @param force Vector that will store the force.
      */
-    virtual void getForce(std::vector<double> &force)
+    inline void getForce(std::vector<double> &force)
     {
         LockShared lock( getStateMutex() );
         force = state.force;
@@ -182,4 +221,9 @@ public:
         pos = state.position;
         ori = state.orientation;
     }
+
+// ROS Callbacks
+public:
+    void forceCallback(const geometry_msgs::Vector3::ConstPtr& msg);
+    void enableControlCallback(const std_msgs::Bool::ConstPtr& msg);
 };

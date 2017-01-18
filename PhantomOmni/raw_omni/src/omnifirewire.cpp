@@ -1,9 +1,4 @@
-#include "omnifirewire.h"
-
-
-OmniFirewire::OmniFirewire() : OmniBase::OmniBase()
-{
-}
+#include "../include/omnifirewire.h"
 
 
 void OmniFirewire::callback(OmniBase::OmniState *state)

@@ -1,18 +1,16 @@
 #pragma once
 
-
 #include "omnibase.h"
-
+#include "raw_omni_driver.h"
 
 class OmniFirewire : public OmniBase
 {
-public:
-    OmniFirewire();
-
 // OmniBase interface
 protected:
     void callback(OmniState *state);
+
 public:
     bool connect();
     bool disconnect();
+    OmniFirewire();
 };

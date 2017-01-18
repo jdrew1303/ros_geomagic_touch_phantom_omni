@@ -129,6 +129,10 @@ include_directories(
 ## either from message generation or dynamic reconfigure
 # add_dependencies(omni_controller ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+## Include files that should be shown by the IDE
+file(GLOB_RECURSE PROJECT_HEADERS "include/*.h")
+add_custom_target(omni_controller_files_for_ide SOURCES ${PROJECT_HEADERS})
+
 ## Create robot_kinematics library
 file(GLOB_RECURSE ROBOT_LIB_CPP ${PROJECT_SOURCE_DIR} src/RobotBase/*.cpp)
 add_library(robot_kinematics STATIC ${ROBOT_LIB_CPP})

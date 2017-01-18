@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(raw_omni)
 
+set (CMAKE_CXX_FLAGS "--std=c++0x ${CMAKE_CXX_FLAGS}")
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -77,16 +79,18 @@ include_directories(
 )
 
 ## Declare a cpp library
-# add_library(raw_omni
-#   src/${PROJECT_NAME}/raw_omni.cpp
-# )
+#add_library()
+
+## Include files that should be shown by the IDE
+file(GLOB_RECURSE PROJECT_HEADERS "include/*.h")
+add_custom_target(raw_omni_files_for_ide SOURCES ${PROJECT_HEADERS})
 
 ## Declare a cpp executable
-add_executable(raw_omni src/raw_omni.cpp src/raw_omni_driver.cpp)
+add_executable(raw_omni src/raw_omni.cpp src/raw_omni_driver.cpp src/omnibase.cpp src/omnifirewire.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(raw_omni raw_omni_generate_messages_cpp)
+add_dependencies(raw_omni raw_omni_generate_messages_cpp )
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(raw_omni

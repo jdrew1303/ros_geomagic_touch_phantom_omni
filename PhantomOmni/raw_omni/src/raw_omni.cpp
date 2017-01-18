@@ -24,8 +24,8 @@
 #include <raw_omni/OmniButtonEvent.h>
 #include <std_msgs/Bool.h>
 
-#include "raw_omni_driver.h"
-#include "node/Omni.h"
+#include "../include/raw_omni_driver.h"
+#include "../../omni_controller/include/node/Omni.h"
 
 class RawOmniNode {
 private:
@@ -83,7 +83,7 @@ public:
             pose_stamped_.header.frame_id = name_ + "stylus";
         }
         
-        // Prepare button state isher
+        // Prepare button state publisher
         {
             std::ostringstream topic_name;
             topic_name << name_ << "button_state";

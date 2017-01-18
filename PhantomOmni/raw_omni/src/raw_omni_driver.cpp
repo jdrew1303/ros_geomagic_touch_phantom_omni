@@ -24,7 +24,7 @@
 #include <arpa/inet.h>
 #include <libraw1394/csr.h>
 
-#include "raw_omni_driver.h"
+#include "../include/raw_omni_driver.h"
 
 #define RAW_OMNI_POT_FILTER_TAPS 20
 
