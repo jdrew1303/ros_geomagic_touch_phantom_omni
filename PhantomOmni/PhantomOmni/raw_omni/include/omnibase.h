@@ -144,6 +144,17 @@ public:
         angles = state.angles;
     }
 
+    void get_current_joint_angles(std::vector<double>& angles) {
+        // Protect the critical section.
+        pthread_mutex_lock(&iso_mutex_);
+
+        angles.clear();
+        angles.insert(angles.end(), current_joint_angles_, current_joint_angles_
+                + sizeof(current_joint_angles_) / sizeof(*current_joint_angles_));
+
+        pthread_mutex_unlock(&iso_mutex_);
+    }
+
     /**
      * @brief Gets the current force acting on the tip.
      * @param force Vector that will store the force.
@@ -221,6 +232,12 @@ public:
         pos = state.position;
         ori = state.orientation;
     }
+    inline std::string get_topic_name()
+    {
+        return this->name_;
+    }
+
+
 
 // ROS Callbacks
 public:

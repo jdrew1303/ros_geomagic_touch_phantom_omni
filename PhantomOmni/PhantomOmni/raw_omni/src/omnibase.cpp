@@ -10,7 +10,7 @@ OmniBase::OmniBase(const std::string& name, const std::string& serial)
 
     // Prepare joint state publisher.
     topic_name = name_ + "joint_states";
-    joint_pub_ = node->advertise<sensor_msgs::JointState>(topic_name.str(), 10);
+    joint_pub_ = node->advertise<sensor_msgs::JointState>(topic_name, 10);
     joint_state_.name.resize(6);
     joint_state_.position.resize(6);
     joint_state_.name[0] = name_ + "waist";
@@ -22,20 +22,20 @@ OmniBase::OmniBase(const std::string& name, const std::string& serial)
 
     // Prepare pose publisher.
     topic_name = name_ + "pose";
-    pose_pub_ = node->advertise<geometry_msgs::PoseStamped>(topic_name.str(), 10);
+    pose_pub_ = node->advertise<geometry_msgs::PoseStamped>(topic_name, 10);
     pose_stamped_.header.frame_id = name_ + "stylus";
 
     // Prepare button state publisher.
     topic_name = name_ + "button_state";
-    button_pub_ = node->advertise<raw_omni::OmniButtonEvent>(topic_name.str(), 10);
+    button_pub_ = node->advertise<raw_omni::OmniButtonEvent>(topic_name, 10);
 
     // Subscribe omni_control topic.
     topic_name = name_ + "control";
-    torque_sub = node->subscribe(topic_name.str(), 1, &OmniBase::torqueCallback, this);
+    torque_sub = node->subscribe(topic_name, 1, &OmniBase::torqueCallback, this);
 
     // Subscribe enable_control topic.
     topic_name << name_ << "enable_control";
-    enable_control_sub_ = node->subscribe(topic_name.str(), 1, &OmniBase::enableCallback, this);
+    enable_control_sub_ = node->subscribe(topic_name, 1, &OmniBase::enableCallback, this);
 
     // Create timer for communication.
     timer_ = node->createTimer(ros::Duration(0.0025),&RawOmniNode::timerHandler, this);
@@ -56,7 +56,6 @@ void OmniBase::enableControlCallback(const std_msgs::Bool_::ConstPtr &msg)
 {
     enableControl(msg->data);
 }
-
 
 void OmniBase::driverCallback(void *data)
 {
