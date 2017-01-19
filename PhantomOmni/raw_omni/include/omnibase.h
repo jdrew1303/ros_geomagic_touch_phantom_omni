@@ -105,9 +105,6 @@ protected:
      */
     virtual void callback(OmniState *state) = 0;
 
-    virtual void callbackRead(OmniState *state) = 0;
-    virtual void callbackWrite(OmniState *state) = 0;
-
 
 
     /**

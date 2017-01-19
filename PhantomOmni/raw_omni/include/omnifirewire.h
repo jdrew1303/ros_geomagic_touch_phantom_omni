@@ -1,7 +1,6 @@
 #pragma once
 
 #include "omnibase.h"
-#include "raw_omni_driver.h"
 #include "ros/ros.h
 #include <iostream>
 #include <iomanip>
@@ -25,7 +24,10 @@ class OmniFirewire : public OmniBase
 // OmniBase interface
 protected:
     void callback(OmniState *state);
-
+    enum raw1394_iso_disposition callbackWrite(raw1394handle_t handle,unsigned char* data, unsigned int* len, unsigned char* tag, unsigned char* sy, int cycle, unsigned int dropped);
+    enum raw1394_iso_disposition callbackRead(raw1394handle_t handle, unsigned char* data, unsigned int len, unsigned char channel, unsigned char tag, unsigned char sy, unsigned int cycle, unsigned int dropped);
+    void* iso_thread_handler(void* arg);
+    std::vector<RawOmniDriver::OmniInfo> OmniFirewire::enumerate_omnis();
 public:
     bool connect();
     void disconnect();
@@ -34,6 +36,10 @@ public:
     void timerHandler(const ros::TimerEvent& event);
     bool run();
     void firewireMain(int argc, char** argv);
+    uint32_t pack_serial_number(const std::string& unpacked);
+    std::string unpack_serial_number(uint32_t packed);
+    bool RawOmniDriver::start_isochronous_transmission();
+    bool RawOmniDriver::stop_isochronous_transmission();
 
 private:
     struct TxIsoBuffer {
