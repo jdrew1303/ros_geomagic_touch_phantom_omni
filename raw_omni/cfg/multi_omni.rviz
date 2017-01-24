@@ -1,0 +1,300 @@
+Panels:
+  - Class: rviz/Displays
+    Help Height: 78
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+        - /Status1
+      Splitter Ratio: 0.481013
+    Tree Height: 307
+  - Class: rviz/Selection
+    Name: Selection
+  - Class: rviz/Tool Properties
+    Expanded:
+      - /2D Pose Estimate1
+      - /2D Nav Goal1
+      - /Publish Point1
+    Name: Tool Properties
+    Splitter Ratio: 0.588679
+  - Class: rviz/Time
+    Experimental: false
+    Name: Time
+    SyncMode: 0
+    SyncSource: ""
+  - Class: rviz/Views
+    Expanded:
+      - /Current View1
+    Name: Views
+    Splitter Ratio: 0.5
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Alpha: 0.5
+      Cell Size: 1
+      Class: rviz/Grid
+      Color: 160; 160; 164
+      Enabled: true
+      Line Style:
+        Line Width: 0.03
+        Value: Lines
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 10
+      Reference Frame: <Fixed Frame>
+      Value: true
+    - Class: rviz/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: false
+        map:
+          Value: true
+        omni1_base:
+          Value: true
+        omni1_lower_arm:
+          Value: true
+        omni1_sensable:
+          Value: true
+        omni1_stylus:
+          Value: true
+        omni1_torso:
+          Value: true
+        omni1_upper_arm:
+          Value: true
+        omni1_wrist1:
+          Value: true
+        omni1_wrist2:
+          Value: true
+        omni2_base:
+          Value: true
+        omni2_lower_arm:
+          Value: true
+        omni2_sensable:
+          Value: true
+        omni2_stylus:
+          Value: true
+        omni2_torso:
+          Value: true
+        omni2_upper_arm:
+          Value: true
+        omni2_wrist1:
+          Value: true
+        omni2_wrist2:
+          Value: true
+      Marker Scale: 0.15
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        map:
+          omni1_base:
+            omni1_sensable:
+              {}
+            omni1_torso:
+              omni1_upper_arm:
+                omni1_lower_arm:
+                  omni1_wrist1:
+                    omni1_wrist2:
+                      omni1_stylus:
+                        {}
+          omni2_base:
+            omni2_sensable:
+              {}
+            omni2_torso:
+              omni2_upper_arm:
+                omni2_lower_arm:
+                  omni2_wrist1:
+                    omni2_wrist2:
+                      omni2_stylus:
+                        {}
+      Update Interval: 0
+      Value: true
+    - Alpha: 0.35
+      Class: rviz/RobotModel
+      Collision Enabled: false
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        omni1_base:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        omni1_lower_arm:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        omni1_stylus:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        omni1_torso:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        omni1_upper_arm:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        omni1_wrist1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        omni1_wrist2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Name: RobotModel
+      Robot Description: omni1_description
+      TF Prefix: ""
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
+    - Alpha: 0.5
+      Class: rviz/RobotModel
+      Collision Enabled: false
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        omni2_base:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        omni2_lower_arm:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        omni2_stylus:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        omni2_torso:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        omni2_upper_arm:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        omni2_wrist1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        omni2_wrist2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Name: RobotModel
+      Robot Description: omni2_description
+      TF Prefix: ""
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.1
+      Class: rviz/Pose
+      Color: 255; 255; 0
+      Enabled: true
+      Head Length: 0.02
+      Head Radius: 0.02
+      Name: Pose
+      Shaft Length: 0.02
+      Shaft Radius: 0.015
+      Shape: Arrow
+      Topic: /omni1/omni1_pose
+      Value: true
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.1
+      Class: rviz/Pose
+      Color: 255; 255; 0
+      Enabled: true
+      Head Length: 0.02
+      Head Radius: 0.02
+      Name: Pose
+      Shaft Length: 0.02
+      Shaft Radius: 0.015
+      Shape: Arrow
+      Topic: /omni2/omni2_pose
+      Value: true
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: map
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz/Interact
+      Hide Inactive Objects: true
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+    - Class: rviz/FocusCamera
+    - Class: rviz/Measure
+    - Class: rviz/SetInitialPose
+      Topic: /initialpose
+    - Class: rviz/SetGoal
+      Topic: /move_base_simple/goal
+    - Class: rviz/PublishPoint
+      Single click: true
+      Topic: /clicked_point
+  Value: true
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 0.665417
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Name: Current View
+      Near Clip Distance: 0.01
+      Pitch: 0.614797
+      Target Frame: base
+      Value: Orbit (rviz)
+      Yaw: 2.38818
+    Saved: ~
+Window Geometry:
+  Displays:
+    collapsed: false
+  Height: 776
+  Hide Left Dock: false
+  Hide Right Dock: false
+  QMainWindow State: 000000ff00000000fd00000004000000000000010f0000027efc0200000009fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c0061007900730100000028000001c2000000dd00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0056006900650077007301000001f0000000b6000000b000ffffff000000010000010f00000288fc0200000002fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004cf0000003efc0100000002fb0000000800540069006d00650100000000000004cf000002f600fffffffb0000000800540069006d00650100000000000004500000000000000000000003ba0000027e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Selection:
+    collapsed: false
+  Time:
+    collapsed: false
+  Tool Properties:
+    collapsed: false
+  Views:
+    collapsed: false
+  Width: 1231
+  X: 42
+  Y: 24

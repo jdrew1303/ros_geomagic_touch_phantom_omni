@@ -1,0 +1,4 @@
+bool grey_button
+bool white_button
+bool grey_button_clicked
+bool white_button_clicked
