@@ -105,9 +105,6 @@ protected:
      */
     virtual void callback(OmniState *state) = 0;
 
-    virtual void callbackRead(OmniState *state) = 0;
-    virtual void callbackWrite(OmniState *state) = 0;
-
 
 
     /**
@@ -142,6 +139,17 @@ public:
     {
         LockShared lock( getStateMutex() );
         angles = state.angles;
+    }
+
+    void get_current_joint_angles(std::vector<double>& angles) {
+        // Protect the critical section.
+        pthread_mutex_lock(&iso_mutex_);
+
+        angles.clear();
+        angles.insert(angles.end(), current_joint_angles_, current_joint_angles_
+                + sizeof(current_joint_angles_) / sizeof(*current_joint_angles_));
+
+        pthread_mutex_unlock(&iso_mutex_);
     }
 
     /**
@@ -221,6 +229,12 @@ public:
         pos = state.position;
         ori = state.orientation;
     }
+    inline std::string get_topic_name()
+    {
+        return this->name_;
+    }
+
+
 
 // ROS Callbacks
 public:

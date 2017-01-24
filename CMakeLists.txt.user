@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.1.0, 2017-01-18T14:52:40. -->
+<!-- Written by QtCreator 4.1.0, 2017-01-24T08:42:26. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -339,7 +339,7 @@
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguation.Title">omni_controller</value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments"></value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/tmp/build/devel/lib/omni_controller</value>
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/tmp/qtc-cmake-MQg1Ih/devel/lib/omni_controller</value>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">omni_controller</value>
@@ -395,7 +395,7 @@
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguation.Title">robot_test</value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments"></value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/tmp/build/devel/lib/omni_controller</value>
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/tmp/qtc-cmake-MQg1Ih/devel/lib/omni_controller</value>
     <value type="int" key="PE.EnvironmentAspect.Base">-1</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">robot_test</value>
@@ -451,7 +451,7 @@
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguation.Title">raw_omni</value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments"></value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/tmp/build/devel/lib/raw_omni</value>
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/tmp/qtc-cmake-MQg1Ih/devel/lib/raw_omni</value>
     <value type="int" key="PE.EnvironmentAspect.Base">-1</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">raw_omni</value>
