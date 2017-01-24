@@ -1,7 +1,7 @@
 #pragma once
 
 #include "omnibase.h"
-#include "ros/ros.h
+#include "ros/ros.h"
 #include <iostream>
 #include <iomanip>
 #include <sstream>
@@ -21,27 +21,42 @@
 
 class OmniFirewire : public OmniBase
 {
+public:
+    struct OmniInfo
+    {
+        std::string serial;
+        int32_t port;
+        int32_t node;
+        OmniInfo(const std::string& serial, int32_t port, int32_t node)
+                : serial(serial), port(port), node(node) {}
+    };
+
 // OmniBase interface
 protected:
     void callback(OmniState *state);
-    enum raw1394_iso_disposition callbackWrite(raw1394handle_t handle,unsigned char* data, unsigned int* len, unsigned char* tag, unsigned char* sy, int cycle, unsigned int dropped);
-    enum raw1394_iso_disposition callbackRead(raw1394handle_t handle, unsigned char* data, unsigned int len, unsigned char channel, unsigned char tag, unsigned char sy, unsigned int cycle, unsigned int dropped);
+
+    static enum raw1394_iso_disposition callbackWrite(raw1394handle_t handle,unsigned char* data, unsigned int* len, unsigned char* tag, unsigned char* sy, int cycle, unsigned int dropped);
+    static enum raw1394_iso_disposition callbackRead(raw1394handle_t handle, unsigned char* data, unsigned int len, unsigned char channel, unsigned char tag, unsigned char sy, unsigned int cycle, unsigned int dropped);
+
     void* iso_thread_handler(void* arg);
-    std::vector<RawOmniDriver::OmniInfo> OmniFirewire::enumerate_omnis();
+    std::vector<OmniFirewire::OmniInfo> enumerate_omnis();
+
 public:
     bool connect();
     void disconnect();
-    OmniFirewire(const std::string &serial_number);
+    bool connected();
+
+    OmniFirewire(const std::string serial_number);
     ~OmniFirewire();
     void timerHandler(const ros::TimerEvent& event);
     bool run();
     void firewireMain(int argc, char** argv);
     uint32_t pack_serial_number(const std::string& unpacked);
     std::string unpack_serial_number(uint32_t packed);
-    bool RawOmniDriver::start_isochronous_transmission();
-    bool RawOmniDriver::stop_isochronous_transmission();
+    bool start_isochronous_transmission();
+    void stop_isochronous_transmission();
 
-private:
+public:
     struct TxIsoBuffer {
         int16_t force_x;
         int16_t force_y;
@@ -118,7 +133,7 @@ private:
         uint32_t wall_time;
     };
 
-private:
+public:
     double pot_filter_accum_[3];
     int pot_filter_count_;
     bool enable_force_flag;
@@ -126,10 +141,8 @@ private:
     double home_joint_angles_[6];
     int16_t force_output_[3];
     bool current_buttons_[2];
-    bool calibrated_;
 
-    pthread_t iso_thread_;
-    pthread_mutex_t iso_mutex_;
+    void set_force(const double * const force);
     volatile enum {
         RAW_OMNI_STATE_READY,
         RAW_OMNI_STATE_THREAD_STARTED,
@@ -141,30 +154,4 @@ private:
     int32_t port_, node_;
     int8_t tx_iso_channel_;
     int8_t rx_iso_channel_;
-
-    static uint32_t pack_serial_number(const std::string& unpacked);
-    static std::string unpack_serial_number(uint32_t packed);
-
-    bool start_isochronous_transmission();
-    void stop_isochronous_transmission();
-
-    static void* iso_thread_handler(void* arg);
-
-    static enum raw1394_iso_disposition txHandler(raw1394handle_t handle,
-            unsigned char* data, unsigned int* len,
-            unsigned char* tag, unsigned char* sy, int cycle,
-            unsigned int dropped);
-    static enum raw1394_iso_disposition rxHandler(raw1394handle_t handle,
-        unsigned char *data, unsigned int len, unsigned char channel,
-        unsigned char tag, unsigned char sy, unsigned int cycle,
-        unsigned int dropped);
-
-public:
-    struct OmniInfo {
-        std::string serial;
-        int32_t port;
-        int32_t node;
-        OmniInfo(const std::string& serial, int32_t port, int32_t node)
-                : serial(serial), port(port), node(node) {}
-    };
 };

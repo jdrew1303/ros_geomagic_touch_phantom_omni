@@ -12,10 +12,14 @@
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <raw_omni/OmniButtonEvent.h>
-#include <raw_omni_driver.h>
 
 class OmniBase
 {
+private:
+    boost::shared_mutex mutex_state;
+
+    void timerCallback(const ros::TimerEvent& event);
+
 protected:
     typedef boost::posix_time::microsec_clock Clock;
     typedef boost::posix_time::ptime Time;
@@ -23,45 +27,45 @@ protected:
 
     struct OmniState
     {
+        std::vector<double> angles_docked;
         std::vector<double> angles;
         std::vector<double> angles_last;
-        std::vector<double> velocities;
-        std::vector<double> force;
+        std::vector<bool>   buttons;
         std::vector<double> control;
+        std::vector<double> force;
         std::vector<double> position;
         std::vector<double> orientation;
+        std::vector<double> velocities;
 
         bool control_on = false;
+        bool calibrated = false;
 
         unsigned int seq = 0;
         Time stamp;
     };
 
-private:
-    boost::shared_mutex mutex_state;
+protected:
     OmniState state;
 
-    RawOmniDriver driver_;
-
-    std::string name_;
+    std::string name;
     std::string topic_name;
 
     ros::NodeHandlePtr node;
 
-    ros::Subscriber torque_sub;
+    ros::Subscriber sub_torque;
 
-    ros::Publisher joint_pub_;
-    sensor_msgs::JointState joint_state_;
+    ros::Publisher pub_joint;
+    sensor_msgs::JointState joint_state;
 
-    ros::Publisher pose_pub_;
-    geometry_msgs::PoseStamped pose_stamped_;
+    ros::Publisher pub_pose;
+    geometry_msgs::PoseStamped pose_stamped;
 
-    ros::Publisher button_pub_;
-    raw_omni::OmniButtonEvent button_event_;
+    ros::Publisher pub_button;
+    raw_omni::OmniButtonEvent button_event;
 
-    ros::Subscriber enable_control_sub_;
+    ros::Subscriber sub_enable_control;
 
-    ros::Timer timer_;
+    ros::Timer timer;
 
     bool last_buttons[2];
 
@@ -81,33 +85,6 @@ protected:
     }
 
     /**
-     * @brief This method should be set as the driver's callback. It performs housekeeping
-     * tasks and calls the implementation specific {@link callback} method after casting \p data
-     * to OmniState *.
-     *
-     * The \p data parameter type is a pointer to void because this is the usual type
-     * required by most drivers. However, this should castable to a pointer to OmniState.
-     *
-     * @param data Data state stored by the driver.
-     */
-    void driverCallback(void *data);
-
-    void driverCallbackRead(void *data);
-    void driverCallbackWrite(void *data);
-
-    /**
-     * @brief Implementation specific callback function called from {@link driverCallback}.
-     *
-     * All driver specific calls to set and get information from the robot should be coded
-     * in this method.
-     *
-     * @param state The current robot's state.
-     */
-    virtual void callback(OmniState *state) = 0;
-
-
-
-    /**
      * @brief Gets the robot's state.
      * @return The robot's state.
      */
@@ -117,7 +94,7 @@ protected:
     }
 
 public:
-    OmniBase(const std::string &name, const std::string &serial);
+    OmniBase(const std::string &name);
 
     /**
      * @brief Attempts to connect to the robot.
@@ -129,7 +106,14 @@ public:
      * @brief Attempts to close the connection to the robot.
      * @return True if the connection was closed. False otherwise.
      */
-    virtual bool disconnect() = 0;
+    virtual void disconnect() = 0;
+
+    /**
+     * @brief Checks if the device is connected.
+     * @return True if connected. False otherwise.
+     * @see connect, disconnect
+     */
+    virtual bool connected() = 0;
 
     /**
      * @brief Gets the current joint angles.
@@ -137,19 +121,20 @@ public:
      */
     inline void getJointAngles(std::vector<double> &angles)
     {
+        // Protect the critical section.
         LockShared lock( getStateMutex() );
         angles = state.angles;
     }
 
-    void get_current_joint_angles(std::vector<double>& angles) {
+    /**
+     * @brief Gets the current buttons' state.
+     * @param button Vector that will store the states.
+     */
+    void getButtonsState(std::vector<bool>& button)
+    {
         // Protect the critical section.
-        pthread_mutex_lock(&iso_mutex_);
-
-        angles.clear();
-        angles.insert(angles.end(), current_joint_angles_, current_joint_angles_
-                + sizeof(current_joint_angles_) / sizeof(*current_joint_angles_));
-
-        pthread_mutex_unlock(&iso_mutex_);
+        LockShared lock( getStateMutex() );
+        button = state.buttons;
     }
 
     /**
@@ -175,6 +160,16 @@ public:
         }
         LockUpgradeToUnique lock_unique(lock);
         state.control = torque;
+    }
+
+    /**
+     * @brief Resets the torque on the first three joints.
+     * @see setTorque
+     */
+    inline void resetTorque()
+    {
+        std::vector<double> null_torque(3,0);
+        OmniBase::setTorque(null_torque);
     }
 
     /**
@@ -229,15 +224,28 @@ public:
         pos = state.position;
         ori = state.orientation;
     }
-    inline std::string get_topic_name()
+
+    /**
+     * @brief Gets the omni name param.
+     * @return Returns the robot's name.
+     */
+    inline std::string getTopicName()
     {
-        return this->name_;
+        return this->name;
     }
 
-
+    /**
+     * @brief Checks if the device has been calibrated.
+     * @return True if calibrated. False otherwise.
+     */
+    inline bool calibrated()
+    {
+        LockShared lock( getStateMutex() );
+        return state.calibrated;
+    }
 
 // ROS Callbacks
 public:
-    void forceCallback(const geometry_msgs::Vector3::ConstPtr& msg);
+    void torqueCallback(const geometry_msgs::Vector3::ConstPtr& msg);
     void enableControlCallback(const std_msgs::Bool::ConstPtr& msg);
 };

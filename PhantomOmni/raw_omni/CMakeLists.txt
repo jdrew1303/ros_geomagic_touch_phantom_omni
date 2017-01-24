@@ -83,7 +83,7 @@ include_directories(
 
 ## Include files that should be shown by the IDE
 file(GLOB_RECURSE PROJECT_HEADERS "include/*.h")
-add_custom_target(raw_omni_files_for_ide SOURCES ${PROJECT_HEADERS})
+add_custom_target(raw_omni_files_for_ide SOURCES ${PROJECT_HEADERS} "cfg/uncrustify.cfg")
 
 ## Declare a cpp executable
 add_executable(raw_omni src/raw_omni.cpp src/raw_omni_driver.cpp src/omnibase.cpp src/omnifirewire.cpp)
