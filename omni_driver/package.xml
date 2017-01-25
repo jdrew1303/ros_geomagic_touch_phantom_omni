@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package>
+  <name>omni_driver</name>
+  <version>1.0.0</version>
+  <description>The omni_driver package</description>
+  <author email="bruno.gbv@poli.ufrj.br">Bruno Guilhermo de Barros Valerio</author>
+  <maintainer email="bruno.gbv@poli.ufrj.br">Bruno Guilhermo de Barros Valerio</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>urdf</build_depend>
+
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>tf</run_depend>
+  <run_depend>urdf</run_depend>
+</package>
