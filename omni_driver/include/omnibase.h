@@ -16,11 +16,12 @@
 
 class OmniBase
 {
+
 private:
-    boost::shared_mutex mutex_state;
+    boost::shared_mutex mutex_state;                        ///< Mutex state returned by @link getMutexState().
 
 protected:
-    typedef boost::posix_time::microsec_clock Clock;
+    typedef boost::posix_time::microsec_clock Clock;        ///< Clock with micro second resolution.
     typedef boost::posix_time::ptime Time;
     typedef boost::posix_time::time_duration TimeDuration;
 
@@ -61,7 +62,6 @@ protected:
         }
     };
 
-protected:
     OmniState state;
 
     std::string name;
@@ -86,11 +86,10 @@ protected:
 
     bool enable_force_flag;
 
-protected:
-    typedef boost::unique_lock<boost::shared_mutex>            LockUnique;
-    typedef boost::shared_lock<boost::shared_mutex>            LockShared;
-    typedef boost::upgrade_lock<boost::shared_mutex>           LockUpgrade;
-    typedef boost::upgrade_to_unique_lock<boost::shared_mutex> LockUpgradeToUnique;
+    typedef boost::unique_lock<boost::shared_mutex>            LockUnique;          ///< The unique lock, used to protect data while writing.
+    typedef boost::shared_lock<boost::shared_mutex>            LockShared;          ///< The shared lock, used to protect data while reading.
+    typedef boost::upgrade_lock<boost::shared_mutex>           LockUpgrade;         ///< The upgradeable lock, used to protect data while reading.
+    typedef boost::upgrade_to_unique_lock<boost::shared_mutex> LockUpgradeToUnique; ///< The upgraded lock, used to protect data while writing.
 
     /**
      * @brief Gets the mutex used for accessing the robot's state.
@@ -270,7 +269,16 @@ public:
 
 // ROS Callbacks
 public:
+    /**
+     * @brief The torqueCallback called by the ROS torque subscriber.
+     * @param ROS message type geometry_msgs::Vector3.
+     */
     void torqueCallback(const geometry_msgs::Vector3::ConstPtr& msg);
+
+    /**
+     * @brief The enableControlCallback called by the ROS enable control subscriber.
+     * @param ROS message type geometry_msgs::Bool.
+     */
     void enableControlCallback(const std_msgs::Bool::ConstPtr& msg);
 };
 
