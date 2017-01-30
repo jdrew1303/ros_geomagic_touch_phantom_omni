@@ -1,4 +1,3 @@
-#include "../include/omnibase.h"
 #include "../include/omnifirewire.h"
 
 

@@ -2,7 +2,6 @@
 
 #include "omnibase.h"
 #include "ros/ros.h"
-
 #include <iostream>
 #include <iomanip>
 #include <sstream>
@@ -16,63 +15,45 @@
 #include <string>
 #include <stdint.h>
 #include <libraw1394/raw1394.h>
-
 #include <boost/thread.hpp>
 
-#define RAW_OMNI_POT_FILTER_TAPS 20
+#define OMNI_DRIVER_POT_FILTER_TAPS 20
 
 class OmniFirewire : public OmniBase
 {
 private:
     typedef boost::shared_ptr<boost::thread> ThreadPtr;
+
+    int pot_filter_count_;
+    double pot_filter_accum_[3];
+    std::string serial_number_;
     ThreadPtr thread_driver;
+    int8_t tx_iso_channel_;
+    int8_t rx_iso_channel_;
+    int16_t force_output_[3];
+    int32_t port_, node_;
+    raw1394handle_t handle_, tx_handle_, rx_handle_;
 
-    static std::string unpackSerialNumber(uint32_t packed);
-
-public:
-    struct OmniInfo
+    volatile enum                                       ///< Thread states.
     {
-        std::string serial;
-        int32_t port;
-        int32_t node;
+        THREAD_READY,
+        THREAD_STARTED,
+        THREAD_TERMINATE
+    } thread_status;
 
-        OmniInfo(const std::string& serial, int32_t port, int32_t node)
-                : serial(serial), port(port), node(node) {}
-    };
-
-// OmniBase interface
-protected:
-    void callback(OmniState *state);
-
-    static enum raw1394_iso_disposition callbackWrite(raw1394handle_t handle,unsigned char* data, unsigned int* len, unsigned char* tag, unsigned char* sy, int cycle, unsigned int dropped);
-    static enum raw1394_iso_disposition callbackRead(raw1394handle_t handle, unsigned char* data, unsigned int len, unsigned char channel, unsigned char tag, unsigned char sy, unsigned int cycle, unsigned int dropped);
-
-    void * isoThreadCallback();
-
-public:
-    bool connect();
-    void disconnect();
-    bool connected();
-
-    OmniFirewire(const std::string &serial_number, const std::string &name = "");
-    ~OmniFirewire();
-    void timerHandler(const ros::TimerEvent& event);
-    bool run();
-    uint32_t pack_serial_number(const std::string& unpacked);
-    bool startIsochronousTransmission();
-    void stopIsochronousTransmission();
-
-    static std::vector<OmniFirewire::OmniInfo> enumerate_omnis();
-
-public:
-    struct TxIsoBuffer {
+    struct TxIsoBuffer                                  ///< Struct used for writing mainly to omni motors.
+    {
         int16_t force_x;
         int16_t force_y;
         int16_t force_z;
+        uint32_t padding1;
+        uint32_t padding2;
 
-        union {
+        union
+        {
             uint16_t bits;
-            struct {
+            struct
+            {
                 bool dock_led0     : 1;
                 bool dock_led1     : 1;
                 bool bit2          : 1;
@@ -91,28 +72,35 @@ public:
                 bool bit15         : 1;
             };
         } status;
-
-        uint32_t padding1;
-        uint32_t padding2;
     } tx_iso_buffer_;
 
-    struct RxIsoBuffer {
-        uint32_t magic;
-
-        int16_t encoder_x;
-        int16_t encoder_y;
-        int16_t encoder_z;
-
+    struct RxIsoBuffer                                  ///< Struct used for reading data from the omni device.
+    {
+        uint8_t tx_packet_num;
+        uint16_t v0;
         uint16_t gimbal_a_x;
         uint16_t gimbal_a_y;
         uint16_t gimbal_a_z;
+        uint16_t s0;
+        uint16_t gimbal_b_x;
+        uint16_t gimbal_b_y;
+        uint16_t gimbal_b_z;
+        uint16_t v1;
+        uint16_t s1;
+        uint16_t t0;
+        uint16_t t1;
+        int16_t encoder_x;
+        int16_t encoder_y;
+        int16_t encoder_z;
+        uint32_t magic;
+        uint32_t time;
+        uint32_t wall_time;
 
-        uint16_t v0;
-        uint8_t tx_packet_num;
-
-        union {
+        union
+        {
             uint8_t bits;
-            struct {
+            struct
+            {
                 bool button1  : 1;
                 bool button2  : 1;
                 bool undocked : 1;
@@ -123,45 +111,100 @@ public:
                 bool bit7     : 1;
             };
         } status;
-
-        uint16_t s0;
-
-        uint16_t gimbal_b_x;
-        uint16_t gimbal_b_y;
-        uint16_t gimbal_b_z;
-
-        uint16_t v1;
-        uint16_t s1;
-
-        uint32_t time;
-
-        uint16_t t0;
-        uint16_t t1;
-
-        uint32_t wall_time;
     };
 
+    /**
+     * @brief Used to pack the omni serial number.
+     * @param unpacked Unpacked serial number in string format.
+     * @return Returns packed serial number in uint32_t format.
+     */
+    uint32_t pack_serial_number(const std::string& unpacked);
+
+    /**
+     * @brief Used to unpack omni serial number.
+     * @param packed Packed serial number in uint32_t format.
+     * @return Returns unpacked serial number in string format.
+     * @see packSerialNumber
+     */
+    static std::string unpackSerialNumber(uint32_t packed);
+
+    /**
+     * @brief The callback used by the driver to write data to omni.
+     * @param handle
+     * @param data
+     * @param len
+     * @param tag
+     * @param sy
+     * @param cycle
+     * @param dropped
+     * @return Returns a raw1394_iso_disposition to be used by raw1394_iso_xmit_init().
+     */
+    static enum raw1394_iso_disposition callbackWrite(raw1394handle_t handle,unsigned char* data, unsigned int* len, unsigned char* tag, unsigned char* sy, int cycle, unsigned int dropped);
+
+    /**
+     * @brief The callback used by the driver to read data from omni.
+     * @param handle
+     * @param data
+     * @param len
+     * @param tag
+     * @param sy
+     * @param cycle
+     * @param dropped
+     * @return Returns a raw1394_iso_disposition to be used by raw1394_iso_recv_init().
+     */
+    static enum raw1394_iso_disposition callbackRead(raw1394handle_t handle, unsigned char* data, unsigned int len, unsigned char channel, unsigned char tag, unsigned char sy, unsigned int cycle, unsigned int dropped);
+
+    /**
+     * @brief The callback that will be called routinely by the driver.
+     */
+    void * isoThreadCallback();
+
+    /**
+     * @brief Used to check if omni device is connected.
+     * @return Returns 1 if connected, 0 otherwise.
+     */
+    bool connected();
+
+    /**
+     * @brief Starts the firewire isochronous transmission.
+     * @return Returns 1 if succesfull, 0 otherwise.
+     */
+    bool startIsochronousTransmission();
+
+    /**
+     * @brief Stops the isochronous transmission.
+     */
+    void stopIsochronousTransmission();
+
 public:
-    double pot_filter_accum_[3];
-    int pot_filter_count_;
-    double current_joint_angles_[6];
-    double home_joint_angles_[6];
-    int16_t force_output_[3];
-    bool current_buttons_[2];
+    OmniFirewire(const std::string &serial_number, const std::string &name = "");
+    ~OmniFirewire();
 
-    void set_force(const double * const force);
+    struct OmniInfo                         ///< Structure with device connection information.
+    {
+        std::string serial;
+        int32_t port;
+        int32_t node;
 
-    volatile enum {
-        THREAD_READY,
-        THREAD_STARTED,
-        THREAD_TERMINATE
-    } thread_status;
+        OmniInfo(const std::string& serial, int32_t port, int32_t node)
+                : serial(serial), port(port), node(node) {}
+    };
 
-    std::string serial_number_;
-    raw1394handle_t handle_, tx_handle_, rx_handle_;
-    int32_t port_, node_;
-    int8_t tx_iso_channel_;
-    int8_t rx_iso_channel_;
+    /**
+     * @brief Used to connect with omni device.
+     * @return Returns 1 if successfull, 0 otherwise.
+     */
+    bool connect();
+
+    /**
+     * @brief Used to disconnect with omni device.
+     */
+    void disconnect();
+    /**
+     * @brief Used to enumerate devices found.
+     * @return Returns a vector with information from different devices in the OmniInfo struct format.
+     */
+    static std::vector<OmniFirewire::OmniInfo> enumerate_omnis();
 };
 
 typedef boost::shared_ptr<OmniFirewire> OmniFirewirePtr;

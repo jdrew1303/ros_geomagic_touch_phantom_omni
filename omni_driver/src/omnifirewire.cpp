@@ -10,22 +10,12 @@ OmniFirewire::OmniFirewire(const std::string &serial_number, const std::string &
     handle_(NULL), tx_handle_(NULL), rx_handle_(NULL),
     port_(-1), node_(-1), tx_iso_channel_(-1), rx_iso_channel_(-1)
 {
-
-    // Initialize the variables.
-    std::memset(current_joint_angles_, 0, sizeof(current_joint_angles_));
-    std::memset(home_joint_angles_, 0, sizeof(home_joint_angles_));
-    std::memset(current_buttons_, 0, sizeof(current_buttons_));
-    //
     this->resetTorque();
 }
 
 OmniFirewire::~OmniFirewire()
 {
     this->disconnect();
-}
-
-void OmniFirewire::callback(OmniBase::OmniState *state)
-{
 }
 
 enum raw1394_iso_disposition OmniFirewire::callbackWrite(raw1394handle_t handle, unsigned char *data, unsigned int* len, unsigned char *tag, unsigned char *sy, int, unsigned int)
@@ -122,12 +112,12 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
 
     if (--omni->pot_filter_count_ <= 0)
     {
-        omni->pot_filter_count_ = RAW_OMNI_POT_FILTER_TAPS;
+        omni->pot_filter_count_ = OMNI_DRIVER_POT_FILTER_TAPS;
 
         // Normalize.
-        omni->pot_filter_accum_[0] /= RAW_OMNI_POT_FILTER_TAPS;
-        omni->pot_filter_accum_[1] /= RAW_OMNI_POT_FILTER_TAPS;
-        omni->pot_filter_accum_[2] /= RAW_OMNI_POT_FILTER_TAPS;
+        omni->pot_filter_accum_[0] /= OMNI_DRIVER_POT_FILTER_TAPS;
+        omni->pot_filter_accum_[1] /= OMNI_DRIVER_POT_FILTER_TAPS;
+        omni->pot_filter_accum_[2] /= OMNI_DRIVER_POT_FILTER_TAPS;
 
         // Compute the gimbal values.
         omni->state.angles[3]
@@ -197,7 +187,7 @@ bool OmniFirewire::connect()
     pot_filter_accum_[0] = 0.0;
     pot_filter_accum_[1] = 0.0;
     pot_filter_accum_[2] = 0.0;
-    pot_filter_count_ = RAW_OMNI_POT_FILTER_TAPS;
+    pot_filter_count_ = OMNI_DRIVER_POT_FILTER_TAPS;
 
     // Start isochronous transmission.
     if (!startIsochronousTransmission()) {
@@ -238,21 +228,6 @@ void OmniFirewire::disconnect()
 bool OmniFirewire::connected()
 {
     return handle_ != NULL;
-}
-
-bool OmniFirewire::run()
-{
-    // Open Phantom Omni.
-    if (!this->connect()) {
-        ROS_ERROR("Failed to open Phantom Omni.");
-        return false;
-    }
-    ROS_INFO("%s (%s): opened.", this->name.c_str(), this->serial_number_.c_str());
-
-    // Spin.
-    ros::spin();
-
-    return true;
 }
 
 uint32_t OmniFirewire::pack_serial_number(const std::string& unpacked)

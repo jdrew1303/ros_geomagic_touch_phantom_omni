@@ -21,11 +21,11 @@ private:
     boost::shared_mutex mutex_state;                        ///< Mutex state returned by @link getMutexState().
 
 protected:
-    typedef boost::posix_time::microsec_clock Clock;        ///< Clock with micro second resolution.
+    typedef boost::posix_time::microsec_clock Clock;
     typedef boost::posix_time::ptime Time;
     typedef boost::posix_time::time_duration TimeDuration;
 
-    struct OmniState
+    struct OmniState                                        ///< The state structure with relevant data.
     {
         std::vector<double> angles_docked;
         std::vector<double> angles;
@@ -64,27 +64,25 @@ protected:
 
     OmniState state;
 
-    std::string name;
-    std::string topic_name;
+    std::string name;                           ///< Name given to diferentiate multiple omnis.
+    std::string topic_name;                     ///< String used to subscribe diferent topics.
 
     ros::NodeHandlePtr node;
+    ros::Subscriber sub_torque;                 ///< Torque ROS subscriber.
+    ros::Subscriber sub_enable_control;         ///< Enable control ROS subscriber.
 
-    ros::Subscriber sub_torque;
-
-    ros::Publisher pub_joint;
+    ros::Publisher pub_joint;                   ///< Joint ROS publisher.
     sensor_msgs::JointState joint_state;
 
-    ros::Publisher pub_pose;
+    ros::Publisher pub_pose;                    ///< Pose ROS publisher.
     geometry_msgs::PoseStamped pose_stamped;
 
-    ros::Publisher pub_button;
+    ros::Publisher pub_button;                  ///< Button ROS publisher.
     omni_driver::OmniButtonEvent button_event;
 
-    ros::Subscriber sub_enable_control;
 
-    bool last_buttons[2];
-
-    bool enable_force_flag;
+    bool last_buttons[2];                       ///< Needed for "Button Clicked" logic.
+    bool enable_force_flag;                     ///< Needed for resetting the internal enable control.
 
     typedef boost::unique_lock<boost::shared_mutex>            LockUnique;          ///< The unique lock, used to protect data while writing.
     typedef boost::shared_lock<boost::shared_mutex>            LockShared;          ///< The shared lock, used to protect data while reading.
