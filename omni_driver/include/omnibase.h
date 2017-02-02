@@ -27,27 +27,35 @@ protected:
 
     struct OmniState                                        ///< The state structure with relevant data.
     {
-        std::vector<double> angles_docked;
         std::vector<double> angles;
+        std::vector<double> angles_docked;
         std::vector<double> angles_last;
-        std::vector<bool>   buttons;
         std::vector<double> control;
         std::vector<double> force;
-        std::vector<double> position;
+        std::vector<double> lock_pos;
         std::vector<double> orientation;
+        std::vector<double> position;
+        std::vector<double> pos_hist1;
+        std::vector<double> pos_hist2;
         std::vector<double> velocities;
-
+        std::vector<double> vel_inp1;
+        std::vector<double> vel_inp2;
+        std::vector<double> vel_inp3;
+        std::vector<double> vel_out1;
+        std::vector<double> vel_out2;
+        std::vector<double> vel_out3;
+        std::vector<bool>   buttons;
         bool control_on = false;
         bool calibrated = false;
-
+        bool lock = false;
         unsigned int seq = 0;
         Time stamp;
 
         OmniState()
         {
             // Joints
-            angles_docked.resize(6);
             angles.resize(6);
+            angles_docked.resize(6);
             angles_last.resize(6);
             velocities.resize(6);
 
@@ -70,6 +78,8 @@ protected:
     ros::NodeHandlePtr node;
     ros::Subscriber sub_torque;                 ///< Torque ROS subscriber.
     ros::Subscriber sub_enable_control;         ///< Enable control ROS subscriber.
+    ros::Subscriber sub_haptic;                 ///< Enable haptic ROS subscriber.
+
 
     ros::Publisher pub_joint;                   ///< Joint ROS publisher.
     sensor_msgs::JointState joint_state;

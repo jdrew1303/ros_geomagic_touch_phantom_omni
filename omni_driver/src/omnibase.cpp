@@ -1,18 +1,5 @@
 #include "../include/omnibase.h"
-
 #include <iostream>
-
-
-void OmniBase::torqueCallback(const geometry_msgs::Vector3::ConstPtr & msg)
-{
-    std::vector<double> input = {msg->x, msg->y, msg->z};
-    setTorque(input);
-}
-
-void OmniBase::enableControlCallback(const std_msgs::Bool::ConstPtr & msg)
-{
-    enableControl(msg->data);
-}
 
 OmniBase::OmniBase(const std::string &name)
         : name(name), enable_force_flag(false)
@@ -53,6 +40,13 @@ OmniBase::OmniBase(const std::string &name)
     std::memset(last_buttons, 0, sizeof(last_buttons));
 }
 
+
+void OmniBase::enableControlCallback(const std_msgs::Bool::ConstPtr & msg)
+{
+    enableControl(msg->data);
+}
+
+
 void OmniBase::publishOmniState()
 {
     if (this->connected() && !this->calibrated()) {
@@ -70,9 +64,10 @@ void OmniBase::publishOmniState()
     {
         joint_state.position[i] = joint_angles[i];
     }
-    //the next line is a necessary to recalibrate potentiometer #2
+    // The next line is a necessary to recalibrate potentiometer #2.
     joint_state.position[4]=(joint_state.position[4]+0.27+(joint_state.position[4]+1.73)/1.72);
 
+    // Publish the joint state;
     pub_joint.publish(joint_state);
 
     // Publish the end effector pose.
@@ -81,16 +76,20 @@ void OmniBase::publishOmniState()
     pose_stamped.pose.orientation.w = 1.0;
     pub_pose.publish(pose_stamped);
 
-    // Publish the button state.
+    // Publish the button event.
     std::vector<bool> button_state;
     this->getButtonsState(button_state);
     button_event.grey_button = button_state[0];
     button_event.white_button = button_state[1];
-    //
     button_event.grey_button_clicked = !last_buttons[0] && button_state[0];
     button_event.white_button_clicked = !last_buttons[1] && button_state[1];
     last_buttons[0] = button_state[0];
     last_buttons[1] = button_state[1];
-    //
     pub_button.publish(button_event);
+}
+
+void OmniBase::torqueCallback(const geometry_msgs::Vector3::ConstPtr & msg)
+{
+    std::vector<double> input = {msg->x, msg->y, msg->z};
+    setTorque(input);
 }

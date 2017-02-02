@@ -87,7 +87,7 @@ file(GLOB_RECURSE PROJECT_HEADERS "include/*.h")
 add_custom_target(omni_driver_files_for_ide SOURCES ${PROJECT_HEADERS} "cfg/uncrustify.cfg")
 
 ## Declare a cpp executable
-add_executable(omni_driver src/raw_omni.cpp src/raw_omni_driver.cpp src/omnibase.cpp src/omnifirewire.cpp src/omninode.cpp)
+add_executable(omni_driver src/raw_omni.cpp src/raw_omni_driver.cpp src/omnibase.cpp src/omnifirewire.cpp src/omninode.cpp src/omniethernet.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes

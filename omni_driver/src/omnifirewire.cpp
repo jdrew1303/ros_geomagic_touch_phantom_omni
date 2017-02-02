@@ -10,58 +10,11 @@ OmniFirewire::OmniFirewire(const std::string &serial_number, const std::string &
     handle_(NULL), tx_handle_(NULL), rx_handle_(NULL),
     port_(-1), node_(-1), tx_iso_channel_(-1), rx_iso_channel_(-1)
 {
-    this->resetTorque();
 }
 
 OmniFirewire::~OmniFirewire()
 {
     this->disconnect();
-}
-
-enum raw1394_iso_disposition OmniFirewire::callbackWrite(raw1394handle_t handle, unsigned char *data, unsigned int* len, unsigned char *tag, unsigned char *sy, int, unsigned int)
-{
-    *len = 0;
-    *tag = 0;
-    *sy = 0;
-    // Get the OmniFirewire object for this handle.
-    OmniFirewire *omni = reinterpret_cast<OmniFirewire*>(raw1394_get_userdata(handle));
-    if (omni == NULL)
-    {
-        return RAW1394_ISO_OK;
-    }
-
-    // Edit force output
-    {
-        OmniBase::LockShared lock( omni->getStateMutex() );
-        if (omni->state.control_on)
-        {
-            omni->tx_iso_buffer_.force_x = omni->state.control[0];
-            omni->tx_iso_buffer_.force_y = omni->state.control[1];
-            omni->tx_iso_buffer_.force_z = omni->state.control[2];
-        }
-        else
-        {
-            omni->tx_iso_buffer_.status.force_enabled = 0;
-        }
-    }
-
-    if (omni->enable_force_flag)
-    {
-        if (omni->tx_iso_buffer_.status.force_enabled == 1)
-            omni->tx_iso_buffer_.status.force_enabled = 0;
-        else
-        {
-            omni->tx_iso_buffer_.status.force_enabled = 1;
-            omni->enable_force_flag = false;
-        }
-    }
-
-    // Copy data.
-    std::memcpy(data, &omni->tx_iso_buffer_, sizeof(omni->tx_iso_buffer_));
-    *len = sizeof(omni->tx_iso_buffer_);
-    *tag = 0;
-    *sy = 0;
-    return RAW1394_ISO_OK;
 }
 
 enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, unsigned char* data, unsigned int len, unsigned char channel, unsigned char tag, unsigned char sy, unsigned int cycle, unsigned int dropped)
@@ -140,6 +93,53 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
     return RAW1394_ISO_OK;
 }
 
+enum raw1394_iso_disposition OmniFirewire::callbackWrite(raw1394handle_t handle, unsigned char *data, unsigned int* len, unsigned char *tag, unsigned char *sy, int, unsigned int)
+{
+    *len = 0;
+    *tag = 0;
+    *sy = 0;
+    // Get the OmniFirewire object for this handle.
+    OmniFirewire *omni = reinterpret_cast<OmniFirewire*>(raw1394_get_userdata(handle));
+    if (omni == NULL)
+    {
+        return RAW1394_ISO_OK;
+    }
+
+    // Edit force output
+    {
+        OmniBase::LockShared lock( omni->getStateMutex() );
+        if (omni->state.control_on)
+        {
+            omni->tx_iso_buffer_.force_x = omni->state.control[0];
+            omni->tx_iso_buffer_.force_y = omni->state.control[1];
+            omni->tx_iso_buffer_.force_z = omni->state.control[2];
+        }
+        else
+        {
+            omni->tx_iso_buffer_.status.force_enabled = 0;
+        }
+    }
+
+    if (omni->enable_force_flag)
+    {
+        if (omni->tx_iso_buffer_.status.force_enabled == 1)
+            omni->tx_iso_buffer_.status.force_enabled = 0;
+        else
+        {
+            omni->tx_iso_buffer_.status.force_enabled = 1;
+            omni->enable_force_flag = false;
+        }
+    }
+
+    // Copy data.
+    std::memcpy(data, &omni->tx_iso_buffer_, sizeof(omni->tx_iso_buffer_));
+    *len = sizeof(omni->tx_iso_buffer_);
+    *tag = 0;
+    *sy = 0;
+    return RAW1394_ISO_OK;
+}
+
+
 
 bool OmniFirewire::connect()
 {
@@ -199,6 +199,10 @@ bool OmniFirewire::connect()
     return true;
 }
 
+bool OmniFirewire::connected()
+{
+    return handle_ != NULL;
+}
 
 void OmniFirewire::disconnect()
 {
@@ -225,9 +229,59 @@ void OmniFirewire::disconnect()
 
 }
 
-bool OmniFirewire::connected()
+std::vector<OmniFirewire::OmniInfo> OmniFirewire::enumerate_omnis()
 {
-    return handle_ != NULL;
+    std::vector<OmniInfo> omnis;
+    raw1394handle_t handle = raw1394_new_handle();
+
+    // Get information about the available ports.
+    const int maxports = 5;
+    struct raw1394_portinfo portinfo[maxports];
+    int n_ports = raw1394_get_port_info(handle, portinfo, maxports);
+
+    // Iterate through the list of ports.
+    for (int p = 0 ; p < n_ports; p++) {
+        // Open the port if we can.
+        if (portinfo[p].nodes == 0 || raw1394_set_port(handle, p) == -1) {
+            // Not the port we're interested in.
+            continue;
+        }
+
+        // Iterate through the list of nodes attached to the port.
+        for (int n = 0; n < portinfo[p].nodes; n++) {
+            // Compute the node ID. See IEEE 1394 spec for details.
+            uint32_t node = (1023 << 6) | n;
+
+            // Check the device ID.
+            quadlet_t dev_id = 0;
+            raw1394_read(handle, node, 0x1006000c, sizeof(dev_id), &dev_id);
+            dev_id = ntohl(dev_id);
+            if (dev_id != 0x000b9900) {
+                // Not Phantom Omni.
+                continue;
+            }
+
+            // Now we know it's Phantom Omni. Store the info.
+            quadlet_t serial = 0;
+            raw1394_read(handle, node, 0x10060010, sizeof(serial), &serial);
+            const std::string& unpacked_serial = OmniFirewire::unpackSerialNumber(ntohl(serial));
+            omnis.push_back(OmniInfo(unpacked_serial, p, node));
+        }
+    }
+
+    return omnis;
+}
+
+void * OmniFirewire::isoThreadCallback()
+{
+    while (this->thread_status != THREAD_TERMINATE
+           && raw1394_loop_iterate(this->rx_handle_) != -1
+           && raw1394_loop_iterate(this->tx_handle_) != -1)
+    {
+        // Empty
+    }
+
+    return NULL;
 }
 
 uint32_t OmniFirewire::pack_serial_number(const std::string& unpacked)
@@ -256,29 +310,6 @@ uint32_t OmniFirewire::pack_serial_number(const std::string& unpacked)
     return packed;
 }
 
-std::string OmniFirewire::unpackSerialNumber(uint32_t packed)
-{
-    // Unpack the variables based on the following rule:
-    //     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    //     |1|0|0|0|0|0|  a  |   b   |    c    |  d  |         e         |1|
-    //     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    //     |31           24|23           16|15            8|7             0|
-
-    uint32_t a = (packed >> 23) & 0x007;
-    uint32_t b = (packed >> 19) & 0x00f;
-    uint32_t c = (packed >> 14) & 0x01f;
-    uint32_t d = (packed >> 11) & 0x007;
-    uint32_t e = (packed >>  1) & 0x3ff;
-
-    std::stringstream unpacked;
-    unpacked << std::setfill('0');
-    unpacked << std::setw(1) << a;
-    unpacked << std::setw(2) << b;
-    unpacked << std::setw(2) << c;
-    unpacked << std::setw(1) << d;
-    unpacked << std::setw(5) << e;
-    return unpacked.str();
-}
 
 bool OmniFirewire::startIsochronousTransmission()
 {
@@ -422,57 +453,26 @@ void OmniFirewire::stopIsochronousTransmission()
     }
 }
 
-void * OmniFirewire::isoThreadCallback()
+std::string OmniFirewire::unpackSerialNumber(uint32_t packed)
 {
-    while (this->thread_status != THREAD_TERMINATE
-           && raw1394_loop_iterate(this->rx_handle_) != -1
-           && raw1394_loop_iterate(this->tx_handle_) != -1)
-    {
-        // Empty
-    }
+    // Unpack the variables based on the following rule:
+    //     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    //     |1|0|0|0|0|0|  a  |   b   |    c    |  d  |         e         |1|
+    //     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    //     |31           24|23           16|15            8|7             0|
 
-    return NULL;
-}
+    uint32_t a = (packed >> 23) & 0x007;
+    uint32_t b = (packed >> 19) & 0x00f;
+    uint32_t c = (packed >> 14) & 0x01f;
+    uint32_t d = (packed >> 11) & 0x007;
+    uint32_t e = (packed >>  1) & 0x3ff;
 
-std::vector<OmniFirewire::OmniInfo> OmniFirewire::enumerate_omnis()
-{
-    std::vector<OmniInfo> omnis;
-    raw1394handle_t handle = raw1394_new_handle();
-
-    // Get information about the available ports.
-    const int maxports = 5;
-    struct raw1394_portinfo portinfo[maxports];
-    int n_ports = raw1394_get_port_info(handle, portinfo, maxports);
-
-    // Iterate through the list of ports.
-    for (int p = 0 ; p < n_ports; p++) {
-        // Open the port if we can.
-        if (portinfo[p].nodes == 0 || raw1394_set_port(handle, p) == -1) {
-            // Not the port we're interested in.
-            continue;
-        }
-
-        // Iterate through the list of nodes attached to the port.
-        for (int n = 0; n < portinfo[p].nodes; n++) {
-            // Compute the node ID. See IEEE 1394 spec for details.
-            uint32_t node = (1023 << 6) | n;
-
-            // Check the device ID.
-            quadlet_t dev_id = 0;
-            raw1394_read(handle, node, 0x1006000c, sizeof(dev_id), &dev_id);
-            dev_id = ntohl(dev_id);
-            if (dev_id != 0x000b9900) {
-                // Not Phantom Omni.
-                continue;
-            }
-
-            // Now we know it's Phantom Omni. Store the info.
-            quadlet_t serial = 0;
-            raw1394_read(handle, node, 0x10060010, sizeof(serial), &serial);
-            const std::string& unpacked_serial = OmniFirewire::unpackSerialNumber(ntohl(serial));
-            omnis.push_back(OmniInfo(unpacked_serial, p, node));
-        }
-    }
-
-    return omnis;
+    std::stringstream unpacked;
+    unpacked << std::setfill('0');
+    unpacked << std::setw(1) << a;
+    unpacked << std::setw(2) << b;
+    unpacked << std::setw(2) << c;
+    unpacked << std::setw(1) << d;
+    unpacked << std::setw(5) << e;
+    return unpacked.str();
 }
