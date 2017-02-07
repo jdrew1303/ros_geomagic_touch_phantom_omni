@@ -1,0 +1,29 @@
+<launch>
+    <param name="omni_robot_description" command="cat $(find omni_description)/urdf/omni.urdf" />
+
+	<group ns="omni">
+		<node name="driver" pkg="omni_driver" type="omni_driver" output="screen">
+			<param name="omni_name" type="string" value="" />
+			<param name="omni_type" type="string" value="ethernet" />
+			<param name="omni_serial" type="string" value="11129400000" />
+		</node>
+
+		<node name="state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+			<param name="publish_frequency" type="double" value="400.0" />
+			<remap from="joint_states" to="joint_states" />
+			<remap from="robot_description" to="omni_robot_description" />
+		</node>
+
+		<node name="controller" pkg="omni_controller" type="omni_controller">
+		</node>
+
+        <node name="keyboard" pkg="keyboard" type="keyboard">
+        </node>
+
+        <node name="joy" pkg="joy" type="joy_node">
+        </node>
+    </group>
+
+ 	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find omni_controller)/cfg/omni.rviz" required="true"/>
+ 	
+</launch>

@@ -16,24 +16,34 @@
 #include <stdint.h>
 #include <libraw1394/raw1394.h>
 #include <boost/thread.hpp>
+
+#define linux
 #include <HL/hl.h>
 #include <HD/hd.h>
 #include <HDU/hduError.h>
 #include <HDU/hduVector.h>
 #include <HDU/hduMatrix.h>
-#include <HD/hdExport.h>
+#undef linux
+
+#include "omni_driver/OmniFeedback.h"
+
 
 class OmniEthernet : public OmniBase
 {
 private:
-    void getJointAnglesFromDriver(OmniState *state);
+    void getJointAnglesFromDriver();
     void autoCalibration();
-    void forceCallback(const omni_driver::OmniFeedbackConstPtr& omnifeed);
-    static HDCallbackCode HDCALLBACK HDCallbackCode(void *data);
+    void forceCallback(const omni_driver::OmniFeedback::ConstPtr& omnifeed);
+    static HDCallbackCode HDCALLBACK callback(void *pdata);
+    HDErrorInfo error;
+    HHD hHD;
 
 public:
+    static int calibrationStyle;
     OmniEthernet(const std::string &name = "");
     bool connect();
     bool connected();
     void disconnect();
 };
+
+typedef boost::shared_ptr<OmniEthernet> OmniEthernetPtr;

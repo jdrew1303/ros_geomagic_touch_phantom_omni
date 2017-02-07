@@ -18,6 +18,7 @@ class OmniBase
 {
 
 private:
+
     boost::shared_mutex mutex_state;                        ///< Mutex state returned by @link getMutexState().
 
 protected:
@@ -46,6 +47,7 @@ protected:
         std::vector<double> vel_out3;
         std::vector<bool>   buttons;
         bool control_on = false;
+        bool connected = false;
         bool calibrated = false;
         bool lock = false;
         unsigned int seq = 0;

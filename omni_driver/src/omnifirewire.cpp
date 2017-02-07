@@ -31,8 +31,10 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
     OmniBase::LockUnique lock( omni->getStateMutex() );
 
     // Calibrate if docked.
-    if (!newbuf->status.undocked)
+    if (!newbuf->status.undocked && !omni->state.calibrated)
     {
+        ROS_INFO("Calibrating robot...");
+
         // Calibrate.
         omni->state.angles_docked[0] = 2.0 * M_PI *  newbuf->encoder_x / 15000.0;
         omni->state.angles_docked[1] = 2.0 * M_PI * -newbuf->encoder_y / 15000.0 - 0.23;
@@ -47,11 +49,11 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
             *  newbuf->encoder_x / 15000.0 - omni->state.angles_docked[0];
 
     omni->state.angles[1] = 2.0 * M_PI
-            * -newbuf->encoder_y / 15000.0 - omni->state.angles_docked[1];
+            * -newbuf->encoder_y / 15000.0 - omni->state.angles_docked[1] -0.23;
 
     omni->state.angles[2] = 2.0 * M_PI
             *  newbuf->encoder_z / 15000.0 - omni->state.angles_docked[2]
-            - omni->state.angles[1];
+            - omni->state.angles[1] + 0.37;
 
     // Add the current gimbal pot value for filtering.
     omni->pot_filter_accum_[0] += (double)newbuf->gimbal_a_x
@@ -74,9 +76,9 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
 
         // Compute the gimbal values.
         omni->state.angles[3]
-                =  5.48 * omni->pot_filter_accum_[0] - 2.74;
+                =  5.48 * omni->pot_filter_accum_[0] - 2.74 - 0.029;
         omni->state.angles[4]
-                = -5.28 * omni->pot_filter_accum_[1] + 2.64;
+                = -5.28 * omni->pot_filter_accum_[1] + 2.64 - 0.396;
         omni->state.angles[5]
                 =  4.76 * omni->pot_filter_accum_[2] - 2.38;
 
@@ -194,14 +196,14 @@ bool OmniFirewire::connect()
         ROS_ERROR("Failed to start isochronous transmission!");
         return false;
     }
-
+    state.connected = true;
     ROS_INFO("Isochronous transmission started successfully.");
     return true;
 }
 
 bool OmniFirewire::connected()
 {
-    return handle_ != NULL;
+    return this->state.connected;
 }
 
 void OmniFirewire::disconnect()
@@ -280,6 +282,8 @@ void * OmniFirewire::isoThreadCallback()
     {
         // Empty
     }
+
+    ROS_INFO("Exited driver thread!!!");
 
     return NULL;
 }

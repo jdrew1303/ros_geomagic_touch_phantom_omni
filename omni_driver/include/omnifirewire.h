@@ -41,19 +41,15 @@ private:
         THREAD_TERMINATE
     } thread_status;
 
-    struct TxIsoBuffer                                  ///< Struct used for writing mainly to omni motors.
+    struct TxIsoBuffer     ///< Struct used for writing mainly to omni motors.
     {
         int16_t force_x;
         int16_t force_y;
         int16_t force_z;
-        uint32_t padding1;
-        uint32_t padding2;
 
-        union
-        {
+        union {
             uint16_t bits;
-            struct
-            {
+            struct {
                 bool dock_led0     : 1;
                 bool dock_led1     : 1;
                 bool bit2          : 1;
@@ -72,35 +68,29 @@ private:
                 bool bit15         : 1;
             };
         } status;
+
+        uint32_t padding1;
+        uint32_t padding2;
     } tx_iso_buffer_;
 
-    struct RxIsoBuffer                                  ///< Struct used for reading data from the omni device.
+    struct RxIsoBuffer     ///< Struct used for reading data from the omni device.
     {
-        uint8_t tx_packet_num;
-        uint16_t v0;
-        uint16_t gimbal_a_x;
-        uint16_t gimbal_a_y;
-        uint16_t gimbal_a_z;
-        uint16_t s0;
-        uint16_t gimbal_b_x;
-        uint16_t gimbal_b_y;
-        uint16_t gimbal_b_z;
-        uint16_t v1;
-        uint16_t s1;
-        uint16_t t0;
-        uint16_t t1;
+        uint32_t magic;
+
         int16_t encoder_x;
         int16_t encoder_y;
         int16_t encoder_z;
-        uint32_t magic;
-        uint32_t time;
-        uint32_t wall_time;
 
-        union
-        {
+        uint16_t gimbal_a_x;
+        uint16_t gimbal_a_y;
+        uint16_t gimbal_a_z;
+
+        uint16_t v0;
+        uint8_t tx_packet_num;
+
+        union {
             uint8_t bits;
-            struct
-            {
+            struct {
                 bool button1  : 1;
                 bool button2  : 1;
                 bool undocked : 1;
@@ -111,6 +101,22 @@ private:
                 bool bit7     : 1;
             };
         } status;
+
+        uint16_t s0;
+
+        uint16_t gimbal_b_x;
+        uint16_t gimbal_b_y;
+        uint16_t gimbal_b_z;
+
+        uint16_t v1;
+        uint16_t s1;
+
+        uint32_t time;
+
+        uint16_t t0;
+        uint16_t t1;
+
+        uint32_t wall_time;
     };
 
     /**

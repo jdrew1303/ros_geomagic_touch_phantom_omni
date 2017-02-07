@@ -6,7 +6,7 @@ OmniBase::OmniBase(const std::string &name)
 {
     this->resetTorque();
 
-    node = ros::NodeHandlePtr( new ros::NodeHandle("~") );
+    node = ros::NodeHandlePtr( new ros::NodeHandle("") );
 
     // Prepare joint state publisher.
     topic_name = name + "joint_states";
@@ -49,7 +49,7 @@ void OmniBase::enableControlCallback(const std_msgs::Bool::ConstPtr & msg)
 
 void OmniBase::publishOmniState()
 {
-    if (this->connected() && !this->calibrated()) {
+    if (!this->connected() || !this->calibrated()) {
         // Phantom Omni is not open or calibrated. Don't publish.
         return;
     }
