@@ -45,6 +45,7 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
         omni->state.calibrated = true;
     }
     // Compute the encoder values.
+    // All angles should be ~= 0 when docked.
     omni->state.angles[0] = 2.0 * M_PI
             *  newbuf->encoder_x / 15000.0 - omni->state.angles_docked[0];
 
@@ -75,12 +76,13 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
         omni->pot_filter_accum_[2] /= OMNI_DRIVER_POT_FILTER_TAPS;
 
         // Compute the gimbal values.
+        // All angles should be ~= 0 when docked.
         omni->state.angles[3]
-                =  5.48 * omni->pot_filter_accum_[0] - 2.74 - 0.029;
+                =  5.48 * omni->pot_filter_accum_[0] - 2.74 - 0.035;
         omni->state.angles[4]
-                = -5.28 * omni->pot_filter_accum_[1] + 2.64 - 0.396;
+                = -5.28 * omni->pot_filter_accum_[1] + 2.64 - 0.2;
         omni->state.angles[5]
-                =  4.76 * omni->pot_filter_accum_[2] - 2.38;
+                =  4.76 * omni->pot_filter_accum_[2] - 2.3;
 
         // Reset the accumulator array.
         omni->pot_filter_accum_[0] = 0.0;

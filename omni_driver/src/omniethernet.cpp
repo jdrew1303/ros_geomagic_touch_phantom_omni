@@ -16,12 +16,14 @@ void OmniEthernet::getJointAnglesFromDriver()
 
     double encoder2deg2rad = 0.024 * M_PI / 180;
     double gimbal2deg2rad = 0.0735 * M_PI / 180;
-    state.angles[0] = encoder2deg2rad * encoders_values[0];
-    state.angles[1] = encoder2deg2rad * encoders_values[1];
-    state.angles[2] = encoder2deg2rad * (encoders_values[1] + encoders_values[2]);
-    state.angles[3] = gimbal2deg2rad * (encoders_values[3] -2048);
-    state.angles[4] = 0.0909*M_PI/180 * (encoders_values[4] -2563);
-    state.angles[5] = gimbal2deg2rad * (encoders_values[5] -2259);
+
+    // All angles should be ~= 0 when docked.
+    state.angles[0] =   encoder2deg2rad *  encoders_values[0];
+    state.angles[1] = -(encoder2deg2rad *  encoders_values[1] + 0.2760412744 );
+    state.angles[2] =  (encoder2deg2rad * (encoders_values[1] + encoders_values[2]) + 0.6572211831 );
+    state.angles[3] = -(gimbal2deg2rad  * (encoders_values[3] - 2048));
+    state.angles[4] = -(gimbal2deg2rad  * (encoders_values[4] - 50) * 0.788343558 - 1.826507352 );
+    state.angles[5] =  (gimbal2deg2rad  * (encoders_values[5] -2259) - 0.045050144 );
 }
 
 void OmniEthernet::autoCalibration()
