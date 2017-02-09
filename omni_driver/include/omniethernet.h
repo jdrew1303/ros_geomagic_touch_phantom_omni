@@ -31,19 +31,58 @@
 class OmniEthernet : public OmniBase
 {
 private:
-    void getJointAnglesFromDriver();
-    void autoCalibration();
-    void forceCallback(const omni_driver::OmniFeedback::ConstPtr& omnifeed);
-    static HDCallbackCode HDCALLBACK callback(void *pdata);
     HDErrorInfo error;
     HHD hHD;
 
+    /**
+     * @brief Calibrates the device using one of the supported styles.
+     */
+    void autoCalibration();
+
+    /**
+     * @brief ROS subsricber callback to set the device's haptic feedback.
+     * @param omnifeed Receives a ROS message.
+     */
+    void forceCallback(const omni_driver::OmniFeedback::ConstPtr& omnifeed);
+
+    /**
+     * @brief Gets the angles from the encoder and sets them to OmniState.
+     */
+    void getJointAnglesFromDriver();
+
+    /**
+     * @brief Callback that will be called at every iteration, getting data from the device and locking the device position if necessary.
+     * @param pdata Receives a pointer to an OmniEthernet object.
+     * @return Returns 1 if the communication should continue, 0 otherwise.
+     */
+    static HDCallbackCode HDCALLBACK callback(void *pdata);
+
 public:
     static int calibrationStyle;
-    OmniEthernet(const std::string &name = "");
+
+    /**
+     * @brief Connects and calibrates to the device, starting the communication.
+     * @return Return 1 if the connection was succesfull, 0 otherwise.
+     */
     bool connect();
+
+    /**
+     * @brief Used to check if a device is connected.
+     * @return Returns 1 if a device connected, 0 otherwise.
+     */
     bool connected();
+
+    /**
+     * @brief Disconnects the device, called by destructor.
+     */
     void disconnect();
+
+    /**
+     * @brief OmniEthernet constructor, calls OmniBase constructor with same parameter.
+     * @param name Reference to string of omni name.
+     */
+    OmniEthernet(const std::string &name = "");
+    ~OmniEthernet();
 };
 
 typedef boost::shared_ptr<OmniEthernet> OmniEthernetPtr;

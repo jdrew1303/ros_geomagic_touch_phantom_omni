@@ -22,8 +22,8 @@
 class OmniFirewire : public OmniBase
 {
 private:
-    typedef boost::shared_ptr<boost::thread> ThreadPtr;
 
+    typedef boost::shared_ptr<boost::thread> ThreadPtr;
     int pot_filter_count_;
     double pot_filter_accum_[3];
     std::string serial_number_;
@@ -183,8 +183,6 @@ private:
     void stopIsochronousTransmission();
 
 public:
-    OmniFirewire(const std::string &serial_number, const std::string &name = "");
-    ~OmniFirewire();
 
     struct OmniInfo                         ///< Structure with device connection information.
     {
@@ -196,6 +194,7 @@ public:
                 : serial(serial), port(port), node(node) {}
     };
 
+
     /**
      * @brief Used to connect with omni device.
      * @return Returns 1 if successfull, 0 otherwise.
@@ -206,11 +205,20 @@ public:
      * @brief Used to disconnect with omni device.
      */
     void disconnect();
+
     /**
      * @brief Used to enumerate devices found.
      * @return Returns a vector with information from different devices in the OmniInfo struct format.
      */
     static std::vector<OmniFirewire::OmniInfo> enumerate_omnis();
+
+    /**
+     * @brief OmniFirewire constructor, only sets some members needed for communicating with omni.
+     * @param serial_number Reference to string of serial number.
+     * @param name Reference to string of omni name.
+     */
+    OmniFirewire(const std::string &serial_number, const std::string &name = "");
+    ~OmniFirewire();
 };
 
 typedef boost::shared_ptr<OmniFirewire> OmniFirewirePtr;

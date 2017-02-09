@@ -120,6 +120,11 @@ protected:
     }
 
 public:
+
+    /**
+     * @brief OmniBase constructor, sets some members and prepares ros topics and publishers.
+     * @param name Reference to string of omni name.
+     */
     explicit OmniBase(const std::string &name = "");
 
     /**
@@ -277,8 +282,8 @@ public:
         return state.calibrated;
     }
 
-// ROS Callbacks
 public:
+
     /**
      * @brief The torqueCallback called by the ROS torque subscriber.
      * @param ROS message type geometry_msgs::Vector3.

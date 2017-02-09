@@ -7,6 +7,11 @@ OmniEthernet::OmniEthernet(const std::string &name) :
 {
 }
 
+OmniEthernet::~OmniEthernet()
+{
+    this->disconnect();
+}
+
 void OmniEthernet::getJointAnglesFromDriver()
 {
     // Using HD_CURRENT_ENCODER_VALUES instead of HD_CURRENT_JOINT_ANGLES
@@ -79,9 +84,9 @@ void OmniEthernet::forceCallback(const omni_driver::OmniFeedback::ConstPtr &omni
     ////////////////////helps to stabilize the overall force feedback. It isn't
     ////////////////////like we are getting direct impedance matching from the
     ////////////////////omni anyway
-    this->state.force[0] = omnifeed->force.x - 0.001 * this->state.velocities[0];
-    this->state.force[1] = omnifeed->force.y - 0.001 * this->state.velocities[1];
-    this->state.force[2] = omnifeed->force.z - 0.001 * this->state.velocities[2];
+    this->state.control[0] = omnifeed->force.x - 0.001 * this->state.velocities[0];
+    this->state.control[1] = omnifeed->force.y - 0.001 * this->state.velocities[1];
+    this->state.control[2] = omnifeed->force.z - 0.001 * this->state.velocities[2];
 
     this->state.lock_pos[0] = omnifeed->position.x;
     this->state.lock_pos[1] = omnifeed->position.y;
@@ -90,13 +95,18 @@ void OmniEthernet::forceCallback(const omni_driver::OmniFeedback::ConstPtr &omni
 
 bool OmniEthernet::connect()
 {
-    // The name must be the same configured in the geomagic software.
+
+/*######################################################################################
+             The name must be the same configured in the geomagic software!
+  ######################################################################################*/
     hHD = hdInitDevice("Phantom Omni");
+/*######################################################################################*/
+
     if (HD_DEVICE_ERROR(error = hdGetError()))
     {
         //hduPrintError(stderr, &error, "Failed to initialize haptic device");
         ROS_ERROR("Failed to initialize haptic device"); //: %s", &error);
-        return -1;
+        return 0;
     }
 
     ROS_INFO("Found %s.", hdGetString(HD_DEVICE_MODEL_TYPE));
@@ -105,11 +115,12 @@ bool OmniEthernet::connect()
     if (HD_DEVICE_ERROR(error = hdGetError()))
     {
         ROS_ERROR("Failed to start the scheduler"); //, &error);
-        return -1;
+        return 0;
     }
     autoCalibration();
     hdScheduleAsynchronous(&OmniEthernet::callback, this, HD_MAX_SCHEDULER_PRIORITY);
     state.connected = true;
+    return 1;
 }
 
 bool OmniEthernet::connected()
@@ -161,7 +172,7 @@ HDCallbackCode HDCALLBACK OmniEthernet::callback(void *pdata)
     {
         for (int k = 0; k<3; ++k)
         {
-            omni->state.force[k] = 0.04 * (omni->state.lock_pos[k] - omni->state.position[k])
+            omni->state.control[k] = 0.04 * (omni->state.lock_pos[k] - omni->state.position[k])
                     - 0.001 * omni->state.velocities[k];
         }
     }
