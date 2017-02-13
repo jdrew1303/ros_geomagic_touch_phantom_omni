@@ -17,11 +17,16 @@
 #include <libraw1394/raw1394.h>
 #include <boost/thread.hpp>
 
-#define OMNI_DRIVER_POT_FILTER_TAPS 20
 
 class OmniFirewire : public OmniBase
 {
 private:
+
+    static const unsigned int GIMBAL_FILTER_SIZE = 100;
+
+    std::vector<double> gimbal_filter_1;
+    std::vector<double> gimbal_filter_2;
+    std::vector<double> gimbal_filter_3;
 
     typedef boost::shared_ptr<boost::thread> ThreadPtr;
     int pot_filter_count_;

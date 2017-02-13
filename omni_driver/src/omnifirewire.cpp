@@ -10,6 +10,9 @@ OmniFirewire::OmniFirewire(const std::string &serial_number, const std::string &
     handle_(NULL), tx_handle_(NULL), rx_handle_(NULL),
     port_(-1), node_(-1), tx_iso_channel_(-1), rx_iso_channel_(-1)
 {
+    gimbal_filter_1.resize(GIMBAL_FILTER_SIZE);
+    gimbal_filter_2.resize(GIMBAL_FILTER_SIZE);
+    gimbal_filter_3.resize(GIMBAL_FILTER_SIZE);
 }
 
 OmniFirewire::~OmniFirewire()
@@ -44,6 +47,7 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
         omni->tx_iso_buffer_.status.dock_led1 = 1;
         omni->state.calibrated = true;
     }
+
     // Compute the encoder values.
     // All angles should be ~= 0 when docked.
     omni->state.angles[0] = 2.0 * M_PI
@@ -56,38 +60,48 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
             *  newbuf->encoder_z / 15000.0 - omni->state.angles_docked[2]
             - omni->state.angles[1] + 0.37;
 
-    // Add the current gimbal pot value for filtering.
-    omni->pot_filter_accum_[0] += (double)newbuf->gimbal_a_x
+    // Adding values to the filter vector.
+    std::rotate(omni->gimbal_filter_1.begin(),
+                omni->gimbal_filter_1.begin() + 1,
+                omni->gimbal_filter_1.end());
+    omni->gimbal_filter_1[GIMBAL_FILTER_SIZE - 1] = (double)newbuf->gimbal_a_x
             / (newbuf->gimbal_a_x + newbuf->gimbal_b_x);
-
-    omni->pot_filter_accum_[1] += (double)newbuf->gimbal_a_y
+    //
+    std::rotate(omni->gimbal_filter_2.begin(),
+                omni->gimbal_filter_2.begin() + 1,
+                omni->gimbal_filter_2.end());
+    omni->gimbal_filter_2[GIMBAL_FILTER_SIZE - 1] = (double)newbuf->gimbal_a_y
             / (newbuf->gimbal_a_y + newbuf->gimbal_b_y);
-
-    omni->pot_filter_accum_[2] += (double)newbuf->gimbal_a_z
+    //
+    std::rotate(omni->gimbal_filter_3.begin(),
+                omni->gimbal_filter_3.begin() + 1,
+                omni->gimbal_filter_3.end());
+    omni->gimbal_filter_3[GIMBAL_FILTER_SIZE - 1] = (double)newbuf->gimbal_a_z
             / (newbuf->gimbal_a_z + newbuf->gimbal_b_z);
 
-    if (--omni->pot_filter_count_ <= 0)
+    if (omni->pot_filter_count_ <= 0)
     {
-        omni->pot_filter_count_ = OMNI_DRIVER_POT_FILTER_TAPS;
-
-        // Normalize.
-        omni->pot_filter_accum_[0] /= OMNI_DRIVER_POT_FILTER_TAPS;
-        omni->pot_filter_accum_[1] /= OMNI_DRIVER_POT_FILTER_TAPS;
-        omni->pot_filter_accum_[2] /= OMNI_DRIVER_POT_FILTER_TAPS;
+        // Compute the mean.
+        omni->pot_filter_accum_[0] =
+                std::accumulate(omni->gimbal_filter_1.begin(), omni->gimbal_filter_1.end(), 0.0)
+                / GIMBAL_FILTER_SIZE;
+        omni->pot_filter_accum_[1] =
+                std::accumulate(omni->gimbal_filter_2.begin(), omni->gimbal_filter_2.end(), 0.0)
+                / GIMBAL_FILTER_SIZE;
+        omni->pot_filter_accum_[2] =
+                std::accumulate(omni->gimbal_filter_3.begin(), omni->gimbal_filter_3.end(), 0.0)
+                / GIMBAL_FILTER_SIZE;
 
         // Compute the gimbal values.
         // All angles should be ~= 0 when docked.
-        omni->state.angles[3]
-                =  5.48 * omni->pot_filter_accum_[0] - 2.74 - 0.035;
-        omni->state.angles[4]
-                = -5.28 * omni->pot_filter_accum_[1] + 2.64 - 0.2;
-        omni->state.angles[5]
-                =  4.76 * omni->pot_filter_accum_[2] - 2.3;
+        omni->state.angles[3] =  (5.48 * omni->pot_filter_accum_[0] - 2.74) - 0.020;
+        omni->state.angles[4] = (-5.28 * omni->pot_filter_accum_[1] + 2.64) - 0.435;
+        omni->state.angles[5] =  (4.76 * omni->pot_filter_accum_[2] - 2.3) - 0.085;
 
-        // Reset the accumulator array.
-        omni->pot_filter_accum_[0] = 0.0;
-        omni->pot_filter_accum_[1] = 0.0;
-        omni->pot_filter_accum_[2] = 0.0;
+    }
+    else
+    {
+        --omni->pot_filter_count_;
     }
 
     // Get the button state.
@@ -191,7 +205,7 @@ bool OmniFirewire::connect()
     pot_filter_accum_[0] = 0.0;
     pot_filter_accum_[1] = 0.0;
     pot_filter_accum_[2] = 0.0;
-    pot_filter_count_ = OMNI_DRIVER_POT_FILTER_TAPS;
+    pot_filter_count_ = GIMBAL_FILTER_SIZE;
 
     // Start isochronous transmission.
     if (!startIsochronousTransmission()) {

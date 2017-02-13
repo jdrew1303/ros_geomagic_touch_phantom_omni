@@ -1,0 +1,92 @@
+\hypertarget{classOmniEthernet}{\section{Omni\-Ethernet Class Reference}
+\label{classOmniEthernet}\index{Omni\-Ethernet@{Omni\-Ethernet}}
+}
+Inheritance diagram for Omni\-Ethernet\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classOmniEthernet}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{classOmniEthernet_a2c066f15ef8554fb34ad7901101fa623}{connect} ()
+\begin{DoxyCompactList}\small\item\em Connects and calibrates to the device, starting the communication. \end{DoxyCompactList}\item 
+bool \hyperlink{classOmniEthernet_aee413137593a3231deeb304537d80d05}{connected} ()
+\begin{DoxyCompactList}\small\item\em Used to check if a device is connected. \end{DoxyCompactList}\item 
+\hypertarget{classOmniEthernet_aba4911f37396e1b1f09f7e5b28ea105f}{void \hyperlink{classOmniEthernet_aba4911f37396e1b1f09f7e5b28ea105f}{disconnect} ()}\label{classOmniEthernet_aba4911f37396e1b1f09f7e5b28ea105f}
+
+\begin{DoxyCompactList}\small\item\em Disconnects the device, called by destructor. \end{DoxyCompactList}\item 
+\hyperlink{classOmniEthernet_a55e6473c599ca47a64d35f9194ad5603}{Omni\-Ethernet} (const std\-::string \&\hyperlink{classOmniBase_a69efd9c11cdef64cbdcf57b52c6539f7}{name}=\char`\"{}\char`\"{})
+\begin{DoxyCompactList}\small\item\em \hyperlink{classOmniEthernet}{Omni\-Ethernet} constructor, calls \hyperlink{classOmniBase}{Omni\-Base} constructor with same parameter. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classOmniEthernet_a1e1795bfe2ff731548c50bf6e7391f23}{static int {\bfseries calibration\-Style} = 0}\label{classOmniEthernet_a1e1795bfe2ff731548c50bf6e7391f23}
+
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classOmniEthernet_a55e6473c599ca47a64d35f9194ad5603}{\index{Omni\-Ethernet@{Omni\-Ethernet}!Omni\-Ethernet@{Omni\-Ethernet}}
+\index{Omni\-Ethernet@{Omni\-Ethernet}!OmniEthernet@{Omni\-Ethernet}}
+\subsubsection[{Omni\-Ethernet}]{\setlength{\rightskip}{0pt plus 5cm}Omni\-Ethernet\-::\-Omni\-Ethernet (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{name = {\ttfamily \char`\"{}\char`\"{}}}
+\end{DoxyParamCaption}
+)}}\label{classOmniEthernet_a55e6473c599ca47a64d35f9194ad5603}
+
+
+\hyperlink{classOmniEthernet}{Omni\-Ethernet} constructor, calls \hyperlink{classOmniBase}{Omni\-Base} constructor with same parameter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & Reference to string of omni name. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classOmniEthernet_a2c066f15ef8554fb34ad7901101fa623}{\index{Omni\-Ethernet@{Omni\-Ethernet}!connect@{connect}}
+\index{connect@{connect}!OmniEthernet@{Omni\-Ethernet}}
+\subsubsection[{connect}]{\setlength{\rightskip}{0pt plus 5cm}bool Omni\-Ethernet\-::connect (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classOmniEthernet_a2c066f15ef8554fb34ad7901101fa623}
+
+
+Connects and calibrates to the device, starting the communication. 
+
+\begin{DoxyReturn}{Returns}
+Return 1 if the connection was succesfull, 0 otherwise. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classOmniBase_a60f376af41716a697ea79753160c3ca7}{Omni\-Base}.
+
+\hypertarget{classOmniEthernet_aee413137593a3231deeb304537d80d05}{\index{Omni\-Ethernet@{Omni\-Ethernet}!connected@{connected}}
+\index{connected@{connected}!OmniEthernet@{Omni\-Ethernet}}
+\subsubsection[{connected}]{\setlength{\rightskip}{0pt plus 5cm}bool Omni\-Ethernet\-::connected (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classOmniEthernet_aee413137593a3231deeb304537d80d05}
+
+
+Used to check if a device is connected. 
+
+\begin{DoxyReturn}{Returns}
+Returns 1 if a device connected, 0 otherwise. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classOmniBase_a22df750b9563aa7956950698e7463660}{Omni\-Base}.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+include/omniethernet.\-h\item 
+src/omniethernet.\-cpp\end{DoxyCompactItemize}

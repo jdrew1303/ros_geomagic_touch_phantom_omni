@@ -1,0 +1,479 @@
+\hypertarget{classOmniBase}{\section{Omni\-Base Class Reference}
+\label{classOmniBase}\index{Omni\-Base@{Omni\-Base}}
+}
+Inheritance diagram for Omni\-Base\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classOmniBase}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structOmniBase_1_1OmniState}{Omni\-State}
+\begin{DoxyCompactList}\small\item\em $<$ The state structure with relevant data. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classOmniBase_ab8717851c5496b3311ba0b48114e8004}{Omni\-Base} (const std\-::string \&\hyperlink{classOmniBase_a69efd9c11cdef64cbdcf57b52c6539f7}{name}=\char`\"{}\char`\"{})
+\begin{DoxyCompactList}\small\item\em \hyperlink{classOmniBase}{Omni\-Base} constructor, sets some members and prepares ros topics and publishers. \end{DoxyCompactList}\item 
+\hypertarget{classOmniBase_afd21d9d7906e46cb6feb4d963bf8b9c7}{void \hyperlink{classOmniBase_afd21d9d7906e46cb6feb4d963bf8b9c7}{publish\-Omni\-State} ()}\label{classOmniBase_afd21d9d7906e46cb6feb4d963bf8b9c7}
+
+\begin{DoxyCompactList}\small\item\em Publishes the current robot's state. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classOmniBase_a60f376af41716a697ea79753160c3ca7}{connect} ()=0
+\begin{DoxyCompactList}\small\item\em Attempts to connect to the robot. \end{DoxyCompactList}\item 
+virtual void \hyperlink{classOmniBase_a7ba2a80063858d1cf7d5b03f9796ced4}{disconnect} ()=0
+\begin{DoxyCompactList}\small\item\em Attempts to close the connection to the robot. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classOmniBase_a22df750b9563aa7956950698e7463660}{connected} ()=0
+\begin{DoxyCompactList}\small\item\em Checks if the device is connected. \end{DoxyCompactList}\item 
+void \hyperlink{classOmniBase_aad2a1a9f26e79fd83b66aa8a0687b2fe}{get\-Joint\-Angles} (std\-::vector$<$ double $>$ \&angles)
+\begin{DoxyCompactList}\small\item\em Gets the current joint angles. \end{DoxyCompactList}\item 
+void \hyperlink{classOmniBase_a81bc07c9e555ffd56c2e9875fb02a5f3}{get\-Buttons\-State} (std\-::vector$<$ bool $>$ \&button)
+\begin{DoxyCompactList}\small\item\em Gets the current buttons' state. \end{DoxyCompactList}\item 
+void \hyperlink{classOmniBase_a2063df1014b3929d67c651fd72254d9f}{get\-Force} (std\-::vector$<$ double $>$ \&force)
+\begin{DoxyCompactList}\small\item\em Gets the current force acting on the tip. \end{DoxyCompactList}\item 
+void \hyperlink{classOmniBase_a6cae32aaf35f41719956c1f4e58f15e0}{set\-Torque} (const std\-::vector$<$ double $>$ \&torque)
+\begin{DoxyCompactList}\small\item\em Sets the torque on the first three joints. \end{DoxyCompactList}\item 
+void \hyperlink{classOmniBase_af5bd87d6589d31d88080f51f23b589df}{reset\-Torque} ()
+\begin{DoxyCompactList}\small\item\em Resets the torque on the first three joints. \end{DoxyCompactList}\item 
+void \hyperlink{classOmniBase_a1665798fd79dd5fb09a86e054364d5ce}{enable\-Control} (bool enable)
+\begin{DoxyCompactList}\small\item\em Chooses if the control on the first three joints is on. \end{DoxyCompactList}\item 
+void \hyperlink{classOmniBase_a81b7e2a28ea342cd956b549c8478c4c2}{get\-Joint\-Velocities} (std\-::vector$<$ double $>$ \&vel)
+\begin{DoxyCompactList}\small\item\em Gets the current joint velocities. \end{DoxyCompactList}\item 
+void \hyperlink{classOmniBase_a633d60e797f463662e7e43fa26ab339a}{get\-Tip\-Position} (std\-::vector$<$ double $>$ \&pos)
+\begin{DoxyCompactList}\small\item\em Gets the current tip position with respect to the robot's base frame. \end{DoxyCompactList}\item 
+void \hyperlink{classOmniBase_ab5a4cfa7473ec7ec301d6fa8565693f1}{get\-Tip\-Orientation} (std\-::vector$<$ double $>$ \&ori)
+\begin{DoxyCompactList}\small\item\em Gets the current tip orientation with respect to the robot's base frame. \end{DoxyCompactList}\item 
+void \hyperlink{classOmniBase_a19382d9187bca9ad3be17b8b5f5578ef}{get\-Tip\-Pose} (std\-::vector$<$ double $>$ \&pos, std\-::vector$<$ double $>$ \&ori)
+\begin{DoxyCompactList}\small\item\em Gets the current tip position and orientation with respect to the robot's base frame. \end{DoxyCompactList}\item 
+std\-::string \hyperlink{classOmniBase_ac5e0bcd250af6cc9a7396fa9306519ec}{get\-Topic\-Name} ()
+\begin{DoxyCompactList}\small\item\em Gets the omni name param. \end{DoxyCompactList}\item 
+bool \hyperlink{classOmniBase_a1b7f1a5010a0676f3446aa6adab1aaa4}{calibrated} ()
+\begin{DoxyCompactList}\small\item\em Checks if the device has been calibrated. \end{DoxyCompactList}\item 
+void \hyperlink{classOmniBase_a3bec44a6c7adfe6343eb56f20171f08e}{torque\-Callback} (const geometry\-\_\-msgs\-::\-Vector3\-::\-Const\-Ptr \&msg)
+\begin{DoxyCompactList}\small\item\em The torque\-Callback called by the R\-O\-S torque subscriber. \end{DoxyCompactList}\item 
+void \hyperlink{classOmniBase_ada27c388676a85ab31650cd2c1f8c068}{enable\-Control\-Callback} (const std\-\_\-msgs\-::\-Bool\-::\-Const\-Ptr \&msg)
+\begin{DoxyCompactList}\small\item\em The enable\-Control\-Callback called by the R\-O\-S enable control subscriber. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classOmniBase_a46bff542660db9dadc41f044159b3b6a}{typedef \\*
+boost\-::posix\-\_\-time\-::microsec\-\_\-clock {\bfseries Clock}}\label{classOmniBase_a46bff542660db9dadc41f044159b3b6a}
+
+\item 
+\hypertarget{classOmniBase_a4e45d98f32711195ffee4cfaadb535e9}{typedef boost\-::posix\-\_\-time\-::ptime {\bfseries Time}}\label{classOmniBase_a4e45d98f32711195ffee4cfaadb535e9}
+
+\item 
+\hypertarget{classOmniBase_accb4adedacf66489514f1a9fd9d564a4}{typedef \\*
+boost\-::posix\-\_\-time\-::time\-\_\-duration {\bfseries Time\-Duration}}\label{classOmniBase_accb4adedacf66489514f1a9fd9d564a4}
+
+\item 
+\hypertarget{classOmniBase_ad03370b447b9b46cb62d6ebb002d7c37}{typedef boost\-::unique\-\_\-lock\\*
+$<$ boost\-::shared\-\_\-mutex $>$ \hyperlink{classOmniBase_ad03370b447b9b46cb62d6ebb002d7c37}{Lock\-Unique}}\label{classOmniBase_ad03370b447b9b46cb62d6ebb002d7c37}
+
+\begin{DoxyCompactList}\small\item\em The unique lock, used to protect data while writing. \end{DoxyCompactList}\item 
+\hypertarget{classOmniBase_af9820aff8dc6ff7e8120bde218d557ca}{typedef boost\-::shared\-\_\-lock\\*
+$<$ boost\-::shared\-\_\-mutex $>$ \hyperlink{classOmniBase_af9820aff8dc6ff7e8120bde218d557ca}{Lock\-Shared}}\label{classOmniBase_af9820aff8dc6ff7e8120bde218d557ca}
+
+\begin{DoxyCompactList}\small\item\em The shared lock, used to protect data while reading. \end{DoxyCompactList}\item 
+\hypertarget{classOmniBase_a7c9de7ece34c2c51e6922925fe5f11d7}{typedef boost\-::upgrade\-\_\-lock\\*
+$<$ boost\-::shared\-\_\-mutex $>$ \hyperlink{classOmniBase_a7c9de7ece34c2c51e6922925fe5f11d7}{Lock\-Upgrade}}\label{classOmniBase_a7c9de7ece34c2c51e6922925fe5f11d7}
+
+\begin{DoxyCompactList}\small\item\em The upgradeable lock, used to protect data while reading. \end{DoxyCompactList}\item 
+\hypertarget{classOmniBase_a017d027fa1c72afe7b13c91869325364}{typedef \\*
+boost\-::upgrade\-\_\-to\-\_\-unique\-\_\-lock\\*
+$<$ boost\-::shared\-\_\-mutex $>$ \hyperlink{classOmniBase_a017d027fa1c72afe7b13c91869325364}{Lock\-Upgrade\-To\-Unique}}\label{classOmniBase_a017d027fa1c72afe7b13c91869325364}
+
+\begin{DoxyCompactList}\small\item\em The upgraded lock, used to protect data while writing. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+boost\-::shared\-\_\-mutex \& \hyperlink{classOmniBase_ae742a01f62b6e312c4704eea0d250f9d}{get\-State\-Mutex} ()
+\begin{DoxyCompactList}\small\item\em Gets the mutex used for accessing the robot's state. \end{DoxyCompactList}\item 
+\hyperlink{structOmniBase_1_1OmniState}{Omni\-State} $\ast$ \hyperlink{classOmniBase_a5c0ece986d3fbfa05331d0c885051134}{get\-State} ()
+\begin{DoxyCompactList}\small\item\em Gets the robot's state. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classOmniBase_acfbd44decc32ec4af3eeca3e25281e45}{\hyperlink{structOmniBase_1_1OmniState}{Omni\-State} {\bfseries state}}\label{classOmniBase_acfbd44decc32ec4af3eeca3e25281e45}
+
+\item 
+\hypertarget{classOmniBase_a69efd9c11cdef64cbdcf57b52c6539f7}{std\-::string \hyperlink{classOmniBase_a69efd9c11cdef64cbdcf57b52c6539f7}{name}}\label{classOmniBase_a69efd9c11cdef64cbdcf57b52c6539f7}
+
+\begin{DoxyCompactList}\small\item\em Name given to diferentiate multiple omnis. \end{DoxyCompactList}\item 
+\hypertarget{classOmniBase_aad7cbf8f7beffd367ab50c3453e8d459}{std\-::string \hyperlink{classOmniBase_aad7cbf8f7beffd367ab50c3453e8d459}{topic\-\_\-name}}\label{classOmniBase_aad7cbf8f7beffd367ab50c3453e8d459}
+
+\begin{DoxyCompactList}\small\item\em String used to subscribe diferent topics. \end{DoxyCompactList}\item 
+\hypertarget{classOmniBase_a6bd8b4515724498791325d07caa849de}{ros\-::\-Node\-Handle\-Ptr {\bfseries node}}\label{classOmniBase_a6bd8b4515724498791325d07caa849de}
+
+\item 
+\hypertarget{classOmniBase_aca7da5f50524b6ad3d08deb11be59e2d}{ros\-::\-Subscriber \hyperlink{classOmniBase_aca7da5f50524b6ad3d08deb11be59e2d}{sub\-\_\-torque}}\label{classOmniBase_aca7da5f50524b6ad3d08deb11be59e2d}
+
+\begin{DoxyCompactList}\small\item\em Torque R\-O\-S subscriber. \end{DoxyCompactList}\item 
+\hypertarget{classOmniBase_a19970fdd4e693296f33fea90e8080033}{ros\-::\-Subscriber \hyperlink{classOmniBase_a19970fdd4e693296f33fea90e8080033}{sub\-\_\-enable\-\_\-control}}\label{classOmniBase_a19970fdd4e693296f33fea90e8080033}
+
+\begin{DoxyCompactList}\small\item\em Enable control R\-O\-S subscriber. \end{DoxyCompactList}\item 
+\hypertarget{classOmniBase_a60598eb25c3e6a1167fcbbdae581f1a5}{ros\-::\-Subscriber \hyperlink{classOmniBase_a60598eb25c3e6a1167fcbbdae581f1a5}{sub\-\_\-haptic}}\label{classOmniBase_a60598eb25c3e6a1167fcbbdae581f1a5}
+
+\begin{DoxyCompactList}\small\item\em Enable haptic R\-O\-S subscriber. \end{DoxyCompactList}\item 
+\hypertarget{classOmniBase_a610f935950307a0395c07d36313809b7}{ros\-::\-Publisher \hyperlink{classOmniBase_a610f935950307a0395c07d36313809b7}{pub\-\_\-joint}}\label{classOmniBase_a610f935950307a0395c07d36313809b7}
+
+\begin{DoxyCompactList}\small\item\em Joint R\-O\-S publisher. \end{DoxyCompactList}\item 
+\hypertarget{classOmniBase_ac4302b7badb135c465b71cb2d67b1a85}{sensor\-\_\-msgs\-::\-Joint\-State {\bfseries joint\-\_\-state}}\label{classOmniBase_ac4302b7badb135c465b71cb2d67b1a85}
+
+\item 
+\hypertarget{classOmniBase_ad8d0103682a01ed2a635f6aa01fb0124}{ros\-::\-Publisher \hyperlink{classOmniBase_ad8d0103682a01ed2a635f6aa01fb0124}{pub\-\_\-pose}}\label{classOmniBase_ad8d0103682a01ed2a635f6aa01fb0124}
+
+\begin{DoxyCompactList}\small\item\em Pose R\-O\-S publisher. \end{DoxyCompactList}\item 
+\hypertarget{classOmniBase_a0e3d2a98eb5be64e37dcce8939b99fe8}{geometry\-\_\-msgs\-::\-Pose\-Stamped {\bfseries pose\-\_\-stamped}}\label{classOmniBase_a0e3d2a98eb5be64e37dcce8939b99fe8}
+
+\item 
+\hypertarget{classOmniBase_a1cbe27fd9e63d07a9875e82a581bfab5}{ros\-::\-Publisher \hyperlink{classOmniBase_a1cbe27fd9e63d07a9875e82a581bfab5}{pub\-\_\-button}}\label{classOmniBase_a1cbe27fd9e63d07a9875e82a581bfab5}
+
+\begin{DoxyCompactList}\small\item\em Button R\-O\-S publisher. \end{DoxyCompactList}\item 
+\hypertarget{classOmniBase_aad994dc88b576231e3f37c11f510b319}{omni\-\_\-driver\-::\-Omni\-Button\-Event {\bfseries button\-\_\-event}}\label{classOmniBase_aad994dc88b576231e3f37c11f510b319}
+
+\item 
+\hypertarget{classOmniBase_acfbeb777f0f48bd79e18a57fa0d78d29}{bool \hyperlink{classOmniBase_acfbeb777f0f48bd79e18a57fa0d78d29}{last\-\_\-buttons} \mbox{[}2\mbox{]}}\label{classOmniBase_acfbeb777f0f48bd79e18a57fa0d78d29}
+
+\begin{DoxyCompactList}\small\item\em Needed for \char`\"{}\-Button Clicked\char`\"{} logic. \end{DoxyCompactList}\item 
+\hypertarget{classOmniBase_a2f35fcfb594e7be1bf22fcc3c3330348}{bool \hyperlink{classOmniBase_a2f35fcfb594e7be1bf22fcc3c3330348}{enable\-\_\-force\-\_\-flag}}\label{classOmniBase_a2f35fcfb594e7be1bf22fcc3c3330348}
+
+\begin{DoxyCompactList}\small\item\em Needed for resetting the internal enable control. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classOmniBase_ab8717851c5496b3311ba0b48114e8004}{\index{Omni\-Base@{Omni\-Base}!Omni\-Base@{Omni\-Base}}
+\index{Omni\-Base@{Omni\-Base}!OmniBase@{Omni\-Base}}
+\subsubsection[{Omni\-Base}]{\setlength{\rightskip}{0pt plus 5cm}Omni\-Base\-::\-Omni\-Base (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{name = {\ttfamily \char`\"{}\char`\"{}}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [explicit]}}}\label{classOmniBase_ab8717851c5496b3311ba0b48114e8004}
+
+
+\hyperlink{classOmniBase}{Omni\-Base} constructor, sets some members and prepares ros topics and publishers. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & Reference to string of omni name. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classOmniBase_a1b7f1a5010a0676f3446aa6adab1aaa4}{\index{Omni\-Base@{Omni\-Base}!calibrated@{calibrated}}
+\index{calibrated@{calibrated}!OmniBase@{Omni\-Base}}
+\subsubsection[{calibrated}]{\setlength{\rightskip}{0pt plus 5cm}bool Omni\-Base\-::calibrated (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classOmniBase_a1b7f1a5010a0676f3446aa6adab1aaa4}
+
+
+Checks if the device has been calibrated. 
+
+\begin{DoxyReturn}{Returns}
+True if calibrated. False otherwise. 
+\end{DoxyReturn}
+\hypertarget{classOmniBase_a60f376af41716a697ea79753160c3ca7}{\index{Omni\-Base@{Omni\-Base}!connect@{connect}}
+\index{connect@{connect}!OmniBase@{Omni\-Base}}
+\subsubsection[{connect}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool Omni\-Base\-::connect (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classOmniBase_a60f376af41716a697ea79753160c3ca7}
+
+
+Attempts to connect to the robot. 
+
+\begin{DoxyReturn}{Returns}
+True if the connection succeeds. False otherwise. 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{classOmniFirewire_a5159a261f8a2a8a1e23e21ffc8b7d6d7}{Omni\-Firewire}, and \hyperlink{classOmniEthernet_a2c066f15ef8554fb34ad7901101fa623}{Omni\-Ethernet}.
+
+\hypertarget{classOmniBase_a22df750b9563aa7956950698e7463660}{\index{Omni\-Base@{Omni\-Base}!connected@{connected}}
+\index{connected@{connected}!OmniBase@{Omni\-Base}}
+\subsubsection[{connected}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool Omni\-Base\-::connected (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classOmniBase_a22df750b9563aa7956950698e7463660}
+
+
+Checks if the device is connected. 
+
+\begin{DoxyReturn}{Returns}
+True if connected. False otherwise. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See Also}
+\hyperlink{classOmniBase_a60f376af41716a697ea79753160c3ca7}{connect}, \hyperlink{classOmniBase_a7ba2a80063858d1cf7d5b03f9796ced4}{disconnect} 
+\end{DoxySeeAlso}
+
+
+Implemented in \hyperlink{classOmniEthernet_aee413137593a3231deeb304537d80d05}{Omni\-Ethernet}.
+
+\hypertarget{classOmniBase_a7ba2a80063858d1cf7d5b03f9796ced4}{\index{Omni\-Base@{Omni\-Base}!disconnect@{disconnect}}
+\index{disconnect@{disconnect}!OmniBase@{Omni\-Base}}
+\subsubsection[{disconnect}]{\setlength{\rightskip}{0pt plus 5cm}virtual void Omni\-Base\-::disconnect (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classOmniBase_a7ba2a80063858d1cf7d5b03f9796ced4}
+
+
+Attempts to close the connection to the robot. 
+
+\begin{DoxyReturn}{Returns}
+True if the connection was closed. False otherwise. 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{classOmniFirewire_a7e8c7caaa494c1e0024cc3dbdeab5eee}{Omni\-Firewire}, and \hyperlink{classOmniEthernet_aba4911f37396e1b1f09f7e5b28ea105f}{Omni\-Ethernet}.
+
+\hypertarget{classOmniBase_a1665798fd79dd5fb09a86e054364d5ce}{\index{Omni\-Base@{Omni\-Base}!enable\-Control@{enable\-Control}}
+\index{enable\-Control@{enable\-Control}!OmniBase@{Omni\-Base}}
+\subsubsection[{enable\-Control}]{\setlength{\rightskip}{0pt plus 5cm}void Omni\-Base\-::enable\-Control (
+\begin{DoxyParamCaption}
+\item[{bool}]{enable}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classOmniBase_a1665798fd79dd5fb09a86e054364d5ce}
+
+
+Chooses if the control on the first three joints is on. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em enable} & True to enable. False otherwise. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classOmniBase_ada27c388676a85ab31650cd2c1f8c068}{\index{Omni\-Base@{Omni\-Base}!enable\-Control\-Callback@{enable\-Control\-Callback}}
+\index{enable\-Control\-Callback@{enable\-Control\-Callback}!OmniBase@{Omni\-Base}}
+\subsubsection[{enable\-Control\-Callback}]{\setlength{\rightskip}{0pt plus 5cm}void Omni\-Base\-::enable\-Control\-Callback (
+\begin{DoxyParamCaption}
+\item[{const std\-\_\-msgs\-::\-Bool\-::\-Const\-Ptr \&}]{msg}
+\end{DoxyParamCaption}
+)}}\label{classOmniBase_ada27c388676a85ab31650cd2c1f8c068}
+
+
+The enable\-Control\-Callback called by the R\-O\-S enable control subscriber. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em R\-O\-S} & message type geometry\-\_\-msgs\-::\-Bool. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classOmniBase_a81bc07c9e555ffd56c2e9875fb02a5f3}{\index{Omni\-Base@{Omni\-Base}!get\-Buttons\-State@{get\-Buttons\-State}}
+\index{get\-Buttons\-State@{get\-Buttons\-State}!OmniBase@{Omni\-Base}}
+\subsubsection[{get\-Buttons\-State}]{\setlength{\rightskip}{0pt plus 5cm}void Omni\-Base\-::get\-Buttons\-State (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ bool $>$ \&}]{button}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classOmniBase_a81bc07c9e555ffd56c2e9875fb02a5f3}
+
+
+Gets the current buttons' state. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em button} & Vector that will store the states. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classOmniBase_a2063df1014b3929d67c651fd72254d9f}{\index{Omni\-Base@{Omni\-Base}!get\-Force@{get\-Force}}
+\index{get\-Force@{get\-Force}!OmniBase@{Omni\-Base}}
+\subsubsection[{get\-Force}]{\setlength{\rightskip}{0pt plus 5cm}void Omni\-Base\-::get\-Force (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ double $>$ \&}]{force}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classOmniBase_a2063df1014b3929d67c651fd72254d9f}
+
+
+Gets the current force acting on the tip. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em force} & Vector that will store the force. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classOmniBase_aad2a1a9f26e79fd83b66aa8a0687b2fe}{\index{Omni\-Base@{Omni\-Base}!get\-Joint\-Angles@{get\-Joint\-Angles}}
+\index{get\-Joint\-Angles@{get\-Joint\-Angles}!OmniBase@{Omni\-Base}}
+\subsubsection[{get\-Joint\-Angles}]{\setlength{\rightskip}{0pt plus 5cm}void Omni\-Base\-::get\-Joint\-Angles (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ double $>$ \&}]{angles}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classOmniBase_aad2a1a9f26e79fd83b66aa8a0687b2fe}
+
+
+Gets the current joint angles. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em angles} & Vector that will store the angles. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classOmniBase_a81b7e2a28ea342cd956b549c8478c4c2}{\index{Omni\-Base@{Omni\-Base}!get\-Joint\-Velocities@{get\-Joint\-Velocities}}
+\index{get\-Joint\-Velocities@{get\-Joint\-Velocities}!OmniBase@{Omni\-Base}}
+\subsubsection[{get\-Joint\-Velocities}]{\setlength{\rightskip}{0pt plus 5cm}void Omni\-Base\-::get\-Joint\-Velocities (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ double $>$ \&}]{vel}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classOmniBase_a81b7e2a28ea342cd956b549c8478c4c2}
+
+
+Gets the current joint velocities. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em vel} & Vector that will store the velocities. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classOmniBase_a5c0ece986d3fbfa05331d0c885051134}{\index{Omni\-Base@{Omni\-Base}!get\-State@{get\-State}}
+\index{get\-State@{get\-State}!OmniBase@{Omni\-Base}}
+\subsubsection[{get\-State}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Omni\-State}$\ast$ Omni\-Base\-::get\-State (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}}\label{classOmniBase_a5c0ece986d3fbfa05331d0c885051134}
+
+
+Gets the robot's state. 
+
+\begin{DoxyReturn}{Returns}
+The robot's state. 
+\end{DoxyReturn}
+\hypertarget{classOmniBase_ae742a01f62b6e312c4704eea0d250f9d}{\index{Omni\-Base@{Omni\-Base}!get\-State\-Mutex@{get\-State\-Mutex}}
+\index{get\-State\-Mutex@{get\-State\-Mutex}!OmniBase@{Omni\-Base}}
+\subsubsection[{get\-State\-Mutex}]{\setlength{\rightskip}{0pt plus 5cm}boost\-::shared\-\_\-mutex\& Omni\-Base\-::get\-State\-Mutex (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}}\label{classOmniBase_ae742a01f62b6e312c4704eea0d250f9d}
+
+
+Gets the mutex used for accessing the robot's state. 
+
+\begin{DoxyReturn}{Returns}
+The mutex. 
+\end{DoxyReturn}
+\hypertarget{classOmniBase_ab5a4cfa7473ec7ec301d6fa8565693f1}{\index{Omni\-Base@{Omni\-Base}!get\-Tip\-Orientation@{get\-Tip\-Orientation}}
+\index{get\-Tip\-Orientation@{get\-Tip\-Orientation}!OmniBase@{Omni\-Base}}
+\subsubsection[{get\-Tip\-Orientation}]{\setlength{\rightskip}{0pt plus 5cm}void Omni\-Base\-::get\-Tip\-Orientation (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ double $>$ \&}]{ori}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classOmniBase_ab5a4cfa7473ec7ec301d6fa8565693f1}
+
+
+Gets the current tip orientation with respect to the robot's base frame. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ori} & Vector that will store the orientation as a quaternion. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classOmniBase_a19382d9187bca9ad3be17b8b5f5578ef}{\index{Omni\-Base@{Omni\-Base}!get\-Tip\-Pose@{get\-Tip\-Pose}}
+\index{get\-Tip\-Pose@{get\-Tip\-Pose}!OmniBase@{Omni\-Base}}
+\subsubsection[{get\-Tip\-Pose}]{\setlength{\rightskip}{0pt plus 5cm}void Omni\-Base\-::get\-Tip\-Pose (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ double $>$ \&}]{pos, }
+\item[{std\-::vector$<$ double $>$ \&}]{ori}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classOmniBase_a19382d9187bca9ad3be17b8b5f5578ef}
+
+
+Gets the current tip position and orientation with respect to the robot's base frame. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pos} & Vector that will store the position. \\
+\hline
+{\em ori} & Vector that will store the orientation as a quaternion. \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See Also}
+\hyperlink{classOmniBase_a633d60e797f463662e7e43fa26ab339a}{get\-Tip\-Position}, \hyperlink{classOmniBase_ab5a4cfa7473ec7ec301d6fa8565693f1}{get\-Tip\-Orientation} 
+\end{DoxySeeAlso}
+\hypertarget{classOmniBase_a633d60e797f463662e7e43fa26ab339a}{\index{Omni\-Base@{Omni\-Base}!get\-Tip\-Position@{get\-Tip\-Position}}
+\index{get\-Tip\-Position@{get\-Tip\-Position}!OmniBase@{Omni\-Base}}
+\subsubsection[{get\-Tip\-Position}]{\setlength{\rightskip}{0pt plus 5cm}void Omni\-Base\-::get\-Tip\-Position (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ double $>$ \&}]{pos}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classOmniBase_a633d60e797f463662e7e43fa26ab339a}
+
+
+Gets the current tip position with respect to the robot's base frame. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pos} & Vector that will store the position. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classOmniBase_ac5e0bcd250af6cc9a7396fa9306519ec}{\index{Omni\-Base@{Omni\-Base}!get\-Topic\-Name@{get\-Topic\-Name}}
+\index{get\-Topic\-Name@{get\-Topic\-Name}!OmniBase@{Omni\-Base}}
+\subsubsection[{get\-Topic\-Name}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string Omni\-Base\-::get\-Topic\-Name (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classOmniBase_ac5e0bcd250af6cc9a7396fa9306519ec}
+
+
+Gets the omni name param. 
+
+\begin{DoxyReturn}{Returns}
+Returns the robot's name. 
+\end{DoxyReturn}
+\hypertarget{classOmniBase_af5bd87d6589d31d88080f51f23b589df}{\index{Omni\-Base@{Omni\-Base}!reset\-Torque@{reset\-Torque}}
+\index{reset\-Torque@{reset\-Torque}!OmniBase@{Omni\-Base}}
+\subsubsection[{reset\-Torque}]{\setlength{\rightskip}{0pt plus 5cm}void Omni\-Base\-::reset\-Torque (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classOmniBase_af5bd87d6589d31d88080f51f23b589df}
+
+
+Resets the torque on the first three joints. 
+
+\begin{DoxySeeAlso}{See Also}
+\hyperlink{classOmniBase_a6cae32aaf35f41719956c1f4e58f15e0}{set\-Torque} 
+\end{DoxySeeAlso}
+\hypertarget{classOmniBase_a6cae32aaf35f41719956c1f4e58f15e0}{\index{Omni\-Base@{Omni\-Base}!set\-Torque@{set\-Torque}}
+\index{set\-Torque@{set\-Torque}!OmniBase@{Omni\-Base}}
+\subsubsection[{set\-Torque}]{\setlength{\rightskip}{0pt plus 5cm}void Omni\-Base\-::set\-Torque (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ double $>$ \&}]{torque}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classOmniBase_a6cae32aaf35f41719956c1f4e58f15e0}
+
+
+Sets the torque on the first three joints. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em torque} & 3-\/elements vector with the torque values. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classOmniBase_a3bec44a6c7adfe6343eb56f20171f08e}{\index{Omni\-Base@{Omni\-Base}!torque\-Callback@{torque\-Callback}}
+\index{torque\-Callback@{torque\-Callback}!OmniBase@{Omni\-Base}}
+\subsubsection[{torque\-Callback}]{\setlength{\rightskip}{0pt plus 5cm}void Omni\-Base\-::torque\-Callback (
+\begin{DoxyParamCaption}
+\item[{const geometry\-\_\-msgs\-::\-Vector3\-::\-Const\-Ptr \&}]{msg}
+\end{DoxyParamCaption}
+)}}\label{classOmniBase_a3bec44a6c7adfe6343eb56f20171f08e}
+
+
+The torque\-Callback called by the R\-O\-S torque subscriber. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em R\-O\-S} & message type geometry\-\_\-msgs\-::\-Vector3. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+include/omnibase.\-h\item 
+src/omnibase.\-cpp\end{DoxyCompactItemize}

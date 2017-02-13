@@ -1,0 +1,94 @@
+\hypertarget{classOmniFirewire}{\section{Omni\-Firewire Class Reference}
+\label{classOmniFirewire}\index{Omni\-Firewire@{Omni\-Firewire}}
+}
+Inheritance diagram for Omni\-Firewire\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classOmniFirewire}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structOmniFirewire_1_1OmniInfo}{Omni\-Info}
+\begin{DoxyCompactList}\small\item\em $<$ Structure with device connection information. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{classOmniFirewire_a5159a261f8a2a8a1e23e21ffc8b7d6d7}{connect} ()
+\begin{DoxyCompactList}\small\item\em Used to connect with omni device. \end{DoxyCompactList}\item 
+\hypertarget{classOmniFirewire_a7e8c7caaa494c1e0024cc3dbdeab5eee}{void \hyperlink{classOmniFirewire_a7e8c7caaa494c1e0024cc3dbdeab5eee}{disconnect} ()}\label{classOmniFirewire_a7e8c7caaa494c1e0024cc3dbdeab5eee}
+
+\begin{DoxyCompactList}\small\item\em Used to disconnect with omni device. \end{DoxyCompactList}\item 
+\hyperlink{classOmniFirewire_af9298dc3107550d4da86e4eb12fdfe09}{Omni\-Firewire} (const std\-::string \&serial\-\_\-number, const std\-::string \&\hyperlink{classOmniBase_a69efd9c11cdef64cbdcf57b52c6539f7}{name}=\char`\"{}\char`\"{})
+\begin{DoxyCompactList}\small\item\em \hyperlink{classOmniFirewire}{Omni\-Firewire} constructor, only sets some members needed for communicating with omni. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static std\-::vector\\*
+$<$ \hyperlink{structOmniFirewire_1_1OmniInfo}{Omni\-Firewire\-::\-Omni\-Info} $>$ \hyperlink{classOmniFirewire_a1862100a3027d7ea92342faa79751073}{enumerate\-\_\-omnis} ()
+\begin{DoxyCompactList}\small\item\em Used to enumerate devices found. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classOmniFirewire_af9298dc3107550d4da86e4eb12fdfe09}{\index{Omni\-Firewire@{Omni\-Firewire}!Omni\-Firewire@{Omni\-Firewire}}
+\index{Omni\-Firewire@{Omni\-Firewire}!OmniFirewire@{Omni\-Firewire}}
+\subsubsection[{Omni\-Firewire}]{\setlength{\rightskip}{0pt plus 5cm}Omni\-Firewire\-::\-Omni\-Firewire (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{serial\-\_\-number, }
+\item[{const std\-::string \&}]{name = {\ttfamily \char`\"{}\char`\"{}}}
+\end{DoxyParamCaption}
+)}}\label{classOmniFirewire_af9298dc3107550d4da86e4eb12fdfe09}
+
+
+\hyperlink{classOmniFirewire}{Omni\-Firewire} constructor, only sets some members needed for communicating with omni. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serial\-\_\-number} & Reference to string of serial number. \\
+\hline
+{\em name} & Reference to string of omni name. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classOmniFirewire_a5159a261f8a2a8a1e23e21ffc8b7d6d7}{\index{Omni\-Firewire@{Omni\-Firewire}!connect@{connect}}
+\index{connect@{connect}!OmniFirewire@{Omni\-Firewire}}
+\subsubsection[{connect}]{\setlength{\rightskip}{0pt plus 5cm}bool Omni\-Firewire\-::connect (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classOmniFirewire_a5159a261f8a2a8a1e23e21ffc8b7d6d7}
+
+
+Used to connect with omni device. 
+
+\begin{DoxyReturn}{Returns}
+Returns 1 if successfull, 0 otherwise. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classOmniBase_a60f376af41716a697ea79753160c3ca7}{Omni\-Base}.
+
+\hypertarget{classOmniFirewire_a1862100a3027d7ea92342faa79751073}{\index{Omni\-Firewire@{Omni\-Firewire}!enumerate\-\_\-omnis@{enumerate\-\_\-omnis}}
+\index{enumerate\-\_\-omnis@{enumerate\-\_\-omnis}!OmniFirewire@{Omni\-Firewire}}
+\subsubsection[{enumerate\-\_\-omnis}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$ {\bf Omni\-Firewire\-::\-Omni\-Info} $>$ Omni\-Firewire\-::enumerate\-\_\-omnis (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{classOmniFirewire_a1862100a3027d7ea92342faa79751073}
+
+
+Used to enumerate devices found. 
+
+\begin{DoxyReturn}{Returns}
+Returns a vector with information from different devices in the \hyperlink{structOmniFirewire_1_1OmniInfo}{Omni\-Info} struct format. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+include/omnifirewire.\-h\item 
+src/omnifirewire.\-cpp\end{DoxyCompactItemize}
