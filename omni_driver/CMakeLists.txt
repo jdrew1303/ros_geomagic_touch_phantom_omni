@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   tf
   urdf
+  moveit_ros_planning
 )
 
 find_package(Boost REQUIRED COMPONENTS thread)

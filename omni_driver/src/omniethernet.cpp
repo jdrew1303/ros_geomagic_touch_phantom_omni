@@ -22,13 +22,18 @@ void OmniEthernet::getJointAnglesFromDriver()
     double encoder2deg2rad = 0.024 * M_PI / 180;
     double gimbal2deg2rad = 0.0735 * M_PI / 180;
 
+    // Getting time difference between two consecutive reading.
+    state.time_last_angle_acquisition = state.time_current_angle_acquisition;
+    Clock clock;
+    state.time_current_angle_acquisition = clock.local_time();
+
     // All angles should be ~= 0 when docked.
     state.angles[0] =   encoder2deg2rad *  encoders_values[0];
     state.angles[1] = -(encoder2deg2rad *  encoders_values[1] + 0.2760412744 );
     state.angles[2] =  (encoder2deg2rad * (encoders_values[1] + encoders_values[2]) + 0.6572211831 );
-    state.angles[3] = -(gimbal2deg2rad  * (encoders_values[3] - 2048));
+    state.angles[3] = -(gimbal2deg2rad  * (encoders_values[3] - 2048) /*- 0.014*/);
     state.angles[4] = -(gimbal2deg2rad  * (encoders_values[4] - 50) * 0.788343558 - 1.826507352 );
-    state.angles[5] =  (gimbal2deg2rad  * (encoders_values[5] -2259) - 0.045050144 );
+    state.angles[5] =  (gimbal2deg2rad  * (encoders_values[5] -2259) - 0.0382/*- 0.045050144*/ );
 }
 
 void OmniEthernet::autoCalibration()
@@ -149,25 +154,11 @@ HDCallbackCode HDCALLBACK OmniEthernet::callback(void *pdata)
     double position[3];
     hdGetDoublev(HD_CURRENT_POSITION, position);
     std::copy(position, position + 3, omni->state.position.begin());
-    //
     omni->getJointAnglesFromDriver();
-    hduVector3Dd vel_buff(0, 0, 0);
 
-    //todo velocity
-    /*vel_buff = (omni->state.position * 3. - 4. * omni->state.pos_hist1
-            + omni->state.pos_hist2) / 0.002;  //mm/s, 2nd order backward dif
-    omni->state.velocities = (.2196 * (vel_buff + omni->state.vel_inp3)
-            + .6588 * (omni->state.vel_inp1 + omni->state.vel_inp2)) / 1000.0
-            - (-2.7488 * omni->state.vel_out1 + 2.5282 * omni->state.vel_out2
-                    - 0.7776 * omni->state.vel_out3);  //cutoff freq of 20 Hz
-    omni->state.pos_hist2 = omni->state.pos_hist1;
-    omni->state.pos_hist1 = omni->state.position;
-    omni->state.vel_inp3 = omni->state.vel_inp2;
-    omni->state.vel_inp2 = omni->state.vel_inp1;
-    omni->state.vel_inp1 = vel_buff;
-    omni->state.vel_out3 = omni->state.vel_out2;
-    omni->state.vel_out2 = omni->state.vel_out1;
-    omni->state.vel_out1 = omni->state.velocities;*/
+    // Calculates forward kinematics and velocities.
+    omni->updateRobotState();
+
     if (omni->state.lock == true)
     {
         for (int k = 0; k<3; ++k)

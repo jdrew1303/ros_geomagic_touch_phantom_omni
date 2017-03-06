@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <libraw1394/raw1394.h>
 #include <boost/thread.hpp>
+#include <math.h>
 
 
 class OmniFirewire : public OmniBase

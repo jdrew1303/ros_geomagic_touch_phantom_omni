@@ -12,6 +12,14 @@
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/PoseStamped.h>
 
+#include <moveit/planning_interface/planning_interface.h>
+#include <moveit/planning_scene_interface/planning_scene_interface.h>
+#include <moveit/move_group_interface/move_group.h>
+#include <moveit_msgs/DisplayTrajectory.h>
+#include <moveit/robot_state/robot_state.h>
+#include <moveit/robot_model/robot_model.h>
+#include <moveit/robot_model_loader/robot_model_loader.h>
+
 #include "omni_driver/OmniButtonEvent.h"
 
 class OmniBase
@@ -36,8 +44,7 @@ protected:
         std::vector<double> lock_pos;
         std::vector<double> orientation;
         std::vector<double> position;
-        std::vector<double> pos_hist1;
-        std::vector<double> pos_hist2;
+        std::vector<double> angles_hist1;
         std::vector<double> velocities;
         std::vector<double> vel_inp1;
         std::vector<double> vel_inp2;
@@ -46,6 +53,9 @@ protected:
         std::vector<double> vel_out2;
         std::vector<double> vel_out3;
         std::vector<bool>   buttons;
+        std::vector<std::string> joint_names;
+        Time time_last_angle_acquisition;
+        Time time_current_angle_acquisition;
         bool control_on = false;
         bool connected = false;
         bool calibrated = false;
@@ -60,6 +70,8 @@ protected:
             angles_docked.resize(6);
             angles_last.resize(6);
             velocities.resize(6);
+            joint_names.resize(6);
+            angles_hist1.resize(6);
 
             // Buttons
             buttons.resize(2);
@@ -81,7 +93,7 @@ protected:
     ros::Subscriber sub_torque;                 ///< Torque ROS subscriber.
     ros::Subscriber sub_enable_control;         ///< Enable control ROS subscriber.
     ros::Subscriber sub_haptic;                 ///< Enable haptic ROS subscriber.
-
+    ros::Subscriber sub_moveit;                 ///< Enable button subscriber for moveit.
 
     ros::Publisher pub_joint;                   ///< Joint ROS publisher.
     sensor_msgs::JointState joint_state;
@@ -92,15 +104,19 @@ protected:
     ros::Publisher pub_button;                  ///< Button ROS publisher.
     omni_driver::OmniButtonEvent button_event;
 
+    robot_model::RobotModelPtr kinematic_model;
+    robot_state::RobotStatePtr kinematic_state;
+    robot_state::JointModelGroup* joint_model_group;
+
 
     bool last_buttons[2];                       ///< Needed for "Button Clicked" logic.
     bool enable_force_flag;                     ///< Needed for resetting the internal enable control.
 
+    // VER COM JOAO ******************************
     typedef boost::unique_lock<boost::shared_mutex>            LockUnique;          ///< The unique lock, used to protect data while writing.
     typedef boost::shared_lock<boost::shared_mutex>            LockShared;          ///< The shared lock, used to protect data while reading.
     typedef boost::upgrade_lock<boost::shared_mutex>           LockUpgrade;         ///< The upgradeable lock, used to protect data while reading.
     typedef boost::upgrade_to_unique_lock<boost::shared_mutex> LockUpgradeToUnique; ///< The upgraded lock, used to protect data while writing.
-
     /**
      * @brief Gets the mutex used for accessing the robot's state.
      * @return The mutex.
@@ -118,6 +134,7 @@ protected:
     {
         return &state;
     }
+
 
 public:
 
@@ -139,8 +156,7 @@ public:
     virtual bool connect() = 0;
 
     /**
-     * @brief Attempts to close the connection to the robot.
-     * @return True if the connection was closed. False otherwise.
+     * @brief Closes robot connection.
      */
     virtual void disconnect() = 0;
 
@@ -295,6 +311,12 @@ public:
      * @param ROS message type geometry_msgs::Bool.
      */
     void enableControlCallback(const std_msgs::Bool::ConstPtr& msg);
+
+    void updateRobotState();
+
+    void fwdKin(const unsigned int idx = 5);
+
+    void calculateVelocities();
 };
 
 typedef boost::shared_ptr<OmniBase> OmniBasePtr;

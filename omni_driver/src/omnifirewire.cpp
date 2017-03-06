@@ -48,6 +48,10 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
         omni->state.calibrated = true;
     }
 
+    // Getting time difference between two consecutive readings.
+    omni->state.time_last_angle_acquisition = omni->state.time_current_angle_acquisition;
+    omni->state.time_current_angle_acquisition = boost::posix_time::microsec_clock::local_time();
+
     // Compute the encoder values.
     // All angles should be ~= 0 when docked.
     omni->state.angles[0] = 2.0 * M_PI
@@ -94,8 +98,8 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
 
         // Compute the gimbal values.
         // All angles should be ~= 0 when docked.
-        omni->state.angles[3] =  (5.48 * omni->pot_filter_accum_[0] - 2.74) - 0.020;
-        omni->state.angles[4] = (-5.28 * omni->pot_filter_accum_[1] + 2.64) - 0.435;
+        omni->state.angles[3] =  -(5.48 * omni->pot_filter_accum_[0] - 2.74) + 0.020;
+        omni->state.angles[4] = (-5.28 * omni->pot_filter_accum_[1] + 2.64) - 0.447;
         omni->state.angles[5] =  (4.76 * omni->pot_filter_accum_[2] - 2.3) - 0.085;
 
     }
@@ -103,6 +107,9 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
     {
         --omni->pot_filter_count_;
     }
+
+    // Calculates forward kinematics and joint velocities.
+    omni->updateRobotState();
 
     // Get the button state.
     omni->state.buttons[0] = !newbuf->status.button1;

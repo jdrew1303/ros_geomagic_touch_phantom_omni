@@ -9,8 +9,7 @@
 		</node>
 
 		<node name="state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
-			<param name="publish_frequency" type="double" value="400.0" />
-			<remap from="joint_states" to="joint_states" />
+            <param name="tf_prefix" type="string" value="" />
 			<remap from="robot_description" to="omni_robot_description" />
 		</node>
 
