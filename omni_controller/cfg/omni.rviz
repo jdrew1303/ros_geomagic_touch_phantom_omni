@@ -8,6 +8,7 @@ Panels:
         - /Status1
         - /TF1
         - /TF1/Frames1
+        - /Axes1
       Splitter Ratio: 0.5
     Tree Height: 463
   - Class: rviz/Selection
@@ -79,6 +80,10 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        end_effector:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         lower_arm:
           Alpha: 1
           Show Axes: false
@@ -115,6 +120,13 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 0.02
+      Name: Axes
+      Radius: 0.002
+      Reference Frame: end_effector
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -139,22 +151,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.187242
+      Distance: 0.519237
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.0357149
-        Y: 0.0730142
-        Z: 0.100602
+        X: 0.039981
+        Y: 0.0655096
+        Z: 0.106814
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: -0.404602
+      Pitch: 0.235398
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.260378
+      Yaw: 0.690378
     Saved: ~
 Window Geometry:
   Displays:

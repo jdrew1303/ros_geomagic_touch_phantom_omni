@@ -3,7 +3,7 @@
 int OmniEthernet::calibrationStyle = 0;
 
 OmniEthernet::OmniEthernet(const std::string &name) :
-    OmniBase(name)
+    OmniBase(name, 800)
 {
 }
 
@@ -23,7 +23,7 @@ void OmniEthernet::getJointAnglesFromDriver()
     double gimbal2deg2rad = 0.0735 * M_PI / 180;
 
     // Getting time difference between two consecutive reading.
-    state.time_last_angle_acquisition = state.time_current_angle_acquisition;
+//    state.time_last_angle_acquisition = state.time_current_angle_acquisition;
     Clock clock;
     state.time_current_angle_acquisition = clock.local_time();
 
@@ -31,9 +31,10 @@ void OmniEthernet::getJointAnglesFromDriver()
     state.angles[0] =   encoder2deg2rad *  encoders_values[0];
     state.angles[1] = -(encoder2deg2rad *  encoders_values[1] + 0.2760412744 );
     state.angles[2] =  (encoder2deg2rad * (encoders_values[1] + encoders_values[2]) + 0.6572211831 );
-    state.angles[3] = -(gimbal2deg2rad  * (encoders_values[3] - 2048) /*- 0.014*/);
-    state.angles[4] = -(gimbal2deg2rad  * (encoders_values[4] - 50) * 0.788343558 - 1.826507352 );
-    state.angles[5] =  (gimbal2deg2rad  * (encoders_values[5] -2259) - 0.0382/*- 0.045050144*/ );
+    state.angles[3] = -(gimbal2deg2rad  * (encoders_values[3] - 2048));
+    state.angles[4] = -(gimbal2deg2rad  * (encoders_values[4] - 600) * 1.2 - 3.160347962);
+    state.angles[5] =  (gimbal2deg2rad  * (encoders_values[5] -2259) - 0.04233296100712246 );
+
 }
 
 void OmniEthernet::autoCalibration()
@@ -123,7 +124,7 @@ bool OmniEthernet::connect()
         return 0;
     }
     autoCalibration();
-    hdScheduleAsynchronous(&OmniEthernet::callback, this, HD_MAX_SCHEDULER_PRIORITY);
+    handle_callback = hdScheduleAsynchronous(&OmniEthernet::callback, this, HD_MAX_SCHEDULER_PRIORITY);
     state.connected = true;
     return 1;
 }
@@ -137,12 +138,14 @@ void OmniEthernet::disconnect()
 {
     ROS_INFO("Ending Session....");
     hdStopScheduler();
+    hdUnschedule(handle_callback);
     hdDisableDevice(hHD);
 }
 
 HDCallbackCode HDCALLBACK OmniEthernet::callback(void *pdata)
 {
     OmniEthernet *omni = static_cast<OmniEthernet*>(pdata);
+
     if (hdCheckCalibration() == HD_CALIBRATION_NEEDS_UPDATE)
     {
       ROS_DEBUG("Updating calibration...");

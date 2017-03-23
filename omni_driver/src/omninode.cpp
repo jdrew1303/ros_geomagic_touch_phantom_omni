@@ -14,6 +14,10 @@ int main(int argc, char **argv)
     ros::param::param<std::string>("~omni_type", omni_type, "ethernet");
     std::string omni_serial;
     ros::param::param<std::string>("~omni_serial", omni_serial, "");
+
+    // Declare OmniBasePtr
+    OmniBasePtr omni;
+
     if (omni_type == "firewire")
     {
         // List the serial number of each Phantom Omni connected. This is only
@@ -39,49 +43,36 @@ int main(int argc, char **argv)
         }
 
         // Init the firewire driver
-        OmniFirewirePtr omni( new OmniFirewire(omni_serial, omni_name) );
-
-        // Connect
-        omni->connect();
-
-        // ROS Mainloop
-        ros::Rate rate(100);
-        while (ros::ok())
-        {
-            ros::spinOnce();
-
-            omni->publishOmniState();
-
-            rate.sleep();
-        }
-
-        // Disconnect
-        omni->disconnect();
-
-        return 0;
+        omni = OmniBasePtr( new OmniFirewire(omni_serial, omni_name) );
     }
     if (omni_type == "ethernet")
     {
-        OmniEthernetPtr omni( new OmniEthernet( omni_name) );
-
-        // Connect
-        omni->connect();
-
-        // ROS Mainloop
-        ros::Rate rate(100);
-        while (ros::ok())
-        {
-            ros::spinOnce();
-
-            omni->publishOmniState();
-
-            rate.sleep();
-        }
-
-        // Disconnect
-        omni->disconnect();
-
-        return 0;
+        // Init the ethernet driver
+        omni = OmniBasePtr( new OmniEthernet( omni_name) );
     }
 
+    // Connect
+    omni->connect();
+
+    // ROS Mainloop
+    ros::Rate rate(100);
+    while (ros::ok())
+    {
+        ros::spinOnce();
+
+        omni->publishOmniState();
+
+        if (!omni->connected())
+        {
+            omni->disconnect();
+            omni->connect();
+        }
+
+        rate.sleep();
+    }
+
+    // Disconnect
+    omni->disconnect();
+
+    return 0;
 }

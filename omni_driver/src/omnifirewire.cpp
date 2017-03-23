@@ -39,8 +39,9 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
         ROS_INFO("Calibrating robot...");
 
         // Calibrate.
+        // All angles should be ~= 0 when docked.
         omni->state.angles_docked[0] = 2.0 * M_PI *  newbuf->encoder_x / 15000.0;
-        omni->state.angles_docked[1] = 2.0 * M_PI * -newbuf->encoder_y / 15000.0 - 0.23;
+        omni->state.angles_docked[1] = 2.0 * M_PI * -newbuf->encoder_y / 15000.0;
         omni->state.angles_docked[2] = 2.0 * M_PI *  newbuf->encoder_z / 15000.0 + 0.37;
         // Calibrated: the dock LED should be always on.
         omni->tx_iso_buffer_.status.dock_led0 = 1;
@@ -49,7 +50,7 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
     }
 
     // Getting time difference between two consecutive readings.
-    omni->state.time_last_angle_acquisition = omni->state.time_current_angle_acquisition;
+//    omni->state.time_last_angle_acquisition = omni->state.time_current_angle_acquisition;
     omni->state.time_current_angle_acquisition = boost::posix_time::microsec_clock::local_time();
 
     // Compute the encoder values.
@@ -58,7 +59,7 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
             *  newbuf->encoder_x / 15000.0 - omni->state.angles_docked[0];
 
     omni->state.angles[1] = 2.0 * M_PI
-            * -newbuf->encoder_y / 15000.0 - omni->state.angles_docked[1] -0.23;
+            * -newbuf->encoder_y / 15000.0 - omni->state.angles_docked[1];
 
     omni->state.angles[2] = 2.0 * M_PI
             *  newbuf->encoder_z / 15000.0 - omni->state.angles_docked[2]
@@ -98,8 +99,8 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
 
         // Compute the gimbal values.
         // All angles should be ~= 0 when docked.
-        omni->state.angles[3] =  -(5.48 * omni->pot_filter_accum_[0] - 2.74) + 0.020;
-        omni->state.angles[4] = (-5.28 * omni->pot_filter_accum_[1] + 2.64) - 0.447;
+        omni->state.angles[3] = -(5.48 * omni->pot_filter_accum_[0] - 2.74) + 0.020 + 0.025367101673835286;
+        omni->state.angles[4] = -(5.28 * omni->pot_filter_accum_[1] + 2.64) - 0.447 +0.9559879360058527;
         omni->state.angles[5] =  (4.76 * omni->pot_filter_accum_[2] - 2.3) - 0.085;
 
     }
@@ -306,7 +307,8 @@ void * OmniFirewire::isoThreadCallback()
         // Empty
     }
 
-    ROS_INFO("Exited driver thread!!!");
+    std::cout << "Exited driver thread!!!" << std::endl;
+    this->state.connected = false;
 
     return NULL;
 }

@@ -26,7 +26,6 @@ class OmniBase
 {
 
 private:
-
     boost::shared_mutex mutex_state;                        ///< Mutex state returned by @link getMutexState().
 
 protected:
@@ -38,20 +37,15 @@ protected:
     {
         std::vector<double> angles;
         std::vector<double> angles_docked;
+        std::vector<double> angles_hist1;
         std::vector<double> angles_last;
         std::vector<double> control;
         std::vector<double> force;
         std::vector<double> lock_pos;
         std::vector<double> orientation;
         std::vector<double> position;
-        std::vector<double> angles_hist1;
         std::vector<double> velocities;
-        std::vector<double> vel_inp1;
-        std::vector<double> vel_inp2;
-        std::vector<double> vel_inp3;
-        std::vector<double> vel_out1;
-        std::vector<double> vel_out2;
-        std::vector<double> vel_out3;
+        std::vector<double> vel_hist1;
         std::vector<bool>   buttons;
         std::vector<std::string> joint_names;
         Time time_last_angle_acquisition;
@@ -68,10 +62,10 @@ protected:
             // Joints
             angles.resize(6);
             angles_docked.resize(6);
-            angles_last.resize(6);
             velocities.resize(6);
             joint_names.resize(6);
             angles_hist1.resize(6);
+            vel_hist1.resize(6);
 
             // Buttons
             buttons.resize(2);
@@ -112,11 +106,13 @@ protected:
     bool last_buttons[2];                       ///< Needed for "Button Clicked" logic.
     bool enable_force_flag;                     ///< Needed for resetting the internal enable control.
 
-    // VER COM JOAO ******************************
+    double velocity_filter_minimum_dt;          ///< TODO value in milliseconds
+
     typedef boost::unique_lock<boost::shared_mutex>            LockUnique;          ///< The unique lock, used to protect data while writing.
     typedef boost::shared_lock<boost::shared_mutex>            LockShared;          ///< The shared lock, used to protect data while reading.
     typedef boost::upgrade_lock<boost::shared_mutex>           LockUpgrade;         ///< The upgradeable lock, used to protect data while reading.
     typedef boost::upgrade_to_unique_lock<boost::shared_mutex> LockUpgradeToUnique; ///< The upgraded lock, used to protect data while writing.
+
     /**
      * @brief Gets the mutex used for accessing the robot's state.
      * @return The mutex.
@@ -143,6 +139,13 @@ public:
      * @param name Reference to string of omni name.
      */
     explicit OmniBase(const std::string &name = "");
+
+    /**
+     * @brief OmniBase constructor, sets some members and prepares ros topics and publishers.
+     * @param name Reference to string of omni name.
+     * @param velocity_filter_minimum_dt Minimum amount of time that should have passed to compute the robot velocity.
+     */
+    OmniBase(const std::string &name, double velocity_filter_minimum_dt);
 
     /**
      * @brief Publishes the current robot's state.

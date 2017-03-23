@@ -8,7 +8,13 @@ typedef boost::shared_ptr<urdf::Model> URDFModelPtr;
 typedef boost::shared_ptr<srdf::Model> SRDFModelPtr;
 
 OmniBase::OmniBase(const std::string &name)
-        : name(name), enable_force_flag(false)
+    : OmniBase::OmniBase(name, 1000)
+{
+}
+
+OmniBase::OmniBase(const std::string &name, double velocity_filter_minimum_dt)
+    : name(name), enable_force_flag(false),
+      velocity_filter_minimum_dt(velocity_filter_minimum_dt)
 {
     this->resetTorque();
 
@@ -81,14 +87,22 @@ void OmniBase::updateRobotState()
 
 void OmniBase::fwdKin(const unsigned int idx)
 {
-    Eigen::Affine3d end_effector_state;
-    if (idx >= state.joint_names.size())
+
+    if ( idx >= state.joint_names.size() )
     {
         ROS_ERROR("Index exceeds the number of joints.");
         return;
     }
-
-    end_effector_state = kinematic_state->getJointTransform(state.joint_names[idx]);
+    Eigen::Affine3d end_effector_state;
+    Eigen::VectorXd joint_angles(6);
+    joint_angles << state.angles[0],
+                    state.angles[1],
+                    state.angles[2],
+                    state.angles[3],
+                    state.angles[4],
+                    state.angles[5];
+    kinematic_state->setJointGroupPositions(joint_model_group, joint_angles);
+    end_effector_state = kinematic_state->getGlobalLinkTransform("end_effector");
     Eigen::Quaterniond quat(end_effector_state.rotation());
     Eigen::Vector3d pos = end_effector_state.translation();
 
@@ -104,17 +118,29 @@ void OmniBase::fwdKin(const unsigned int idx)
 
 void OmniBase::calculateVelocities()
 {
+    double deltaAngle;
     TimeDuration time = state.time_current_angle_acquisition
             - state.time_last_angle_acquisition;
-    double time_difference = (time.total_microseconds());
+    double dt = time.total_microseconds();
 
-    for (int i=0; i<6; ++i)
+    if (dt >= velocity_filter_minimum_dt)
     {
-        state.velocities[i] = (state.angles[i] - state.angles_hist1[i]) * 1000000 / (time_difference);
+        double tol_dvel = 3; // This is empirical. Deal with it.
+        for (int i = 0; i < 6; ++i)
+        {
+            deltaAngle = state.angles[i] - state.angles_hist1[i];
 
+            double vel = deltaAngle * 1000000 / dt;
+
+            if ( std::abs(vel - state.vel_hist1[i]) < tol_dvel )
+            {
+                state.velocities[i] = vel;
+            }
+            state.vel_hist1[i] = vel;
+        }
+        state.angles_hist1 = state.angles;
+        state.time_last_angle_acquisition = state.time_current_angle_acquisition;
     }
-
-    state.angles_hist1 = state.angles;
 }
 
 
@@ -138,11 +164,11 @@ void OmniBase::publishOmniState()
         joint_state.position[i] = joint_angles[i];
         joint_state.velocity[i] = joint_velocities[i];
 
-        if (i==4)
-        {
-            // The next line is a necessary to recalibrate potentiometer #2.
-            joint_state.position[4]=(joint_state.position[4]+0.27+(joint_state.position[4]+1.73)/1.72);
-        }
+//        if (i==4)
+//        {
+//            // The next line is a necessary to recalibrate potentiometer #2.
+//            joint_state.position[4]=(joint_state.position[4]+0.27+(joint_state.position[4]+1.73)/1.72);
+//        }
 
 
     }

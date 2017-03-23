@@ -33,6 +33,7 @@ class OmniEthernet : public OmniBase
 private:
     HDErrorInfo error;
     HHD hHD;
+    HDSchedulerHandle handle_callback;
 
     /**
      * @brief Calibrates the device using one of the supported styles.
