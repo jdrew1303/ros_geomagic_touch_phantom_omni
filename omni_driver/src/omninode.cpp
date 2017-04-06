@@ -11,7 +11,7 @@ int main(int argc, char **argv)
     std::string omni_name;
     ros::param::param<std::string>("~omni_name", omni_name, "");
     std::string omni_type;
-    ros::param::param<std::string>("~omni_type", omni_type, "ethernet");
+    ros::param::param<std::string>("~omni_type", omni_type, "firewire");
     std::string omni_serial;
     ros::param::param<std::string>("~omni_serial", omni_serial, "");
 
@@ -62,8 +62,10 @@ int main(int argc, char **argv)
 
         omni->publishOmniState();
 
+        // Force a reconnection if connection was lost
         if (!omni->connected())
         {
+            std::cout << "Lost connection" << std::endl;
             omni->disconnect();
             omni->connect();
         }

@@ -188,6 +188,9 @@ private:
      */
     void stopIsochronousTransmission();
 
+protected:
+    void mapTorque();
+
 public:
 
     struct OmniInfo                         ///< Structure with device connection information.
@@ -225,6 +228,17 @@ public:
      */
     OmniFirewire(const std::string &serial_number, const std::string &name = "");
     ~OmniFirewire();
+
+    inline void enableControl(bool enable)
+    {
+        {
+            // Creating a new scope to avoid a deadlock
+            LockUnique lock( getStateMutex() );
+            state.control_on = enable;
+            enable_force_flag = enable;
+        }
+        this->resetTorque();
+    }
 };
 
 typedef boost::shared_ptr<OmniFirewire> OmniFirewirePtr;

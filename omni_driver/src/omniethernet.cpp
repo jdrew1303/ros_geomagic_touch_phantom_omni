@@ -5,6 +5,7 @@ int OmniEthernet::calibrationStyle = 0;
 OmniEthernet::OmniEthernet(const std::string &name) :
     OmniBase(name, 800)
 {
+    this->resetTorque();
 }
 
 OmniEthernet::~OmniEthernet()
@@ -146,6 +147,8 @@ HDCallbackCode HDCALLBACK OmniEthernet::callback(void *pdata)
 {
     OmniEthernet *omni = static_cast<OmniEthernet*>(pdata);
 
+    OmniBase::LockUnique lock( omni->getStateMutex() );
+
     if (hdCheckCalibration() == HD_CALIBRATION_NEEDS_UPDATE)
     {
       ROS_DEBUG("Updating calibration...");
@@ -170,10 +173,7 @@ HDCallbackCode HDCALLBACK OmniEthernet::callback(void *pdata)
                     - 0.001 * omni->state.velocities[k];
         }
     }
-    const double force[3] = {omni->state.force[0],
-                           omni->state.force[1],
-                           omni->state.force[2]};
-    hdSetDoublev(HD_CURRENT_FORCE, force);
+    hdSetLongv(HD_CURRENT_MOTOR_DAC_VALUES, omni->force_output);
     //Get buttons
     int nButtons = 0;
     hdGetIntegerv(HD_CURRENT_BUTTONS, &nButtons);
@@ -191,5 +191,12 @@ HDCallbackCode HDCALLBACK OmniEthernet::callback(void *pdata)
     }
 
     return HD_CALLBACK_CONTINUE;
+}
+
+void OmniEthernet::mapTorque()
+{
+    force_output[0] = state.control[0] * 32767;
+    force_output[1] = state.control[1] * 32767;
+    force_output[2] = state.control[2] * 32767;
 }
 

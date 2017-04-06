@@ -11,13 +11,12 @@ OmniController::OmniController(/*std::string topicName*/)
 {
     nodeName="controller";
 	enable_gamepad = false;
-	enable_keyboard = true;
-	ros::NodeHandle n;
+    enable_keyboard = true;
     force_pub = n.advertise<geometry_msgs::Vector3>("control",1);
     enable_control_pub = n.advertise<std_msgs::Bool>("enable_control",1);
     keyboard_sub = n.subscribe("keyboard/keydown", 1, &OmniController::keyboardPublisher, this);
     gamepad_sub = n.subscribe("joy", 1, &OmniController::gamepadPublisher, this);
-} 	
+}
 
 void OmniController::keyboardPublisher(const keyboard::Key::ConstPtr& msg)
 {
@@ -105,8 +104,27 @@ void OmniController::gamepadPublisher(const sensor_msgs::Joy::ConstPtr& msg)
 	forceOutput.x = -msg->axes[0];
 	forceOutput.y = msg->axes[1];
 	forceOutput.z = ((msg->axes[2] - 1) - (msg->axes[5] - 1))/2;
-	force_pub.publish(forceOutput);
+    force_pub.publish(forceOutput);
 }
+
+void OmniController::teleoperation(std::string robot_name)
+{
+//    teleop_sub = n.subscribe("twist", 1, &OmniController::teleoperationCallback, this);
+
+
+}
+
+void OmniController::omniEthernetTeleop()
+{
+    teleoperation("omniEthernet");
+}
+
+void OmniController::omniFirewireTeleop()
+{
+    teleoperation("omniFirewire");
+}
+
+
 
 int main(int argc, char **argv)
 {

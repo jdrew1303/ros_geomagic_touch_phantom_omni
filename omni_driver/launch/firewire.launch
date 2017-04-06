@@ -10,7 +10,7 @@
 
         <node name="state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
             <remap from="robot_description" to="omni_robot_description" />
-            <param name="tf_prefix" type="string" value="" />
+            <param name="~tf_prefix" type="string" value="" />
         </node>
 
         <node name="controller" pkg="omni_controller" type="omni_controller">

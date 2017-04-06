@@ -28,6 +28,34 @@ class OmniBase
 private:
     boost::shared_mutex mutex_state;                        ///< Mutex state returned by @link getMutexState().
 
+    template <typename Type>
+    void checkLimits(Type & value, Type min, Type max)
+    {
+        if (value < min)
+        {
+            value = min;
+        }
+        else if (value > max)
+        {
+            value = max;
+        }
+    }
+
+    template <typename Type>
+    void checkLimits(std::vector<Type> & values, Type min, Type max)
+    {
+        for (auto iter = values.begin(); iter < values.end(); ++iter)
+        {
+            checkLimits(*iter, min, max);
+        }
+    }
+
+    void fwdKin(const unsigned int idx = 5);
+
+    void calculateVelocities();
+
+    void getEffectorVelocity();
+
 protected:
     typedef boost::posix_time::microsec_clock Clock;
     typedef boost::posix_time::ptime Time;
@@ -46,6 +74,7 @@ protected:
         std::vector<double> position;
         std::vector<double> velocities;
         std::vector<double> vel_hist1;
+        std::vector<double> twist;
         std::vector<bool>   buttons;
         std::vector<std::string> joint_names;
         Time time_last_angle_acquisition;
@@ -66,6 +95,7 @@ protected:
             joint_names.resize(6);
             angles_hist1.resize(6);
             vel_hist1.resize(6);
+            twist.resize(6);
 
             // Buttons
             buttons.resize(2);
@@ -95,12 +125,19 @@ protected:
     ros::Publisher pub_pose;                    ///< Pose ROS publisher.
     geometry_msgs::PoseStamped pose_stamped;
 
+    ros::Publisher pub_twist;
+    geometry_msgs::Twist twist;
+
     ros::Publisher pub_button;                  ///< Button ROS publisher.
     omni_driver::OmniButtonEvent button_event;
+
+    ros::Subscriber sub_teleop;
+    ros::Publisher pub_teleop;
 
     robot_model::RobotModelPtr kinematic_model;
     robot_state::RobotStatePtr kinematic_state;
     robot_state::JointModelGroup* joint_model_group;
+    const robot_state::LinkModel* end_effector_link_model;
 
 
     bool last_buttons[2];                       ///< Needed for "Button Clicked" logic.
@@ -130,6 +167,12 @@ protected:
     {
         return &state;
     }
+
+    /**
+     * @brief Called by the base after a new control value has been received.
+     * @see setTorque
+     */
+    virtual void mapTorque() = 0;
 
 
 public:
@@ -172,7 +215,7 @@ public:
 
     /**
      * @brief Gets the current joint angles.
-     * @param angles Vector that will store the angles.
+     * @param angles std::Vector that will store the angles.
      */
     inline void getJointAngles(std::vector<double> &angles)
     {
@@ -182,8 +225,24 @@ public:
     }
 
     /**
+     * @brief Gets the current joint angles.
+     * @param angles Eigen::VectorXd that will store the angles.
+     */
+    inline void getJointAngles(Eigen::VectorXd angles)
+    {
+        // Protect the critical section.
+        LockShared lock( getStateMutex() );
+        angles << state.angles[0],
+                        state.angles[1],
+                        state.angles[2],
+                        state.angles[3],
+                        state.angles[4],
+                        state.angles[5];
+    }
+
+    /**
      * @brief Gets the current buttons' state.
-     * @param button Vector that will store the states.
+     * @param button std::Vector that will store the states.
      */
     void getButtonsState(std::vector<bool>& button)
     {
@@ -194,7 +253,7 @@ public:
 
     /**
      * @brief Gets the current force acting on the tip.
-     * @param force Vector that will store the force.
+     * @param force std::vector that will store the force.
      */
     inline void getForce(std::vector<double> &force)
     {
@@ -204,14 +263,14 @@ public:
 
     /**
      * @brief Sets the torque on the first three joints.
-     * @param torque 3-elements vector with the torque values.
+     * @param torque 3-elements std::vector with the torque values.
      */
-    inline void setTorque(const std::vector<double> &torque)
+    inline void setTorque(std::vector<double> &torque)
     {
         LockUnique lock( getStateMutex() );
-        state.control[0] = (torque[0] + 1) / 2 * 4095;
-        state.control[1] = (torque[1] + 1) / 2 * 4095;
-        state.control[2] = (torque[2] + 1) / 2 * 4095;
+        checkLimits(torque, -1.0, 1.0);
+        state.control = torque;
+        this->mapTorque();
     }
 
     /**
@@ -228,20 +287,11 @@ public:
      * @brief Chooses if the control on the first three joints is on.
      * @param enable True to enable. False otherwise.
      */
-    inline void enableControl(bool enable)
-    {
-        {
-            // Creating a new scope to avoid a deadlock
-            LockUnique lock( getStateMutex() );
-            state.control_on = enable;
-            enable_force_flag = enable;
-        }
-        this->resetTorque();
-    }
+    virtual void enableControl(bool enable) = 0;
 
     /**
      * @brief Gets the current joint velocities.
-     * @param vel Vector that will store the velocities.
+     * @param vel std::vector that will store the velocities.
      */
     inline void getJointVelocities(std::vector<double> &vel)
     {
@@ -250,8 +300,23 @@ public:
     }
 
     /**
+     * @brief Gets the current joint velocities.
+     * @param vel Eigen::VectorXd that will store the velocities.
+     */
+    inline void getJointVelocities(Eigen::VectorXd vel)
+    {
+        LockShared lock( getStateMutex() );
+        vel << state.velocities[0],
+               state.velocities[1],
+               state.velocities[2],
+               state.velocities[3],
+               state.velocities[4],
+               state.velocities[5];
+    }
+
+    /**
      * @brief Gets the current tip position with respect to the robot's base frame.
-     * @param pos Vector that will store the position.
+     * @param pos std::vector that will store the position.
      */
     inline void getTipPosition(std::vector<double> &pos)
     {
@@ -301,6 +366,8 @@ public:
         return state.calibrated;
     }
 
+    void updateRobotState();
+
 public:
 
     /**
@@ -315,11 +382,16 @@ public:
      */
     void enableControlCallback(const std_msgs::Bool::ConstPtr& msg);
 
-    void updateRobotState();
+    /**
+     * @brief teleoperation Method used to teleoperate other robots using the omni device. To use it, pass the desired teleoperation robot name.
+     * Note that the robot must have the default topic names, i.e. robot_name/joint_states, robot_name/twist, etc.
+     * @param robot_name String correspondig to your robot prefix in the ROS topics.
+     */
+    void teleoperationMaster(std::string robot_name);
 
-    void fwdKin(const unsigned int idx = 5);
+    void teleoperationSlave();
 
-    void calculateVelocities();
+
 };
 
 typedef boost::shared_ptr<OmniBase> OmniBasePtr;

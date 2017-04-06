@@ -8,6 +8,7 @@ Panels:
         - /Status1
         - /TF1
         - /TF1/Frames1
+        - /RobotModel1
         - /Axes1
       Splitter Ratio: 0.5
     Tree Height: 463

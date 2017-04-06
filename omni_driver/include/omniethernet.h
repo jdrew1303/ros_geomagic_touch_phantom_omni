@@ -34,6 +34,7 @@ private:
     HDErrorInfo error;
     HHD hHD;
     HDSchedulerHandle handle_callback;
+    HDlong force_output[3];
 
     /**
      * @brief Calibrates the device using one of the supported styles.
@@ -57,6 +58,9 @@ private:
      * @return Returns 1 if the communication should continue, 0 otherwise.
      */
     static HDCallbackCode HDCALLBACK callback(void *pdata);
+
+protected:
+    void mapTorque();
 
 public:
     static int calibrationStyle;
@@ -84,6 +88,28 @@ public:
      */
     OmniEthernet(const std::string &name = "");
     ~OmniEthernet();
+
+    inline void enableControl(bool enable)
+    {
+        {
+            // Creating a new scope to avoid a deadlock
+            LockUnique lock( getStateMutex() );
+            state.control_on = enable;
+            enable_force_flag = enable;
+        }
+        if (enable)
+        {
+            hdDisable(HD_FORCE_OUTPUT);
+            hdEnable(HD_FORCE_OUTPUT);
+        }
+        else
+        {
+            hdDisable(HD_FORCE_OUTPUT);
+        }
+
+        this->resetTorque();
+    }
+
 };
 
 typedef boost::shared_ptr<OmniEthernet> OmniEthernetPtr;

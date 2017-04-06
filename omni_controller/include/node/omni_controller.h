@@ -21,8 +21,10 @@ private:
 	ros::Publisher enable_control_pub;
 	std_msgs::Bool enable_control;
 	geometry_msgs::Vector3 forceOutput;
+    ros::NodeHandle n;
 	ros::Subscriber keyboard_sub;
 	ros::Subscriber gamepad_sub;
+    ros::Subscriber teleop_sub;
 	bool enable_gamepad;
 	bool enable_keyboard;
 
@@ -33,6 +35,17 @@ public:
 	void keyboardPublisher(const keyboard::Key::ConstPtr& msg);
 
 	void gamepadPublisher(const sensor_msgs::Joy::ConstPtr& msg);
+
+    /**
+     * @brief teleoperation Method used to teleoperate other robots using the omni device. To use it, pass the desired teleoperation robot name.
+     * Note that the robot must have the default topic names, i.e. robot_name/joint_states, robot_name/twist, etc.
+     * @param robot_name String correspondig to your robot prefix in the ROS topics.
+     */
+    void teleoperation(std::string robot_name);
+
+    void omniEthernetTeleop();
+
+    void omniFirewireTeleop();
 
 	const std::string getNodeName()
 	{

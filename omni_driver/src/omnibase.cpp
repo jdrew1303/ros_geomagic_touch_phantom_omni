@@ -16,8 +16,6 @@ OmniBase::OmniBase(const std::string &name, double velocity_filter_minimum_dt)
     : name(name), enable_force_flag(false),
       velocity_filter_minimum_dt(velocity_filter_minimum_dt)
 {
-    this->resetTorque();
-
     node = ros::NodeHandlePtr( new ros::NodeHandle("") );
 
     // Prepare joint state publisher.
@@ -28,6 +26,10 @@ OmniBase::OmniBase(const std::string &name, double velocity_filter_minimum_dt)
     topic_name = name + "pose";
     pub_pose = node->advertise<geometry_msgs::PoseStamped>(topic_name, 10);
     pose_stamped.header.frame_id = name + "stylus";
+
+    // Prepare pose publisher.
+    topic_name = name + "twist";
+    pub_twist = node->advertise<geometry_msgs::Twist>(topic_name, 10);
 
     // Prepare button state publisher.
     topic_name = name + "button_state";
@@ -62,6 +64,7 @@ OmniBase::OmniBase(const std::string &name, double velocity_filter_minimum_dt)
     kinematic_state->setToDefaultValues();
     joint_model_group = kinematic_model->getJointModelGroup("all");
     state.joint_names = joint_model_group->getJointModelNames();
+    end_effector_link_model = kinematic_state->getLinkModel("end_effector");
     //
     const int n = state.joint_names.size();
     joint_state.name.resize(n);
@@ -81,8 +84,17 @@ void OmniBase::enableControlCallback(const std_msgs::Bool::ConstPtr & msg)
 
 void OmniBase::updateRobotState()
 {
+    Eigen::VectorXd joint_angles(6);
+    joint_angles << state.angles[0],
+            state.angles[1],
+            state.angles[2],
+            state.angles[3],
+            state.angles[4],
+            state.angles[5];
+    kinematic_state->setJointGroupPositions(joint_model_group, joint_angles);
     fwdKin();
     calculateVelocities();
+    getEffectorVelocity();
 }
 
 void OmniBase::fwdKin(const unsigned int idx)
@@ -94,14 +106,6 @@ void OmniBase::fwdKin(const unsigned int idx)
         return;
     }
     Eigen::Affine3d end_effector_state;
-    Eigen::VectorXd joint_angles(6);
-    joint_angles << state.angles[0],
-                    state.angles[1],
-                    state.angles[2],
-                    state.angles[3],
-                    state.angles[4],
-                    state.angles[5];
-    kinematic_state->setJointGroupPositions(joint_model_group, joint_angles);
     end_effector_state = kinematic_state->getGlobalLinkTransform("end_effector");
     Eigen::Quaterniond quat(end_effector_state.rotation());
     Eigen::Vector3d pos = end_effector_state.translation();
@@ -140,13 +144,53 @@ void OmniBase::calculateVelocities()
         }
         state.angles_hist1 = state.angles;
         state.time_last_angle_acquisition = state.time_current_angle_acquisition;
+        Eigen::VectorXd joint_velocities(6);
+        joint_velocities << state.velocities[0],
+                state.velocities[1],
+                state.velocities[2],
+                state.velocities[3],
+                state.velocities[4],
+                state.velocities[5];
+        kinematic_state->setJointGroupVelocities(joint_model_group,joint_velocities);
     }
 }
 
+void OmniBase::getEffectorVelocity()
+{
+    Eigen::Vector3d origin(0,0,0);
+    Eigen::MatrixXd jacobian(6,6);
+    kinematic_state->getJacobian(joint_model_group, end_effector_link_model, origin, jacobian, false);
+    Eigen::VectorXd thetaDot(6);
+
+    thetaDot(0) = state.velocities[0];
+    thetaDot(1) = state.velocities[1];
+    thetaDot(2) = state.velocities[2];
+    thetaDot(3) = state.velocities[3];
+    thetaDot(4) = state.velocities[4];
+    thetaDot(5) = state.velocities[5];
+    Eigen::VectorXd xDot(6);
+    xDot = jacobian * thetaDot;
+    for (int i=0; i<6; ++i)
+    {
+        state.twist[i] = xDot(i);
+    }
+}
+
+void OmniBase::teleoperationMaster(std::string robot_name)
+{
+    std::string topic_name = robot_name + "/teleop";
+    pub_teleop = node->advertise<geometry_msgs::Twist>(topic_name, 10);
+}
+
+void OmniBase::teleoperationSlave()
+{
+
+}
 
 void OmniBase::publishOmniState()
 {
-    if (!this->connected() || !this->calibrated()) {
+    if (!this->connected() || !this->calibrated())
+    {
         // Phantom Omni is not open or calibrated. Don't publish.
         return;
     }
@@ -163,14 +207,6 @@ void OmniBase::publishOmniState()
     {
         joint_state.position[i] = joint_angles[i];
         joint_state.velocity[i] = joint_velocities[i];
-
-//        if (i==4)
-//        {
-//            // The next line is a necessary to recalibrate potentiometer #2.
-//            joint_state.position[4]=(joint_state.position[4]+0.27+(joint_state.position[4]+1.73)/1.72);
-//        }
-
-
     }
 
     // Publish the joint state;
@@ -186,6 +222,15 @@ void OmniBase::publishOmniState()
     pose_stamped.pose.orientation.y = state.orientation[2];
     pose_stamped.pose.orientation.z = state.orientation[3];
     pub_pose.publish(pose_stamped);
+
+    // Publish the twist.
+    twist.linear.x = state.twist[0];
+    twist.linear.y = state.twist[1];
+    twist.linear.z = state.twist[2];
+    twist.angular.x = state.twist[3];
+    twist.angular.y = state.twist[4];
+    twist.angular.z = state.twist[5];
+    pub_twist.publish(twist);
 
     // Publish the button event.
     std::vector<bool> button_state;

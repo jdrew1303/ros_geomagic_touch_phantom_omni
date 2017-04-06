@@ -10,6 +10,8 @@ OmniFirewire::OmniFirewire(const std::string &serial_number, const std::string &
     handle_(NULL), tx_handle_(NULL), rx_handle_(NULL),
     port_(-1), node_(-1), tx_iso_channel_(-1), rx_iso_channel_(-1)
 {
+    this->resetTorque();
+
     gimbal_filter_1.resize(GIMBAL_FILTER_SIZE);
     gimbal_filter_2.resize(GIMBAL_FILTER_SIZE);
     gimbal_filter_3.resize(GIMBAL_FILTER_SIZE);
@@ -100,7 +102,7 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
         // Compute the gimbal values.
         // All angles should be ~= 0 when docked.
         omni->state.angles[3] = -(5.48 * omni->pot_filter_accum_[0] - 2.74) + 0.020 + 0.025367101673835286;
-        omni->state.angles[4] = -(5.28 * omni->pot_filter_accum_[1] + 2.64) - 0.447 +0.9559879360058527;
+        omni->state.angles[4] = -(5.28 * omni->pot_filter_accum_[1] + 2.64) ;
         omni->state.angles[5] =  (4.76 * omni->pot_filter_accum_[2] - 2.3) - 0.085;
 
     }
@@ -480,6 +482,13 @@ void OmniFirewire::stopIsochronousTransmission()
         raw1394_destroy_handle(rx_handle_);
         rx_handle_ = NULL;
     }
+}
+
+void OmniFirewire::mapTorque()
+{
+    state.control[0] = (state.control[0] + 1) / 2 * 4095;
+    state.control[1] = (state.control[1] + 1) / 2 * 4095;
+    state.control[2] = (state.control[2] + 1) / 2 * 4095;
 }
 
 std::string OmniFirewire::unpackSerialNumber(uint32_t packed)
