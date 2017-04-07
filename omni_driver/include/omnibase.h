@@ -24,8 +24,11 @@
 
 class OmniBase
 {
-
 private:
+    double last_published_joint5_velocity;
+
+    static const unsigned int MAX_FREEZE_COUNT = 100;
+
     boost::shared_mutex mutex_state;                        ///< Mutex state returned by @link getMutexState().
 
     template <typename Type>
@@ -85,6 +88,7 @@ protected:
         bool lock = false;
         unsigned int seq = 0;
         Time stamp;
+        unsigned int freeze_count;
 
         OmniState()
         {
@@ -142,7 +146,6 @@ protected:
 
     bool last_buttons[2];                       ///< Needed for "Button Clicked" logic.
     bool enable_force_flag;                     ///< Needed for resetting the internal enable control.
-
     double velocity_filter_minimum_dt;          ///< TODO value in milliseconds
 
     typedef boost::unique_lock<boost::shared_mutex>            LockUnique;          ///< The unique lock, used to protect data while writing.
@@ -212,6 +215,11 @@ public:
      * @see connect, disconnect
      */
     virtual bool connected() = 0;
+
+    /**
+     * @brief Wakes up the communications if it is frozen.
+     */
+    virtual void wakeup() = 0;
 
     /**
      * @brief Gets the current joint angles.

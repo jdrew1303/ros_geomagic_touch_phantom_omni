@@ -65,7 +65,6 @@ int main(int argc, char **argv)
         // Force a reconnection if connection was lost
         if (!omni->connected())
         {
-            std::cout << "Lost connection" << std::endl;
             omni->disconnect();
             omni->connect();
         }

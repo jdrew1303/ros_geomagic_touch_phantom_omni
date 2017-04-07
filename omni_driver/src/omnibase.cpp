@@ -14,7 +14,8 @@ OmniBase::OmniBase(const std::string &name)
 
 OmniBase::OmniBase(const std::string &name, double velocity_filter_minimum_dt)
     : name(name), enable_force_flag(false),
-      velocity_filter_minimum_dt(velocity_filter_minimum_dt)
+      velocity_filter_minimum_dt(velocity_filter_minimum_dt),
+      last_published_joint5_velocity(0)
 {
     node = ros::NodeHandlePtr( new ros::NodeHandle("") );
 
@@ -189,7 +190,7 @@ void OmniBase::teleoperationSlave()
 
 void OmniBase::publishOmniState()
 {
-    if (!this->connected() || !this->calibrated())
+    if (!this->connected() /*|| !this->calibrated()*/)
     {
         // Phantom Omni is not open or calibrated. Don't publish.
         return;
@@ -242,6 +243,22 @@ void OmniBase::publishOmniState()
     last_buttons[0] = button_state[0];
     last_buttons[1] = button_state[1];
     pub_button.publish(button_event);
+
+    // Check if the device is frozen. This usually happens when the read buffer
+    // is too small and it is completely filled (at least that is what we think).
+    if (state.velocities[5] == last_published_joint5_velocity)
+    {
+        if (++state.freeze_count > MAX_FREEZE_COUNT)
+        {
+            state.freeze_count = 0;
+            this->wakeup();
+        }
+    }
+    else
+    {
+        state.freeze_count = 0;
+    }
+    last_published_joint5_velocity = state.velocities[5];
 }
 
 void OmniBase::torqueCallback(const geometry_msgs::Vector3::ConstPtr & msg)

@@ -135,6 +135,10 @@ bool OmniEthernet::connected()
     return this->state.connected;
 }
 
+void OmniEthernet::wakeup()
+{
+}
+
 void OmniEthernet::disconnect()
 {
     ROS_INFO("Ending Session....");

@@ -232,6 +232,14 @@ bool OmniFirewire::connected()
     return this->state.connected;
 }
 
+void OmniFirewire::wakeup()
+{
+    raw1394_wake_up(rx_handle_);
+    raw1394_wake_up(tx_handle_);
+    this->disconnect();
+    this->connect();
+}
+
 void OmniFirewire::disconnect()
 {
     // Turn the dock LED off.
@@ -302,14 +310,16 @@ std::vector<OmniFirewire::OmniInfo> OmniFirewire::enumerate_omnis()
 
 void * OmniFirewire::isoThreadCallback()
 {
+    this->rx_handle_status = 0;
+    this->tx_handle_status = 0;
     while (this->thread_status != THREAD_TERMINATE
-           && raw1394_loop_iterate(this->rx_handle_) != -1
-           && raw1394_loop_iterate(this->tx_handle_) != -1)
+           && this->rx_handle_status != -1
+           && this->tx_handle_status != -1)
     {
-        // Empty
+        this->rx_handle_status = raw1394_loop_iterate(this->rx_handle_);
+        this->tx_handle_status = raw1394_loop_iterate(this->tx_handle_);
     }
 
-    std::cout << "Exited driver thread!!!" << std::endl;
     this->state.connected = false;
 
     return NULL;
@@ -401,7 +411,7 @@ bool OmniFirewire::startIsochronousTransmission()
     raw1394_set_userdata(rx_handle_, this);
     if (raw1394_iso_recv_init(rx_handle_,
                               OmniFirewire::callbackRead,
-                              20,
+                              100,
                               0x40,
                               rx_iso_channel_,
                               RAW1394_DMA_PACKET_PER_BUFFER,
@@ -450,6 +460,11 @@ void OmniFirewire::stopIsochronousTransmission()
     // Stop the thread.
     if (thread_status != THREAD_READY) {
         thread_status = THREAD_TERMINATE;
+
+        // Make sure any pending calls are destroyed
+        raw1394_wake_up(rx_handle_);
+        raw1394_wake_up(tx_handle_);
+
         thread_driver->join();
     }
     thread_status = THREAD_READY;

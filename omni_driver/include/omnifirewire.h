@@ -22,7 +22,7 @@
 class OmniFirewire : public OmniBase
 {
 private:
-
+    int rx_handle_status, tx_handle_status;
     static const unsigned int GIMBAL_FILTER_SIZE = 100;
 
     std::vector<double> gimbal_filter_1;
@@ -176,6 +176,11 @@ private:
      * @return Returns 1 if connected, 0 otherwise.
      */
     bool connected();
+
+    /**
+     * @brief Wakes up.
+     */
+    void wakeup();
 
     /**
      * @brief Starts the firewire isochronous transmission.

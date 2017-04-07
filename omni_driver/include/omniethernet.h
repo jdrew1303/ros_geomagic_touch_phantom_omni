@@ -78,6 +78,11 @@ public:
     bool connected();
 
     /**
+     * @brief Wakes up.
+     */
+    void wakeup();
+
+    /**
      * @brief Disconnects the device, called by destructor.
      */
     void disconnect();
