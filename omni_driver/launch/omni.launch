@@ -1,0 +1,28 @@
+<launch>
+    <param name="omni_urdf" command="cat $(find omni_description)/urdf/omni.urdf" />
+    <param name="omni_srdf" command="cat $(find omni_moveit)/config/phantom_omni.srdf" />
+
+    <arg name="prefix" default="" />
+    <arg name="namespace" default="omni" />
+    <arg name="type" default="" />
+
+    <arg name="teleop_master" default="true" />
+    <arg name="teleop_remap" default="/teleop" />
+
+    <group ns="$(arg namespace)">
+		<node name="driver" pkg="omni_driver" type="omni_driver" output="screen">
+			<param name="omni_name" type="string" value="" />
+            <param name="omni_type" type="string" value="$(arg type)" />
+			<param name="omni_serial" type="string" value="11129400000" />
+            <param name="teleop_master" type="boolean" value="$(arg teleop_master)" />
+
+            <remap from="/teleop" to="$(arg teleop_remap)" />
+		</node>
+
+		<node name="state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+            <param name="~tf_prefix" type="string" value="$(arg prefix)" />
+            <remap from="robot_description" to="omni_urdf" />
+        </node>
+    </group>
+ 	
+</launch>

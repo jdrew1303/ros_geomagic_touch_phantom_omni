@@ -3,6 +3,9 @@
     <arg name="namespace" default="omniFirewire" />
     <arg name="type" default="firewire" />
 
+    <arg name="teleop_master" value="false" />
+    <arg name="teleop_remap" default="/omniEthernet/teleop" />
+
     <include file="$(find omni_driver)/launch/omni.launch" pass_all_args="true" />
 
 </launch>

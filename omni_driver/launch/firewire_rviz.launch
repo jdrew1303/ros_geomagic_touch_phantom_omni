@@ -1,0 +1,10 @@
+<launch>
+    <arg name="prefix" default=""/>
+
+    <include file="$(find omni_driver)/launch/firewire.launch" pass_all_args="true" />
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find omni_controller)/cfg/omni.rviz" required="true">
+        <param name="~tf_prefix" type="string" value="$(arg prefix)" />
+    </node>
+ 	
+</launch>
