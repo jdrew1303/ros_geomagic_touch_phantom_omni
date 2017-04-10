@@ -37,6 +37,7 @@ add_message_files(
    OmniButtonEvent.msg
    OmniFeedback.msg
    OmniState.msg
+   TeleopControl.msg
 )
 
 ## Generate services in the 'srv' folder
