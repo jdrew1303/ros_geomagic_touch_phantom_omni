@@ -15,7 +15,9 @@ OmniBase::OmniBase(const std::string &name)
 OmniBase::OmniBase(const std::string &name, double velocity_filter_minimum_dt)
     : name(name), enable_force_flag(false),
       velocity_filter_minimum_dt(velocity_filter_minimum_dt),
-      last_published_joint5_velocity(0)
+      last_published_joint5_velocity(0),
+      teleop_sensitivity(0),
+      teleop_master(true)
 {
     node = ros::NodeHandlePtr( new ros::NodeHandle("") );
 
@@ -32,9 +34,14 @@ OmniBase::OmniBase(const std::string &name, double velocity_filter_minimum_dt)
     topic_name = name + "twist";
     pub_twist = node->advertise<geometry_msgs::Twist>(topic_name, 10);
 
-    // Prepare button state publisher.
+    // Prepare button state publisher and subscribe it.
     topic_name = name + "button_state";
     pub_button = node->advertise<omni_driver::OmniButtonEvent>(topic_name, 10);
+    sub_button = node->subscribe(topic_name, 1, &OmniBase::buttonCallback, this);
+
+    // Prepare teleop publisher
+    topic_name = name + "teleop";
+    pub_teleop_control = node->advertise<omni_driver::TeleopControl>(topic_name, 1);
 
     // Subscribe omni_control topic.
     topic_name = name + "control";
@@ -44,8 +51,16 @@ OmniBase::OmniBase(const std::string &name, double velocity_filter_minimum_dt)
     topic_name = name + "enable_control";
     sub_enable_control = node->subscribe(topic_name, 1, &OmniBase::enableControlCallback, this);
 
-    // Subscribe button_state topic.
-    topic_name = name + "button_state";
+    // Subscribe to teleop topic if this omni is a slave
+    ros::param::param<bool>("~teleop_master", teleop_master, true);
+    if (!teleop_master)
+    {
+        this->teleoperationSlave();
+    }
+
+    // Initialize teleop_control message fields
+    teleop_control.vel_joint.resize(6);
+    teleop_control.vel_effector.resize(6);
 
     std::memset(last_buttons, 0, sizeof(last_buttons));
 
@@ -177,15 +192,67 @@ void OmniBase::getEffectorVelocity()
     }
 }
 
-void OmniBase::teleoperationMaster(std::string robot_name)
-{
-    std::string topic_name = robot_name + "/teleop";
-    pub_teleop = node->advertise<geometry_msgs::Twist>(topic_name, 10);
-}
-
 void OmniBase::teleoperationSlave()
 {
+    sub_teleop = node->subscribe("/teleop", 1, &OmniBase::jointTeleopCallback, this);
+}
 
+void OmniBase::jointTeleopCallback(const omni_driver::TeleopControl::ConstPtr& msg)
+{
+    std::vector<double> vels;
+    switch (msg->mode)
+    {
+    case 0: // joint space
+        if (msg->vel_joint.size() < 3)
+        {
+            ROS_ERROR("TELEOP: Joint velocity vector should contain at least 3 elements!");
+            return;
+        }
+        vels = msg->vel_joint;
+        vels.resize(3);
+        this->setTorque(vels);
+        break;
+    case 1: // cartesian space
+        std::cerr << "Control type 1" << std::endl;
+
+        //todo
+        break;
+    }
+}
+
+void OmniBase::buttonCallback(const omni_driver::OmniButtonEvent::ConstPtr &msg)
+{
+    if (teleop_master)
+    {
+
+        if (msg->grey_button_clicked)
+        {
+            ++teleop_sensitivity;
+
+            ROS_INFO_STREAM(teleop_sensitivity);
+        }
+        if (msg->white_button_clicked)
+        {
+            if (teleop_sensitivity-- > 0);
+            else
+                teleop_sensitivity = 0;
+
+            ROS_INFO_STREAM(teleop_sensitivity);
+        }
+    }
+    else
+    {
+        if (msg->grey_button_clicked)
+        {
+            enableControl(true);
+            ROS_INFO("TELEOP: EnableControl = true");
+        }
+        if (msg->white_button_clicked)
+        {
+            enableControl(false);
+            ROS_INFO("TELEOP: EnableControl = false");
+        }
+    }
 }
 
 void OmniBase::publishOmniState()
@@ -243,6 +310,20 @@ void OmniBase::publishOmniState()
     last_buttons[0] = button_state[0];
     last_buttons[1] = button_state[1];
     pub_button.publish(button_event);
+
+    // Publish the teleoperation data.
+    if (teleop_master)
+    {
+        const double sensitivity_step = 0.01;
+        for (unsigned int k = 0; k < state.velocities.size(); ++k)
+        {
+            teleop_control.vel_joint[k] = teleop_sensitivity * sensitivity_step * state.velocities[k];
+        }
+        teleop_control.vel_effector = state.twist;
+        teleop_control.mode = 0;
+        pub_teleop_control.publish(teleop_control);
+    }
+
 
     // Check if the device is frozen. This usually happens when the read buffer
     // is too small and it is completely filled (at least that is what we think).

@@ -116,7 +116,7 @@ Visualization Manager:
           Show Trail: false
           Value: true
       Name: RobotModel
-      Robot Description: omni_robot_description
+      Robot Description: omni_urdf
       TF Prefix: ""
       Update Interval: 0
       Value: true

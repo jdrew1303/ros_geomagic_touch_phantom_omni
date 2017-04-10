@@ -199,7 +199,7 @@ HDCallbackCode HDCALLBACK OmniEthernet::callback(void *pdata)
 
 void OmniEthernet::mapTorque()
 {
-    force_output[0] = state.control[0] * 32767;
+    force_output[0] = -state.control[0] * 32767;
     force_output[1] = state.control[1] * 32767;
     force_output[2] = state.control[2] * 32767;
 }

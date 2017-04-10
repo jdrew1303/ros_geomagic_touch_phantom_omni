@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <vector>
 
 #include <boost/thread.hpp>
@@ -21,11 +20,16 @@
 #include <moveit/robot_model_loader/robot_model_loader.h>
 
 #include "omni_driver/OmniButtonEvent.h"
+#include "omni_driver/TeleopControl.h"
 
 class OmniBase
 {
 private:
     double last_published_joint5_velocity;
+
+    unsigned int teleop_sensitivity;
+
+    bool teleop_master;
 
     static const unsigned int MAX_FREEZE_COUNT = 100;
 
@@ -133,10 +137,13 @@ protected:
     geometry_msgs::Twist twist;
 
     ros::Publisher pub_button;                  ///< Button ROS publisher.
-    omni_driver::OmniButtonEvent button_event;
+    ros::Subscriber sub_button;
 
     ros::Subscriber sub_teleop;
-    ros::Publisher pub_teleop;
+    ros::Publisher pub_teleop_control;
+
+    omni_driver::OmniButtonEvent button_event;
+    omni_driver::TeleopControl teleop_control;
 
     robot_model::RobotModelPtr kinematic_model;
     robot_state::RobotStatePtr kinematic_state;
@@ -399,6 +406,9 @@ public:
 
     void teleoperationSlave();
 
+    void jointTeleopCallback(const omni_driver::TeleopControl::ConstPtr& msg);
+
+    void buttonCallback(const omni_driver::OmniButtonEvent::ConstPtr& msg);
 
 };
 

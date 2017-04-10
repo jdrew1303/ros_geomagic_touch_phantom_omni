@@ -102,7 +102,7 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
         // Compute the gimbal values.
         // All angles should be ~= 0 when docked.
         omni->state.angles[3] = -(5.48 * omni->pot_filter_accum_[0] - 2.74) + 0.020 + 0.025367101673835286;
-        omni->state.angles[4] = -(5.28 * omni->pot_filter_accum_[1] + 2.64) ;
+        omni->state.angles[4] = -(5.28 * 1.9 * omni->pot_filter_accum_[1] + 2.64) + 8.76231837158503;
         omni->state.angles[5] =  (4.76 * omni->pot_filter_accum_[2] - 2.3) - 0.085;
 
     }
