@@ -17,7 +17,8 @@ OmniBase::OmniBase(const std::string &name, double velocity_filter_minimum_dt)
       velocity_filter_minimum_dt(velocity_filter_minimum_dt),
       last_published_joint5_velocity(0),
       teleop_sensitivity(0),
-      teleop_master(true)
+      teleop_master(true),
+      vel_filter_counter(VELOCITIES_FILTER_SIZE)
 {
     node = ros::NodeHandlePtr( new ros::NodeHandle("") );
 
@@ -90,6 +91,8 @@ OmniBase::OmniBase(const std::string &name, double velocity_filter_minimum_dt)
     {
         joint_state.name[k] = name + state.joint_names[k];
     }
+
+
 }
 
 
@@ -110,6 +113,11 @@ void OmniBase::updateRobotState()
     kinematic_state->setJointGroupPositions(joint_model_group, joint_angles);
     fwdKin();
     calculateVelocities();
+    std::vector<double> filtered_velocities;
+    if ( filterVelocities(filtered_velocities) )
+    {
+        state.velocities = filtered_velocities;
+    }
     getEffectorVelocity();
 }
 
@@ -158,6 +166,7 @@ void OmniBase::calculateVelocities()
             }
             state.vel_hist1[i] = vel;
         }
+
         state.angles_hist1 = state.angles;
         state.time_last_angle_acquisition = state.time_current_angle_acquisition;
         Eigen::VectorXd joint_velocities(6);
@@ -168,6 +177,37 @@ void OmniBase::calculateVelocities()
                 state.velocities[4],
                 state.velocities[5];
         kinematic_state->setJointGroupVelocities(joint_model_group,joint_velocities);
+    }
+}
+
+bool OmniBase::filterVelocities(std::vector<double> &filtered_velocities)
+{
+    std::vector<double> filtered_vector;
+
+    if (vel_filter_counter <= 0)
+    {
+        velocities_filter.insert(velocities_filter.begin(), state.velocities);
+        velocities_filter.resize(VELOCITIES_FILTER_SIZE);
+        double velocities_mean = 0;
+
+        for (unsigned int i =0; i < state.velocities.size(); i++)
+        {
+            for (unsigned int j =0; j < velocities_filter.size(); j++)
+            {
+                velocities_mean += velocities_filter[j][i];
+            }
+            velocities_mean = velocities_mean/VELOCITIES_FILTER_SIZE;
+            filtered_vector.push_back(velocities_mean);
+        }
+        filtered_velocities = filtered_vector;
+        return 1;
+    }
+
+    else
+    {
+        velocities_filter.insert(velocities_filter.begin(), state.velocities);
+        --vel_filter_counter;
+        return 0;
     }
 }
 

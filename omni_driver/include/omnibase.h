@@ -31,6 +31,12 @@ private:
 
     bool teleop_master;
 
+    static const unsigned int VELOCITIES_FILTER_SIZE = 5;
+
+    int vel_filter_counter;
+
+    std::vector<std::vector<double>> velocities_filter;
+
     static const unsigned int MAX_FREEZE_COUNT = 100;
 
     boost::shared_mutex mutex_state;                        ///< Mutex state returned by @link getMutexState().
@@ -60,6 +66,8 @@ private:
     void fwdKin(const unsigned int idx = 5);
 
     void calculateVelocities();
+
+    bool filterVelocities(std::vector<double> &filtered_velocities);
 
     void getEffectorVelocity();
 
@@ -409,6 +417,7 @@ public:
     void jointTeleopCallback(const omni_driver::TeleopControl::ConstPtr& msg);
 
     void buttonCallback(const omni_driver::OmniButtonEvent::ConstPtr& msg);
+
 
 };
 

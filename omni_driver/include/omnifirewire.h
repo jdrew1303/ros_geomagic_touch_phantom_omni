@@ -23,7 +23,7 @@ class OmniFirewire : public OmniBase
 {
 private:
     int rx_handle_status, tx_handle_status;
-    static const unsigned int GIMBAL_FILTER_SIZE = 100;
+    static const unsigned int GIMBAL_FILTER_SIZE = 20;
 
     std::vector<double> gimbal_filter_1;
     std::vector<double> gimbal_filter_2;
