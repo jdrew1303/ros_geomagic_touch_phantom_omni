@@ -67,7 +67,7 @@ private:
 
     void calculateVelocities();
 
-    bool filterVelocities(std::vector<double> &filtered_velocities);
+    void filterVelocities(std::vector<double> &filtered_velocities);
 
     void getEffectorVelocity();
 

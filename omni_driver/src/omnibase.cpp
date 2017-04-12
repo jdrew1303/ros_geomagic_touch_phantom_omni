@@ -114,10 +114,7 @@ void OmniBase::updateRobotState()
     fwdKin();
     calculateVelocities();
     std::vector<double> filtered_velocities;
-    if ( filterVelocities(filtered_velocities) )
-    {
-        state.velocities = filtered_velocities;
-    }
+    filterVelocities(filtered_velocities);
     getEffectorVelocity();
 }
 
@@ -180,10 +177,8 @@ void OmniBase::calculateVelocities()
     }
 }
 
-bool OmniBase::filterVelocities(std::vector<double> &filtered_velocities)
+void OmniBase::filterVelocities(std::vector<double> &filtered_velocities)
 {
-    std::vector<double> filtered_vector;
-
     if (vel_filter_counter <= 0)
     {
         velocities_filter.insert(velocities_filter.begin(), state.velocities);
@@ -192,22 +187,13 @@ bool OmniBase::filterVelocities(std::vector<double> &filtered_velocities)
 
         for (unsigned int i =0; i < state.velocities.size(); i++)
         {
-            for (unsigned int j =0; j < velocities_filter.size(); j++)
+            for (unsigned int j =0; j < VELOCITIES_FILTER_SIZE; j++)
             {
-                velocities_mean += velocities_filter[j][i];
+                velocities_mean += velocities_filter[i][j];
             }
             velocities_mean = velocities_mean/VELOCITIES_FILTER_SIZE;
-            filtered_vector.push_back(velocities_mean);
+            filtered_velocities[velocities_mean];
         }
-        filtered_velocities = filtered_vector;
-        return 1;
-    }
-
-    else
-    {
-        velocities_filter.insert(velocities_filter.begin(), state.velocities);
-        --vel_filter_counter;
-        return 0;
     }
 }
 
@@ -354,7 +340,7 @@ void OmniBase::publishOmniState()
     // Publish the teleoperation data.
     if (teleop_master)
     {
-        const double sensitivity_step = 0.01;
+        const double sensitivity_step = 0.001;
         for (unsigned int k = 0; k < state.velocities.size(); ++k)
         {
             teleop_control.vel_joint[k] = teleop_sensitivity * sensitivity_step * state.velocities[k];
