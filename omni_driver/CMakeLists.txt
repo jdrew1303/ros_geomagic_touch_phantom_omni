@@ -88,13 +88,13 @@ include_directories(
 #add_library()
 
 ## Include files that should be shown by the IDE
-file(GLOB_RECURSE PROJECT_HEADERS "include/*.h" "launch/*.launch")
+file(GLOB_RECURSE PROJECT_HEADERS "include/*.h" "launch/*.launch" "src/*.cpp")
 add_custom_target(omni_driver_files_for_ide SOURCES
     ${PROJECT_HEADERS}
     "cfg/uncrustify.cfg")
 
 ## Declare a cpp executable
-add_executable(omni_driver src/omnibase.cpp src/omnifirewire.cpp src/omninode.cpp src/omniethernet.cpp)
+add_executable(omni_driver src/omnibase.cpp src/omnifirewire.cpp src/omninode.cpp src/omniethernet.cpp src/raw1394msg.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes

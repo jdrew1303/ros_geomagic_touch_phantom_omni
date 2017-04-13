@@ -8,13 +8,20 @@ OmniFirewire::OmniFirewire(const std::string &serial_number, const std::string &
     thread_status(THREAD_READY),
     serial_number_(serial_number),
     handle_(NULL), tx_handle_(NULL), rx_handle_(NULL),
-    port_(-1), node_(-1), tx_iso_channel_(-1), rx_iso_channel_(-1)
+    port_(-1), node_(-1)
 {
     this->resetTorque();
 
     gimbal_filter_1.resize(GIMBAL_FILTER_SIZE);
     gimbal_filter_2.resize(GIMBAL_FILTER_SIZE);
     gimbal_filter_3.resize(GIMBAL_FILTER_SIZE);
+
+    // Set raw1394 messages
+    msg_tx_iso_channel = Raw1394Msg(0x1000,  1, -1);
+    msg_rx_iso_channel = Raw1394Msg(0x1001,  1, -1);
+    msg_start          = Raw1394Msg(0x1087,  1,  0x08);
+    msg_stop           = Raw1394Msg(0x1087,  1,  0x00);
+    msg_unknown        = Raw1394Msg(0x20010, 4,  0xf80f0000);
 }
 
 OmniFirewire::~OmniFirewire()
@@ -275,6 +282,10 @@ std::vector<OmniFirewire::OmniInfo> OmniFirewire::enumerate_omnis()
     struct raw1394_portinfo portinfo[maxports];
     int n_ports = raw1394_get_port_info(handle, portinfo, maxports);
 
+    // Set messages
+    Raw1394Msg msg_dev_id = Raw1394Msg(0x1006000c, sizeof(quadlet_t));
+    Raw1394Msg msg_serial = Raw1394Msg(0x10060010, sizeof(quadlet_t));
+
     // Iterate through the list of ports.
     for (int p = 0 ; p < n_ports; p++) {
         // Open the port if we can.
@@ -289,18 +300,15 @@ std::vector<OmniFirewire::OmniInfo> OmniFirewire::enumerate_omnis()
             uint32_t node = (1023 << 6) | n;
 
             // Check the device ID.
-            quadlet_t dev_id = 0;
-            raw1394_read(handle, node, 0x1006000c, sizeof(dev_id), &dev_id);
-            dev_id = ntohl(dev_id);
-            if (dev_id != 0x000b9900) {
+            msg_dev_id.read(handle, node);
+            if (msg_dev_id.getData() != 0x000b9900) {
                 // Not Phantom Omni.
                 continue;
             }
 
             // Now we know it's Phantom Omni. Store the info.
-            quadlet_t serial = 0;
-            raw1394_read(handle, node, 0x10060010, sizeof(serial), &serial);
-            const std::string& unpacked_serial = OmniFirewire::unpackSerialNumber(ntohl(serial));
+            msg_serial.read(handle, node);
+            const std::string &unpacked_serial = OmniFirewire::unpackSerialNumber(msg_serial);
             omnis.push_back(OmniInfo(unpacked_serial, p, node));
         }
     }
@@ -365,46 +373,40 @@ bool OmniFirewire::startIsochronousTransmission()
     // Find a free isochronous channel number for Tx.
     for (int ch = 0; ch < 63; ch++) {
         if (raw1394_channel_modify(handle_, ch, RAW1394_MODIFY_ALLOC) == 0) {
-            tx_iso_channel_ = ch;
+            msg_tx_iso_channel = ch;
             break;
         }
     }
-    if (tx_iso_channel_ == -1) {
+    if (!msg_tx_iso_channel) {
         // Channel not found. Abort.
         stopIsochronousTransmission();
         return false;
     }
 
     // Find a free isochronous channel number for Tx.
-    for (int ch = 0; ch < 63; ch++) {
+    for (unsigned int ch = 0; ch < 63; ch++) {
         if (raw1394_channel_modify(handle_, ch, RAW1394_MODIFY_ALLOC) == 0) {
-            rx_iso_channel_ = ch;
+            msg_rx_iso_channel = ch;
             break;
         }
     }
-    if (rx_iso_channel_ == -1) {
+    if (!msg_rx_iso_channel) {
         // Channel not found. Abort.
         stopIsochronousTransmission();
         return false;
     }
 
     // Set the Tx isochronous channel.
-    raw1394_write(handle_, node_, 0x1000, 1, (quadlet_t*)&tx_iso_channel_);
+    msg_tx_iso_channel.write(handle_, node_);
 
     // Set the Rx isochronous channel.
-    raw1394_write(handle_, node_, 0x1001, 1, (quadlet_t*)&rx_iso_channel_);
+    msg_rx_iso_channel.write(handle_, node_);
 
     // Not sure what this does, but it is required.
-    {
-        uint32_t data = 0xf80f0000;
-        raw1394_write(handle_, node_, 0x20010, 4, (quadlet_t*)&data);
-    }
+    msg_unknown.write(handle_, node_);
 
     // Tell Omni to start isochronous data transmission.
-    {
-        uint8_t data = 0x08;
-        raw1394_write(handle_, node_, 0x1087, 1, (quadlet_t*)&data);
-    }
+    msg_start.write(handle_, node_);
 
     // Register the read (rx) callback that will be called by the driver
     rx_handle_ = raw1394_new_handle_on_port(port_);
@@ -413,7 +415,7 @@ bool OmniFirewire::startIsochronousTransmission()
                               OmniFirewire::callbackRead,
                               100,
                               0x40,
-                              rx_iso_channel_,
+                              msg_rx_iso_channel,
                               RAW1394_DMA_PACKET_PER_BUFFER,
                              -1) == -1)
     {
@@ -434,7 +436,7 @@ bool OmniFirewire::startIsochronousTransmission()
                               OmniFirewire::callbackWrite,
                               1,
                               sizeof(tx_iso_buffer_),
-                              tx_iso_channel_,
+                              msg_tx_iso_channel,
                               RAW1394_ISO_SPEED_100,
                              -1) == -1)
     {
@@ -475,17 +477,16 @@ void OmniFirewire::stopIsochronousTransmission()
     }
 
     // Tell Omni to stop isochronous transmission.
-    uint8_t data = 0x00;
-    raw1394_write(handle_, node_, 0x1087, 1, (quadlet_t*)&data);
+    msg_stop.write(handle_, node_);
 
-    if (tx_iso_channel_ != -1) {
-        raw1394_channel_modify(handle_, tx_iso_channel_, RAW1394_MODIFY_FREE);
-        tx_iso_channel_ = -1;
+    if (msg_tx_iso_channel != -1) {
+        raw1394_channel_modify(handle_, msg_tx_iso_channel, RAW1394_MODIFY_FREE);
+        msg_tx_iso_channel.clearData();
     }
 
-    if (rx_iso_channel_ != -1) {
-        raw1394_channel_modify(handle_, rx_iso_channel_, RAW1394_MODIFY_FREE);
-        rx_iso_channel_ = -1;
+    if (msg_rx_iso_channel != -1) {
+        raw1394_channel_modify(handle_, msg_rx_iso_channel, RAW1394_MODIFY_FREE);
+        msg_rx_iso_channel.clearData();
     }
 
     if (tx_handle_ != NULL) {

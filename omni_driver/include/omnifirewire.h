@@ -1,7 +1,11 @@
 #pragma once
 
+
 #include "omnibase.h"
 #include "ros/ros.h"
+#include "raw1394msg.h"
+
+
 #include <iostream>
 #include <iomanip>
 #include <sstream>
@@ -34,13 +38,19 @@ private:
     double pot_filter_accum_[3];
     std::string serial_number_;
     ThreadPtr thread_driver;
-    int8_t tx_iso_channel_;
-    int8_t rx_iso_channel_;
     int16_t force_output_[3];
     int32_t port_, node_;
     raw1394handle_t handle_, tx_handle_, rx_handle_;
 
-    volatile enum                                       ///< Thread states.
+    // raw1394 messages
+    Raw1394Msg msg_rx_iso_channel;
+    Raw1394Msg msg_tx_iso_channel;
+    Raw1394Msg msg_start;
+    Raw1394Msg msg_stop;
+    Raw1394Msg msg_unknown;
+
+
+    volatile enum THREAD_STATE                          ///< Thread states.
     {
         THREAD_READY,
         THREAD_STARTED,
