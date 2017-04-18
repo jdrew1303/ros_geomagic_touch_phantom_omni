@@ -225,7 +225,8 @@ void OmniBase::teleoperationSlave()
 
 void OmniBase::jointTeleopCallback(const omni_driver::TeleopControl::ConstPtr& msg)
 {
-    std::vector<double> vels;
+    std::vector<double> control;
+    const unsigned int sensitivity_step = 0.001;
     switch (msg->mode)
     {
     case 0: // joint space
@@ -234,9 +235,9 @@ void OmniBase::jointTeleopCallback(const omni_driver::TeleopControl::ConstPtr& m
             ROS_ERROR("TELEOP: Joint velocity vector should contain at least 3 elements!");
             return;
         }
-        vels = msg->vel_joint;
-        vels.resize(3);
-        this->setTorque(vels);
+        for (int i=0; i<3; ++i)
+            control[i] =  sensitivity_step * (msg->vel_joint[i] - state.velocities[i]);
+        this->setTorque(control);
         break;
     case 1: // cartesian space
         std::cerr << "Control type 1" << std::endl;
@@ -340,12 +341,9 @@ void OmniBase::publishOmniState()
     // Publish the teleoperation data.
     if (teleop_master)
     {
-        const double sensitivity_step = 0.001;
-        for (unsigned int k = 0; k < state.velocities.size(); ++k)
-        {
-            teleop_control.vel_joint[k] = teleop_sensitivity * sensitivity_step * state.velocities[k];
-        }
+        teleop_control.vel_joint = state.velocities;
         teleop_control.vel_effector = state.twist;
+        teleop_control.gain = teleop_sensitivity;
         teleop_control.mode = 0;
         pub_teleop_control.publish(teleop_control);
     }
