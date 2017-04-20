@@ -10,10 +10,10 @@
  */
 class Raw1394Msg
 {
-protected:
-    nodeaddr_t addr;    ///< Message address.
-    size_t     length;  ///< Message length.
-    quadlet_t  data;    ///< The message data.
+public:
+    const nodeaddr_t ADDR;    ///< Message address.
+    const size_t     LENGTH;  ///< Message length.
+    quadlet_t        data;    ///< The message data.
 
 public:
 
@@ -23,14 +23,14 @@ public:
      * @param length The message length.
      * @param data The message data.
      */
-    Raw1394Msg(nodeaddr_t address, size_t length, quadlet_t data);
+    Raw1394Msg(nodeaddr_t address, size_t LENGTH, quadlet_t data);
 
     /**
      * @brief Constructor for Raw1394Msg.
      * @param address The channel address.
      * @param length The message length.
      */
-    Raw1394Msg(nodeaddr_t address, size_t length);
+    Raw1394Msg(nodeaddr_t address, size_t LENGTH);
 
     /**
      * @brief Default constructor.
@@ -87,22 +87,6 @@ public:
     int write(raw1394handle_t handle, nodeid_t node);
 
     /**
-     * @brief Swaps the contents of the two instances.
-     * @param first First class instance.
-     * @param second Second class instnace.
-     */
-    friend void swap(Raw1394Msg &first, Raw1394Msg &second)
-    {
-        // Enable ADL just in case...
-        using std::swap;
-
-        // Swap the contents
-        swap(first.addr,   second.addr);
-        swap(first.length, second.length);
-        swap(first.data,   second.data);
-    }
-
-    /**
      * @brief Same as \see{getData}
      */
     inline operator quadlet_t () const
@@ -118,11 +102,6 @@ public:
     inline Raw1394Msg & operator=(quadlet_t data)
     {
         this->setData(data);
-    }
-
-    inline Raw1394Msg & operator=(Raw1394Msg &msg)
-    {
-        swap(*this, msg);
         return *this;
     }
 };

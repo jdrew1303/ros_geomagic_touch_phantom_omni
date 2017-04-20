@@ -13,12 +13,13 @@ OmniBase::OmniBase(const std::string &name)
 }
 
 OmniBase::OmniBase(const std::string &name, double velocity_filter_minimum_dt)
-    : name(name), enable_force_flag(false),
-      velocity_filter_minimum_dt(velocity_filter_minimum_dt),
-      last_published_joint5_velocity(0),
+    : last_published_joint5_velocity(0),
       teleop_sensitivity(0),
       teleop_master(true),
-      vel_filter_counter(VELOCITIES_FILTER_SIZE)
+      vel_filter_counter(VELOCITIES_FILTER_SIZE),
+      name(name),
+      enable_force_flag(false),
+      velocity_filter_minimum_dt(velocity_filter_minimum_dt)
 {
     node = ros::NodeHandlePtr( new ros::NodeHandle("") );
 
@@ -236,7 +237,7 @@ void OmniBase::jointTeleopCallback(const omni_driver::TeleopControl::ConstPtr& m
             return;
         }
         for (int i=0; i<3; ++i)
-            control[i] =  sensitivity_step * (msg->vel_joint[i] - state.velocities[i]);
+            control[i] =  sensitivity_step * (msg->gain * msg->vel_joint[i] - state.velocities[i]);
         this->setTorque(control);
         break;
     case 1: // cartesian space
