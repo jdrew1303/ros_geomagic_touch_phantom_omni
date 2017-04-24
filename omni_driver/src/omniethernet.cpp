@@ -147,7 +147,7 @@ void OmniEthernet::disconnect()
     hdDisableDevice(hHD);
 }
 
-HDCallbackCode HDCALLBACK OmniEthernet::callback(void *pdata)
+HDCallbackCode OmniEthernet::callback(void *pdata)
 {
     OmniEthernet *omni = static_cast<OmniEthernet*>(pdata);
 
