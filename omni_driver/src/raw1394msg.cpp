@@ -1,11 +1,11 @@
-#include "raw1394msg.h"
+#include "../include/raw1394msg.h"
 
 // Included to use the function ntohl
 #include <arpa/inet.h>
 
 
 Raw1394Msg::Raw1394Msg(nodeaddr_t address, size_t length, quadlet_t data)
-    : addr(address), length(length), data(data)
+    : ADDR(address), LENGTH(length), data(data)
 {
 }
 
@@ -22,15 +22,17 @@ Raw1394Msg::Raw1394Msg()
 
 int Raw1394Msg::read(raw1394handle_t handle, nodeid_t node)
 {
-    return raw1394_read(handle, node, addr, length, &data);
+    int status = raw1394_read(handle, node, ADDR, LENGTH, &data);
 
     // Converts the byte order from the network channel to the one
     // used in the host machine
     data = ntohl(data);
+
+    return status;
 }
 
 
 int Raw1394Msg::write(raw1394handle_t handle, nodeid_t node)
 {
-    return raw1394_write(handle, node, addr, length, &data);
+    return raw1394_write(handle, node, ADDR, LENGTH, &data);
 }

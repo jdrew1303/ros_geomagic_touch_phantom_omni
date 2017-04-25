@@ -5,23 +5,20 @@
 
 OmniFirewire::OmniFirewire(const std::string &serial_number, const std::string &name)
     : OmniBase(name),
-    thread_status(THREAD_READY),
-    serial_number_(serial_number),
-    handle_(NULL), tx_handle_(NULL), rx_handle_(NULL),
-    port_(-1), node_(-1)
+      gimbal_filter_1(GIMBAL_FILTER_SIZE),
+      gimbal_filter_2(GIMBAL_FILTER_SIZE),
+      gimbal_filter_3(GIMBAL_FILTER_SIZE),
+      serial_number_(serial_number),
+      port_(-1), node_(-1),
+      handle_(NULL), tx_handle_(NULL), rx_handle_(NULL),
+      msg_rx_iso_channel(0x1001, 1, -1),
+      msg_tx_iso_channel(0x1000, 1, -1),
+      msg_start(0x1087, 1, 0x08),
+      msg_stop(0x1087, 1, 0x00),
+      msg_unknown(0x20010, 4, 0xf80f0000),
+     thread_status(THREAD_READY)
 {
     this->resetTorque();
-
-    gimbal_filter_1.resize(GIMBAL_FILTER_SIZE);
-    gimbal_filter_2.resize(GIMBAL_FILTER_SIZE);
-    gimbal_filter_3.resize(GIMBAL_FILTER_SIZE);
-
-    // Set raw1394 messages
-    msg_tx_iso_channel = Raw1394Msg(0x1000,  1, -1);
-    msg_rx_iso_channel = Raw1394Msg(0x1001,  1, -1);
-    msg_start          = Raw1394Msg(0x1087,  1,  0x08);
-    msg_stop           = Raw1394Msg(0x1087,  1,  0x00);
-    msg_unknown        = Raw1394Msg(0x20010, 4,  0xf80f0000);
 }
 
 OmniFirewire::~OmniFirewire()
@@ -377,7 +374,7 @@ bool OmniFirewire::startIsochronousTransmission()
             break;
         }
     }
-    if (!msg_tx_iso_channel) {
+    if (msg_tx_iso_channel == (quadlet_t) -1) {
         // Channel not found. Abort.
         stopIsochronousTransmission();
         return false;
@@ -390,7 +387,7 @@ bool OmniFirewire::startIsochronousTransmission()
             break;
         }
     }
-    if (!msg_rx_iso_channel) {
+    if (msg_rx_iso_channel == (quadlet_t) -1) {
         // Channel not found. Abort.
         stopIsochronousTransmission();
         return false;
@@ -479,12 +476,12 @@ void OmniFirewire::stopIsochronousTransmission()
     // Tell Omni to stop isochronous transmission.
     msg_stop.write(handle_, node_);
 
-    if (msg_tx_iso_channel != -1) {
+    if (msg_tx_iso_channel != (quadlet_t) -1) {
         raw1394_channel_modify(handle_, msg_tx_iso_channel, RAW1394_MODIFY_FREE);
         msg_tx_iso_channel.clearData();
     }
 
-    if (msg_rx_iso_channel != -1) {
+    if (msg_rx_iso_channel != (quadlet_t) -1) {
         raw1394_channel_modify(handle_, msg_rx_iso_channel, RAW1394_MODIFY_FREE);
         msg_rx_iso_channel.clearData();
     }

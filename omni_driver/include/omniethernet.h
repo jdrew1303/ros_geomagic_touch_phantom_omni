@@ -57,7 +57,7 @@ private:
      * @param pdata Receives a pointer to an OmniEthernet object.
      * @return Returns 1 if the communication should continue, 0 otherwise.
      */
-    static HDCallbackCode HDCALLBACK callback(void *pdata);
+    static HDCallbackCode callback(void *pdata);
 
 protected:
     void mapTorque();

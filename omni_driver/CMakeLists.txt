@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(omni_driver)
 
-set (CMAKE_CXX_FLAGS "--std=c++0x ${CMAKE_CXX_FLAGS}")
+set (CMAKE_CXX_FLAGS "--std=c++0x ${CMAKE_CXX_FLAGS} -Wall")
 set(CMAKE_BUILD_TYPE "Debug")
 
 ## Find catkin macros and libraries

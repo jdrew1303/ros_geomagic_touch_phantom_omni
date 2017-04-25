@@ -13,12 +13,13 @@ OmniBase::OmniBase(const std::string &name)
 }
 
 OmniBase::OmniBase(const std::string &name, double velocity_filter_minimum_dt)
-    : name(name), enable_force_flag(false),
-      velocity_filter_minimum_dt(velocity_filter_minimum_dt),
-      last_published_joint5_velocity(0),
+    : last_published_joint5_velocity(0),
       teleop_sensitivity(0),
       teleop_master(true),
-      vel_filter_counter(VELOCITIES_FILTER_SIZE)
+      vel_filter_counter(VELOCITIES_FILTER_SIZE),
+      name(name),
+      enable_force_flag(false),
+      velocity_filter_minimum_dt(velocity_filter_minimum_dt)
 {
     node = ros::NodeHandlePtr( new ros::NodeHandle("") );
 
@@ -226,7 +227,6 @@ void OmniBase::teleoperationSlave()
 void OmniBase::jointTeleopCallback(const omni_driver::TeleopControl::ConstPtr& msg)
 {
     std::vector<double> control;
-    const unsigned int sensitivity_step = 0.001;
     switch (msg->mode)
     {
     case 0: // joint space
@@ -235,8 +235,8 @@ void OmniBase::jointTeleopCallback(const omni_driver::TeleopControl::ConstPtr& m
             ROS_ERROR("TELEOP: Joint velocity vector should contain at least 3 elements!");
             return;
         }
-        for (int i=0; i<3; ++i)
-            control[i] =  sensitivity_step * (msg->vel_joint[i] - state.velocities[i]);
+        control = msg->vel_joint;
+        control.resize(3);
         this->setTorque(control);
         break;
     case 1: // cartesian space
@@ -341,9 +341,12 @@ void OmniBase::publishOmniState()
     // Publish the teleoperation data.
     if (teleop_master)
     {
-        teleop_control.vel_joint = state.velocities;
+        const double sensitivity_step = 0.001;
+        for (unsigned int k = 0; k < state.velocities.size(); ++k)
+        {
+            teleop_control.vel_joint[k] = teleop_sensitivity * sensitivity_step * state.velocities[k];
+        }
         teleop_control.vel_effector = state.twist;
-        teleop_control.gain = teleop_sensitivity;
         teleop_control.mode = 0;
         pub_teleop_control.publish(teleop_control);
     }
