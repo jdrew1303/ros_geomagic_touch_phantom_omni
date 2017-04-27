@@ -1,0 +1,19 @@
+controller_list:
+  - name: fake_all_controller
+    joints:
+      - waist
+      - shoulder
+      - elbow
+      - wrist1
+      - wrist2
+      - wrist3
+  - name: fake_actuated_controller
+    joints:
+      - waist
+      - shoulder
+      - elbow
+  - name: fake_passive_controller
+    joints:
+      - wrist1
+      - wrist2
+      - wrist3

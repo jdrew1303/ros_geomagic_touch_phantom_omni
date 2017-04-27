@@ -1,0 +1,10 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: omni_description
+    relative_path: urdf/omni.urdf
+  SRDF:
+    relative_path: config/phantom_omni.srdf
+  CONFIG:
+    author_name: Bruno Guilhermo de Barros Valerio
+    author_email: bruno.gbv@poli.ufrj.br
+    generated_timestamp: 1488831614

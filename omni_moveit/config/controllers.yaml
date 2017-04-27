@@ -1,0 +1,12 @@
+controller_list:
+ - name: omni
+   action_ns: follow_joint_trajectory
+   type: FollowJointTrajectory
+   default: true
+   joints:
+     - waist
+     - shoulder
+     - elbow
+     - wrist1
+     - wrist2
+     - wrist3
