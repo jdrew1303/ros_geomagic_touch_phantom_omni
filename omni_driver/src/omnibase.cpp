@@ -68,7 +68,7 @@ OmniBase::OmniBase(const std::string &name, double velocity_filter_minimum_dt)
 
     // Initializing robot_model for MoveIt!
     std::string path_urdf = "/home/brunogbv/omni_ws/src/PhantomOmni/omni_description/urdf/omni.urdf";
-    std::string path_srdf = "/home/brunogbv/omni_ws/src/omni_moveit/config/phantom_omni.srdf";
+    std::string path_srdf = "/home/brunogbv/omni_ws/src/PhantomOmni/omni_moveit/config/phantom_omni.srdf";
 
     URDFModelPtr urdf_model = URDFModelPtr( new urdf::Model() );
     urdf_model->initFile(path_urdf);

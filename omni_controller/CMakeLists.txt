@@ -9,7 +9,7 @@ find_package(catkin REQUIRED
     geometry_msgs
     std_msgs
     message_generation
-    keyboard)
+    joy)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -47,7 +47,6 @@ find_package(catkin REQUIRED
 ## Generate messages in the 'msg' folder
  add_message_files(
    FILES
-   Key.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -67,9 +66,8 @@ find_package(catkin REQUIRED
 ## Generate added messages and services with any dependencies listed here
  generate_messages(
    DEPENDENCIES
-   std_msgs  # Or other packages containing msgs
+   std_msgs         # Or other packages containing msgs
    geometry_msgs
-   keyboard
  )
 
 ################################################
@@ -104,7 +102,7 @@ find_package(catkin REQUIRED
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES omni_controller
-   CATKIN_DEPENDS message_runtime std_msgs geometry_msgs keyboard
+   CATKIN_DEPENDS message_runtime std_msgs geometry_msgs
 #  DEPENDS system_lib
 )
 

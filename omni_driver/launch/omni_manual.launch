@@ -7,9 +7,6 @@
         <node name="controller" pkg="omni_controller" type="omni_controller">
         </node>
 
-        <node name="keyboard" pkg="keyboard" type="keyboard">
-        </node>
-
         <node name="joy" pkg="joy" type="joy_node">
         </node>
     </group>

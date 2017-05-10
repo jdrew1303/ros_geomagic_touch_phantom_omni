@@ -6,7 +6,6 @@
 #include <std_msgs/Bool.h>
 #include <sstream>
 #include <geometry_msgs/Vector3.h>
-#include <keyboard/Key.h>
 #include <sensor_msgs/Joy.h>
 #include <map>
 
@@ -22,17 +21,13 @@ private:
 	std_msgs::Bool enable_control;
 	geometry_msgs::Vector3 forceOutput;
     ros::NodeHandle n;
-	ros::Subscriber keyboard_sub;
 	ros::Subscriber gamepad_sub;
     ros::Subscriber teleop_sub;
 	bool enable_gamepad;
-	bool enable_keyboard;
 
 public:
 
-    OmniController(/*std::string topicName = "keyboard/keydown"*/);
-
-	void keyboardPublisher(const keyboard::Key::ConstPtr& msg);
+    OmniController();
 
 	void gamepadPublisher(const sensor_msgs::Joy::ConstPtr& msg);
 
