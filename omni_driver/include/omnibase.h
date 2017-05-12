@@ -199,14 +199,14 @@ public:
      * @brief OmniBase constructor, sets some members and prepares ros topics and publishers.
      * @param name Reference to string of omni name.
      */
-    explicit OmniBase(const std::string &name = "");
+    explicit OmniBase(const std::string &name, const std::string &path_urdf, const std::string &path_srdf);
 
     /**
      * @brief OmniBase constructor, sets some members and prepares ros topics and publishers.
      * @param name Reference to string of omni name.
      * @param velocity_filter_minimum_dt Minimum amount of time that should have passed to compute the robot velocity.
      */
-    OmniBase(const std::string &name, double velocity_filter_minimum_dt);
+    OmniBase(const std::string &name,  const std::string &path_urdf, const std::string &path_srdf, double velocity_filter_minimum_dt);
 
     /**
      * @brief Publishes the current robot's state.

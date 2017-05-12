@@ -7,12 +7,12 @@
 typedef boost::shared_ptr<urdf::Model> URDFModelPtr;
 typedef boost::shared_ptr<srdf::Model> SRDFModelPtr;
 
-OmniBase::OmniBase(const std::string &name)
-    : OmniBase::OmniBase(name, 1000)
+OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const std::string &path_srdf)
+    : OmniBase::OmniBase(name, path_urdf , path_srdf , 1000)
 {
 }
 
-OmniBase::OmniBase(const std::string &name, double velocity_filter_minimum_dt)
+OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const std::string &path_srdf, double velocity_filter_minimum_dt)
     : last_published_joint5_velocity(0),
       teleop_sensitivity(0),
       teleop_master(true),
@@ -67,9 +67,6 @@ OmniBase::OmniBase(const std::string &name, double velocity_filter_minimum_dt)
     std::memset(last_buttons, 0, sizeof(last_buttons));
 
     // Initializing robot_model for MoveIt!
-    std::string path_urdf = "/home/brunogbv/omni_ws/src/PhantomOmni/omni_description/urdf/omni.urdf";
-    std::string path_srdf = "/home/brunogbv/omni_ws/src/PhantomOmni/omni_moveit/config/phantom_omni.srdf";
-
     URDFModelPtr urdf_model = URDFModelPtr( new urdf::Model() );
     urdf_model->initFile(path_urdf);
     SRDFModelPtr srdf_model = SRDFModelPtr( new srdf::Model() );
@@ -81,6 +78,10 @@ OmniBase::OmniBase(const std::string &name, double velocity_filter_minimum_dt)
     kinematic_state = robot_state::RobotStatePtr(new robot_state::RobotState(kinematic_model));
     kinematic_state->setToDefaultValues();
     joint_model_group = kinematic_model->getJointModelGroup("all");
+    if (!joint_model_group)
+    {
+        // TODO - quit program
+    }
     state.joint_names = joint_model_group->getJointModelNames();
     end_effector_link_model = kinematic_state->getLinkModel("end_effector");
     //

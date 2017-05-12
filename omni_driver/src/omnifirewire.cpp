@@ -3,8 +3,8 @@
 #include <boost/bind.hpp>
 
 
-OmniFirewire::OmniFirewire(const std::string &serial_number, const std::string &name)
-    : OmniBase(name),
+OmniFirewire::OmniFirewire(const std::string &serial_number, const std::string &name, const std::string &path_urdf, const std::string &path_srdf)
+    : OmniBase(name, path_urdf, path_srdf),
       gimbal_filter_1(GIMBAL_FILTER_SIZE),
       gimbal_filter_2(GIMBAL_FILTER_SIZE),
       gimbal_filter_3(GIMBAL_FILTER_SIZE),

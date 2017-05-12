@@ -1,9 +1,11 @@
 <launch>
-    <param name="omni_urdf" command="cat $(find omni_description)/urdf/omni.urdf" />
-    <param name="omni_srdf" command="cat $(find omni_moveit)/config/phantom_omni.srdf" />
+    <arg name="robot_urdf" default="$(find omni_description)/urdf/omni.urdf" />
+    <arg name="robot_srdf" default="$(find omni_moveit)/config/phantom_omni.srdf" />
+
+    <param name="omni_urdf" command="cat $(arg robot_urdf)" />
 
     <arg name="prefix" default="" />
-    <arg name="namespace" default="omni" />
+    <arg name="namespace" default="" />
     <arg name="type" default="" />
 
     <arg name="teleop_master" default="true" />
@@ -15,11 +17,13 @@
             <param name="omni_type" type="string" value="$(arg type)" />
 			<param name="omni_serial" type="string" value="11129400000" />
             <param name="teleop_master" type="boolean" value="$(arg teleop_master)" />
+            <param name="path_urdf" value="$(arg robot_urdf)" />
+            <param name="path_srdf" value="$(arg robot_srdf)" />
 
             <remap from="/teleop" to="$(arg teleop_remap)" />
 		</node>
 
-		<node name="state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <node name="state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
             <param name="~tf_prefix" type="string" value="$(arg prefix)" />
             <remap from="robot_description" to="omni_urdf" />
         </node>

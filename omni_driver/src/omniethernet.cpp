@@ -2,8 +2,8 @@
 
 int OmniEthernet::calibrationStyle = 0;
 
-OmniEthernet::OmniEthernet(const std::string &name) :
-    OmniBase(name, 800)
+OmniEthernet::OmniEthernet(const std::string &name, const std::string &path_urdf, const std::string &path_srdf) :
+    OmniBase(name, path_urdf, path_srdf)
 {
     this->resetTorque();
 }

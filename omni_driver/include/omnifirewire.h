@@ -241,7 +241,7 @@ public:
      * @param serial_number Reference to string of serial number.
      * @param name Reference to string of omni name.
      */
-    OmniFirewire(const std::string &serial_number, const std::string &name = "");
+    OmniFirewire(const std::string &serial_number, const std::string &name, const std::string &path_urdf, const std::string &path_srdf);
     ~OmniFirewire();
 
     inline void enableControl(bool enable)

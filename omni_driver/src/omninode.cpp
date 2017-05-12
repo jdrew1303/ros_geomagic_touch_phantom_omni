@@ -9,11 +9,15 @@ int main(int argc, char **argv)
 
     // Get the omni parameters.
     std::string omni_name;
-    ros::param::param<std::string>("~omni_name", omni_name, "");
+    ros::param::param<std::string>("~omni_name", omni_name, "omni");
     std::string omni_type;
     ros::param::param<std::string>("~omni_type", omni_type, "firewire");
     std::string omni_serial;
     ros::param::param<std::string>("~omni_serial", omni_serial, "");
+    std::string path_urdf;
+    ros::param::param<std::string>("~path_urdf", path_urdf, "");
+    std::string path_srdf;
+    ros::param::param<std::string>("~path_srdf", path_srdf, "");
 
     // Declare OmniBasePtr
     OmniBasePtr omni;
@@ -43,12 +47,12 @@ int main(int argc, char **argv)
         }
 
         // Init the firewire driver
-        omni = OmniBasePtr( new OmniFirewire(omni_serial, omni_name) );
+        omni = OmniBasePtr( new OmniFirewire(omni_serial, omni_name, path_urdf, path_srdf ) );
     }
     if (omni_type == "ethernet")
     {
         // Init the ethernet driver
-        omni = OmniBasePtr( new OmniEthernet( omni_name) );
+        omni = OmniBasePtr( new OmniEthernet( omni_name, path_urdf, path_srdf ) );
     }
 
     // Connect

@@ -91,7 +91,7 @@ public:
      * @brief OmniEthernet constructor, calls OmniBase constructor with same parameter.
      * @param name Reference to string of omni name.
      */
-    OmniEthernet(const std::string &name = "");
+    OmniEthernet(const std::string &name, const std::string &path_urdf, const std::string &path_srdf);
     ~OmniEthernet();
 
     inline void enableControl(bool enable)
