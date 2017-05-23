@@ -87,8 +87,7 @@ can be found in the link below:
 
 From there, you just need to download the PhantomOmni docker image or build your
 own using the Dockerfile provided.
-
-- Build command:
+# Build command:
 ```sh 
 $ cd <Dockerfile Path Location>
 $ sudo docker build -t <tag_prefix:tag_suffix> .
@@ -102,12 +101,13 @@ $ sudo docker build -t gscar:PhantomOmni .
 Please note that the final dot is needed.
 By default, both username and password on this image is omni.
 
-- Run command:
+# Run command:
 Once the image is built, which will take quite a while, you can run it using the
 following command:
 ```sh 
 $ sudo docker run --device=/dev/fw1 -ti --rm --privileged -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -ti --device=/dev/bus/usb/001/005 --net=host gscar:PhantomOmni
 ```
+
 # Final steps:
 At this point the firewire version should already be functional, but the 
 ethernet still need two steps to work. First, you must change your IPV4 to
