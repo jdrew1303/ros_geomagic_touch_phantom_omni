@@ -12,7 +12,7 @@ The list of dependencies is quite large, but in order to facilitate the end user
 life, we decided to make a Docker image. Running through docker is recommended
 in cases where the user doesn't want to waste time setting up the environment or
 wants complete isolation from the Omni space. If docker is your way to go, skip 
-to docker session. If you don't mind docker, proceed to final steps once all
+to **The Docker way** session. If you don't mind docker, proceed to **Final steps** once all
 dependencies are installed.
 
 Some of these packages will probably be already installed in your PC. If you're
@@ -69,7 +69,7 @@ $ apt-get update && apt-get install libusb-dev
 $ apt-get update && apt-get install libboost-all-dev 
 ``` 
 
-# Geomagic Touch Device Drivers and OpenHaptics:
+### Geomagic Touch Device Drivers and OpenHaptics:
 As I can't distribute Sensable's software, those you'll have to download directly
 from them. Please note that to access the download section, you may have to make
 an account on their forum.
