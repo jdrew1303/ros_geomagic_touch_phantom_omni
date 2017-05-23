@@ -70,16 +70,21 @@ $ apt-get update && apt-get install libboost-all-dev
 ``` 
 
 # Geomagic Touch Device Drivers and OpenHaptics:
-As I'm not sure if I may post direct download links here, i'll post the link to 
-download directly from Sensable.
-https://3dsystems.teamplatform.com/pages/102863?t=fptvcy2zbkcc
+As I can't distribute Sensable's software, those you'll have to download directly
+from them. Please note that to access the download section, you may have to make
+an account on their forum.
+
+- https://3dsystems.teamplatform.com/pages/102863?t=fptvcy2zbkcc
+
 From there, you'll need both the OpenHaptics and the GTDD files. Just extract it
 and run the install script.
 
 # The Docker way:
-First, what you should do is install docker for your OS. A tutorial for Ubuntu 
+First, what you should do is install docker for your OS. A guide for Ubuntu 
 can be found in the link below:
-https://www.docker.com/docker-ubuntu
+
+- https://www.docker.com/docker-ubuntu
+
 From there, you just need to download the PhantomOmni docker image or build your
 own using the Dockerfile provided.
 
