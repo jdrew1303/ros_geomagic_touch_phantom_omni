@@ -1,73 +1,54 @@
 # What is this?
 This is a ROS metapackage for both Sensable Phantom Omni (IEEE1394 connection) 
-and Geomagic Touch (Ethernet connection). It publishes the device information 
-such as joint angles, teleoperation data, buttons state, tip of stylus pose and 
-twist to /omniFirewire or /omniEthernet by default. It also subscribes to some
-topics, like .../control, .../enable_control and .../teleop, the latter only if 
-the omni was launched in slave mode. If you don't know or don't have ROS, you
+and Geomagic Touch (Ethernet connection). Included in this metapackage is the
+omni_driver package, which contains the omni_driver node. If you don't know or don't have ROS, you
 should first go to http://www.ros.org/.
 
-# Dependencies:
-The list of dependencies is quite large, but in order to facilitate the end user
-life, we decided to make a Docker image. Running through docker is recommended
-in cases where the user doesn't want to waste time setting up the environment or
-wants complete isolation from the Omni space. If docker is your way to go, skip 
-to **The Docker way** session. If you don't mind docker, proceed to **Final steps** once all
-dependencies are installed.
+# Contents
 
-Some of these packages will probably be already installed in your PC. If you're
-not sure, run the command anyway.
+## Topics
+The omni_driver node publishes information to four topics:
+- `[prefix]/joint_states` ([sensor_msgs/JointState](http://docs.ros.org/api/sensor_msgs/html/msg/JointState.html)) -- position, velocity and name of each joint.
+- `[prefix]/pose` ([geometry_msgs/PoseStamped](http://docs.ros.org/api/geometry_msgs/html/msg/PoseStamped.html)) -- stylus tip pose with a timestamp.
+- `[prefix]/twist` ([geometry_msgs/Twist](http://docs.ros.org/api/geometry_msgs/html/msg/Twist.html)) -- stylus tip linear and angular velocities.
+- `[prefix]/button_state` (omni_driver/OmniButtonEvent) -- state (pressed/released) of the device buttons.
 
-- build-essential:
-```sh 
-$ sudo apt-get install build-essential 
-```
+Besides, two topics are available to interact with the robot:
+- `[prefix]/control` ([geometry_msgs/Vector3](http://docs.ros.org/api/geometry_msgs/html/msg/Vector3.html)) -- each component is read between [-1, 1] and controls a single motor. The (x, y, z) components command the joints 1, 2 and 3, respectively.
+- `[prefix]/enable_control` ([std_msgs/Bool](http://docs.ros.org/api/std_msgs/html/msg/Bool.html)) -- true to enable the control, and false disable it.
+ 
+If the node was launched as a slave for teleoperation (by setting the parameter `~teleop_master` to false) the node also subscribes to an additional topic:
+- `/teleop` (omni_driver/TeleopControl) -- the device reads the velocity values and attempts to mimic them.
 
-- libncurses 5:
+Otherwise, the it is assumed that the node is a teleoperation master (i.e. `~teleop_master` defaults to true) and the node published the additional topic
+- `[prefix]/teleop` (omni_driver/TeleopControl) -- control to teleoperate another robot.
+
+## Parameters
+As you should have notices by now, most of the topics can be prefixed. This is done by altering the parameter `~omni_name` and/or running the node from a [group](http://wiki.ros.org/roslaunch/XML/group) with namespace inside a launch file. Below we list the available parameters:
+| Parameter Name  |  Type  |      Options       | Default Value | Description |
+| :-------------- | :----: | :----------------: | :-----------: | :---------- |
+| `~omni_name`    | string | any                | omni          | Prefix that is put before many of the topics names |
+| `~omni_type`    | string | firewire, ethernet | firewire      | The communication type |
+| `~omni_serial`  | string | any                |               | The serial number printed below the device |
+| `~teleop_master`|  bool  | true, false        | true          | The teleoperation mode (true for master, false for slave) |
+| `~path_urdf`    | string | any                |               | Path to the URDF location |
+| `~path_srdf`    | string | any                |               | Path to the SRDF location |
+
+# Dependencies
+The list of dependencies is quite large, so we decided to provide a Docker image with
+everything ready to run. Therefore, using this Software through docker is recommended because very little
+setting up is needed to get the program up and running. If Docker is your way to go, skip 
+to **The Docker way** session. Otherwise, you may choose to install the dependencies and compile the program
+from source. Once all dependencies are stored you may proceed to **Final steps**.
+
+The following command will install the required dependencies to compile the program from source:
 ```sh
-$ sudo apt-get install libncurses5-dev
+$ sudo apt-get update
+$ sudo apt-get install build-essential libncurses5-dev freeglut3 dh-autoreconf \
+    ros-indigo-ros-core ros-indigo-moveit ros-indigo-joy ros-indigo-joystick-drivers \
+    libeigen3-dev libraw1394-dev libusb-dev libboost-all-dev 
 ```
-
-- freeglut 3:
-```sh
-$ sudo apt-get install freeglut3
-```
-
-- dh-autoreconf:
-```sh
-$ sudo apt-get install dh-autoreconf
-```
-
-- MoveIt! for ROS-Indigo:
-```sh
-$ sudo apt-get install ros-indigo-moveit
-```
-
-- Joy drivers:
-```sh 
-$ sudo apt-get install ros-indigo-joy 
-$ sudo apt-get install ros-indigo-joystick-drivers 
-```
-
-- Eigen:
-```sh 
-$ sudo apt-get update && apt-get install libeigen3-dev 
-```
-
-- IEEE1394 drivers:
-```sh 
-$ sudo apt-get update && apt-get install libraw1394-dev
-```
-
-- USB:
-```sh 
-$ apt-get update && apt-get install libusb-dev 
-```
-
-- Boost:
-```sh 
-$ apt-get update && apt-get install libboost-all-dev 
-``` 
+This commands installs build-essential, libncurses 5, freeglut 3, dh-autoreconf, ROS-Indigo, MoveIt! and joy drivers for ROS-Indigo, Eigen, Boost, IEEE1394 (firewire) driver, and libusb-dev.
 
 ### Geomagic Touch Device Drivers and OpenHaptics:
 As I can't distribute Sensable's software, those you'll have to download directly
