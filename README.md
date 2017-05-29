@@ -13,7 +13,7 @@ The omni_driver node publishes information to four topics:
 - `[prefix]/twist` ([geometry_msgs/Twist](http://docs.ros.org/api/geometry_msgs/html/msg/Twist.html)) -- stylus tip linear and angular velocities.
 - `[prefix]/button_state` (omni_driver/OmniButtonEvent) -- state (pressed/released) of the device buttons.
 
-Besides, two topics are available to interact with the robot:
+Besides, two topics are available to interact with the robot (the node subscribes to them):
 - `[prefix]/control` ([geometry_msgs/Vector3](http://docs.ros.org/api/geometry_msgs/html/msg/Vector3.html)) -- each component is read between [-1, 1] and controls a single motor. The (x, y, z) components command the joints 1, 2 and 3, respectively.
 - `[prefix]/enable_control` ([std_msgs/Bool](http://docs.ros.org/api/std_msgs/html/msg/Bool.html)) -- true to enable the control, and false disable it.
  
@@ -36,7 +36,7 @@ As you should have notices by now, most of the topics can be prefixed. This is d
 
 # Dependencies
 The list of dependencies is quite large, so we decided to provide a Docker image with
-everything ready to run. Therefore, using this Software through docker is recommended because very little
+everything ready to run. Therefore, using this Software through Docker is recommended because very little
 setting up is needed to get the program up and running. If Docker is your way to go, skip 
 to **The Docker way** session. Otherwise, you may choose to install the dependencies and compile the program
 from source. Once all dependencies are stored you may proceed to **Final steps**.
@@ -50,7 +50,7 @@ $ sudo apt-get install build-essential libncurses5-dev freeglut3 dh-autoreconf \
 ```
 This commands installs build-essential, libncurses 5, freeglut 3, dh-autoreconf, ROS-Indigo, MoveIt! and joy drivers for ROS-Indigo, Eigen, Boost, IEEE1394 (firewire) driver, and libusb-dev.
 
-### Geomagic Touch Device Drivers and OpenHaptics:
+## Geomagic Touch Device Drivers and OpenHaptics:
 As I can't distribute Sensable's software, those you'll have to download directly
 from them. Please note that to access the download section, you may have to make
 an account on their forum.
