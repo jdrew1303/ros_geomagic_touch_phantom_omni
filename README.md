@@ -1,5 +1,5 @@
 # Table of Contents
-1. [What is this?](#what-is-this?)
+1. [About](#about)
 2. [Usage](#usage)
 3. [Dependencies](#dependencies)
 4. [The Docker Way](#the-docker-way)
@@ -7,7 +7,7 @@
 6. [Troubleshooting](#troubleshooting)
 7. [License](#license)
 
-# What is this?
+# About
 This is a ROS metapackage for both Sensable Phantom Omni (IEEE1394 connection) 
 and Geomagic Touch (Ethernet connection). Included in this metapackage is the
 omni_driver package, which contains the omni_driver node. If you don't know or don't have ROS, you
@@ -195,5 +195,5 @@ as to avoid confusion with created images.
 ## Ethernet
  - **[ERROR] [timestamp]: Failed to initialize haptic device** -- Check the config files on "/opt/geomagic_touch_device_driver/config". Please make sure the device was properly configured as explained on above. Please note that any name other than "Phantom Omni" will not work. If using the Docker Way, please make sure you committed the changes on the container after configuring the device before exiting, as changes are not automatically saved on Docker.
 
- # License
- This Software is distributed under the [MIT License](https://opensource.org/licenses/MIT).
+# License
+This Software is distributed under the [MIT License](https://opensource.org/licenses/MIT).
