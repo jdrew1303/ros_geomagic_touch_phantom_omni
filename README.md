@@ -34,6 +34,7 @@ Otherwise, the it is assumed that the node is a teleoperation master (i.e. `~tel
 
 ## Parameters
 As you should have notices by now, most of the topics can be prefixed. This is done by altering the parameter `~omni_name` and/or running the node from a [group](http://wiki.ros.org/roslaunch/XML/group) with namespace inside a launch file. Below we list the available parameters:
+
 | Parameter Name  |  Type  |      Options       | Default Value | Description |
 | :-------------- | :----: | :----------------: | :-----------: | :---------- |
 | `~omni_name`    | string | any                | omni          | Prefix that is put before many of the topics names |
