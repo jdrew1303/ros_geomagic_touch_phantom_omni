@@ -47,17 +47,17 @@ As you should have notices by now, most of the topics can be prefixed. This is d
 ## Launch Files
 If you want to use a FireWire device, run:
 ```sh 
-$ roslaunch omni_driver FireWire.launch
+$ roslaunch omni_driver firewire.launch
 ```
 If Ethernet is the one you're using, then:
 ```sh 
-$ roslaunch omni_driver Ethernet.launch
+$ roslaunch omni_driver ethernet.launch
 ```
 If you want to teleoperate one of them, start the Master as you would normally
 then run the slave i.e:
 ```sh 
-$ roslaunch omni_driver FireWire.launch
-$ roslaunch omni_driver Ethernet_slave.launch
+$ roslaunch omni_driver firewire.launch
+$ roslaunch omni_driver ethernet_slave.launch
 ```
 
 # Dependencies
@@ -98,23 +98,23 @@ own using the Dockerfile provided.
 ## Downloading image
 Downloading the image is very simple and is recommended in most cases. To download it, just run:
 ```sh
-$ sudo Docker pull brunogbv/phantomomni
+$ sudo docker pull brunogbv/phantomomni
 ```
 As an optional step, you can rename it in order to use the examples below.
 ```sh
-$ sudo Docker tag brunogbv/phantomomni gscar:PhantomOmni
+$ sudo docker tag brunogbv/phantomomni gscar:PhantomOmni
 ```
 
 ## Build command
 ```sh 
 $ cd [Dockerfile Path Location]
-$ sudo Docker build -t [tag_prefix:tag_suffix] .
+$ sudo docker build -t [tag_prefix:tag_suffix] .
 ```
 Ex: My Dockerfile is in ~/Downloads/Docker/Dockerfile and it will be named 
 gscar:PhantomOmni.
 ```sh 
 $ cd ~/Downloads/Docker
-$ sudo Docker build -t gscar:PhantomOmni .
+$ sudo docker build -t gscar:PhantomOmni .
 ```
 Please note that the final dot is needed.
 By default, both username and password on this image is omni.
@@ -123,7 +123,7 @@ By default, both username and password on this image is omni.
 After downloading or building the image, you can run it using the
 following command:
 ```sh 
-$ sudo Docker run -ti --rm --privileged -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --net=host gscar:PhantomOmni
+$ sudo docker run -ti --rm --privileged -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --net=host gscar:PhantomOmni
 ```
 
 
@@ -135,7 +135,7 @@ can check what is your device using **dmesg**.
 
 First, connect the device on the PC and wait a few moments. Then, run the following command:
 ```sh
-$ dmesg | grep FireWire
+$ dmesg | grep firewire
 ```
 On my PC, I got the following output:
 ```sh
@@ -179,11 +179,11 @@ image, as this is the Docker way. If you want to commit the changes done in the
 container, run the following command in a host terminal while the images is 
 still running:
 ```sh 
-$ sudo Docker container ls 
+$ sudo docker container ls 
 ```
 From there, copy the Container ID and use it in the following command:
 ```sh 
-$ sudo Docker commit [ContainerID] [tag_prefix:tag_suffix]
+$ sudo docker commit [ContainerID] [tag_prefix:tag_suffix]
 ```
 This will save the image running on ContainerID to a tag_prefix:tag_suffix image
 name. If you use the same name as the running image, it will be overwritten. I recommend preserving the original name
