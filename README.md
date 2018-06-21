@@ -49,6 +49,14 @@ If you want to use a FireWire device, run:
 ```sh 
 $ roslaunch omni_driver firewire.launch
 ```
+Additionally, you need to update the serial number on the omni.launch file so that it matches yours. The Ethernet version doesn't need this step.
+Go to omni_driver/launch/omni.launch and look for this line:
+```sh
+$ <param name="omni_type" type="string" value="$(arg type)" />
+			<param name="omni_serial" type="string" value="11129400000" />
+```
+Then change the value to match your device's serial number.
+
 If Ethernet is the one you're using, then:
 ```sh 
 $ roslaunch omni_driver ethernet.launch
