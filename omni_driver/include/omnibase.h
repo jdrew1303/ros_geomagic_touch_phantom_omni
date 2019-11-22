@@ -63,7 +63,7 @@ private:
         }
     }
 
-    void fwdKin(const unsigned int idx = 5);
+    void fwdKin();
 
     void calculateVelocities();
 

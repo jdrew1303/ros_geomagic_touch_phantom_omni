@@ -120,14 +120,9 @@ void OmniBase::updateRobotState()
     getEffectorVelocity();
 }
 
-void OmniBase::fwdKin(const unsigned int idx)
+void OmniBase::fwdKin()
 {
-
-    if ( idx >= state.joint_names.size() )
-    {
-        ROS_ERROR("Index exceeds the number of joints.");
-        return;
-    }
+    
     Eigen::Affine3d end_effector_state;
     end_effector_state = kinematic_state->getGlobalLinkTransform("end_effector");
     Eigen::Quaterniond quat(end_effector_state.rotation());
