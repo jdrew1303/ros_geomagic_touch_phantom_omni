@@ -26,18 +26,30 @@ class OmniBase
 {
 private:
 
+    class Link {
+    public:
+        std::string name;
+        Link(const std::string link_name){
+            name = link_name;
+        }
+    };
+
     struct Links {
-        std::string base = "base";
-        std::string torso = "torso";
-        std::string upper_arm = "upper_arm";
-        std::string lower_arm = "lower_arm";
-        std::string wrist = "wrist";
-        std::string tip = "tip";
-        std::string stylus = "stylus";
-        std::string end_effector = "end_effector";
+        Link base = Link("base");
+        Link torso = Link("torso");
+        Link upper_arm = Link("upper_arm");
+        Link lower_arm = Link("lower_arm");
+        Link wrist = Link("wrist");
+        Link tip = Link("tip");
+        Link stylus = Link("stylus");
+        Link end_effector = Link("end_effector");
     };
 
     Links links;
+
+    Eigen::Matrix3d rot_link_to_teleop;
+
+    double force_feedback_gain;
 
     double last_published_joint5_velocity;
 
@@ -162,6 +174,7 @@ protected:
     ros::Subscriber sub_button;
 
     ros::Subscriber sub_teleop;
+    ros::Subscriber sub_force;
     ros::Publisher pub_teleop_control;
 
     omni_driver::OmniButtonEvent button_event;
@@ -205,7 +218,6 @@ protected:
      * @see setTorque
      */
     virtual void mapTorque() = 0;
-
 
 public:
 
@@ -426,13 +438,17 @@ public:
      */
     void teleoperationMaster(std::string robot_name);
 
+    void teleoperationForceFeedback();
+
+    void forceFeedbackCallback(const geometry_msgs::Vector3& force);
+
     void teleoperationSlave();
 
     void jointTeleopCallback(const omni_driver::TeleopControl::ConstPtr& msg);
 
     void buttonCallback(const omni_driver::OmniButtonEvent::ConstPtr& msg);
 
-
+    Eigen::Vector3d calculateTorqueFeedback(const Eigen::Vector3d& force, double feedback_gain);
 };
 
 typedef boost::shared_ptr<OmniBase> OmniBasePtr;

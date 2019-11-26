@@ -53,19 +53,44 @@ Visualization Manager:
       Reference Frame: <Fixed Frame>
       Value: true
     - Class: rviz/TF
-      Enabled: false
+      Enabled: true
       Frame Timeout: 15
       Frames:
         All Enabled: false
-      Marker Scale: 1
+        base:
+          Value: false
+        end_effector:
+          Value: false
+        lower_arm:
+          Value: true
+        stylus:
+          Value: false
+        tip:
+          Value: false
+        torso:
+          Value: false
+        upper_arm:
+          Value: false
+        wrist:
+          Value: false
+      Marker Scale: 0.1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        base:
+          torso:
+            upper_arm:
+              lower_arm:
+                wrist:
+                  tip:
+                    end_effector:
+                      {}
+                    stylus:
+                      {}
       Update Interval: 0
-      Value: false
+      Value: true
     - Alpha: 1
       Class: rviz/RobotModel
       Collision Enabled: false

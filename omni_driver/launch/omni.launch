@@ -19,6 +19,7 @@
             <param name="teleop_master" type="boolean" value="$(arg teleop_master)" />
             <param name="path_urdf" value="$(arg robot_urdf)" />
             <param name="path_srdf" value="$(arg robot_srdf)" />
+            <param name="force_feedback_gain" type="double" value="1.0" />
 
             <remap from="/teleop" to="$(arg teleop_remap)" />
 		</node>

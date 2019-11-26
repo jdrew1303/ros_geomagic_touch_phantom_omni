@@ -13,13 +13,14 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
 }
 
 OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const std::string &path_srdf, double velocity_filter_minimum_dt)
-    : last_published_joint5_velocity(0),
-      teleop_sensitivity(0),
-      teleop_master(true),
-      vel_filter_counter(VELOCITIES_FILTER_SIZE),
-      name(name),
-      enable_force_flag(false),
-      velocity_filter_minimum_dt(velocity_filter_minimum_dt)
+    : force_feedback_gain(0),
+    last_published_joint5_velocity(0),
+    teleop_sensitivity(0),
+    teleop_master(true),
+    vel_filter_counter(VELOCITIES_FILTER_SIZE),
+    name(name),
+    enable_force_flag(false),
+    velocity_filter_minimum_dt(velocity_filter_minimum_dt)
 {
     node = ros::NodeHandlePtr( new ros::NodeHandle("") );
 
@@ -56,9 +57,32 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
     // Subscribe to teleop topic if this omni is a slave
     ros::param::param<bool>("~teleop_master", teleop_master, true);
     if (!teleop_master)
-    {
         this->teleoperationSlave();
-    }
+    else
+        this->teleoperationForceFeedback();
+
+    // Get the force feedback gain
+    ros::param::param<double>("~force_feedback_gain", force_feedback_gain, 0);
+
+    // Get the link names
+    ros::param::param<std::string>("~link_base",         links.base.name, "base");
+    ros::param::param<std::string>("~link_torso",        links.base.name, "torso");
+    ros::param::param<std::string>("~link_upper_arm",    links.base.name, "upper_arm");
+    ros::param::param<std::string>("~link_lower_arm",    links.base.name, "lower_arm");
+    ros::param::param<std::string>("~link_wrist",        links.base.name, "wrist");
+    ros::param::param<std::string>("~link_tip",          links.base.name, "tip");
+    ros::param::param<std::string>("~link_stylus",       links.base.name, "stylus");
+    ros::param::param<std::string>("~link_end_effector", links.base.name, "end_effector");
+
+    // Get link to teleop rotation
+    std::vector<double> rot_data;
+    ros::param::param<std::vector<double>>("~rot_link_to_teleop_colwise", rot_data, rot_data);
+    if (rot_data.empty())
+        rot_link_to_teleop.setIdentity();
+    else if (rot_data.size() == 9)
+        rot_link_to_teleop = Eigen::Matrix3d(rot_data.data());
+    else
+        throw std::logic_error("rotation matrix is represented by a 9 element array");
 
     // Initialize teleop_control message fields
     teleop_control.vel_joint.resize(6);
@@ -83,7 +107,7 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
         // TODO - quit program
     }
     state.joint_names = joint_model_group->getJointModelNames();
-    end_effector_link_model = kinematic_state->getLinkModel(links.end_effector);
+    end_effector_link_model = kinematic_state->getLinkModel(links.end_effector.name);
     //
     const int n = state.joint_names.size();
     joint_state.name.resize(n);
@@ -122,9 +146,8 @@ void OmniBase::updateRobotState()
 
 void OmniBase::fwdKin()
 {
-    
     Eigen::Affine3d end_effector_state;
-    end_effector_state = kinematic_state->getGlobalLinkTransform(links.end_effector);
+    end_effector_state = kinematic_state->getGlobalLinkTransform(links.end_effector.name);
     Eigen::Quaterniond quat(end_effector_state.rotation());
     Eigen::Vector3d pos = end_effector_state.translation();
 
@@ -136,6 +159,32 @@ void OmniBase::fwdKin()
     state.position[0] = pos[0];
     state.position[1] = pos[1];
     state.position[2] = pos[2];
+}
+
+Eigen::Vector3d OmniBase::calculateTorqueFeedback(const Eigen::Vector3d& force, double feedback_gain)
+{
+    if (feedback_gain == 0)
+        return Eigen::Vector3d::Zero();
+
+    // Get the desired frame
+    auto frame = links.lower_arm.name;
+
+    // Get the Jacobian matrix written on the base frame
+    Eigen::Vector3d origin(0,0.08,0);
+    Eigen::MatrixXd jacobian;
+    auto link_model = kinematic_state->getLinkModel(frame);
+    kinematic_state->getJacobian(joint_model_group, link_model, origin, jacobian, false);
+
+    // Rotate the force vector from the desired frame to the base frame
+    Eigen::Vector3d force_on_link_frame = rot_link_to_teleop.transpose() * force;
+    //
+    auto quat_base_link = kinematic_state->getGlobalLinkTransform(frame).rotation();
+    force_on_link_frame = quat_base_link.conjugate() * force_on_link_frame;
+
+    auto ret = feedback_gain * jacobian.block<3,3>(0,0).transpose() * force_on_link_frame;
+    std::cout << ret.transpose() << std::endl;
+    std::cout << "--" << std::endl;
+    return ret.block<3,1>(0,0);
 }
 
 void OmniBase::calculateVelocities()
@@ -213,6 +262,20 @@ void OmniBase::getEffectorVelocity()
     {
         state.twist[i] = xDot(i);
     }
+}
+
+void OmniBase::teleoperationForceFeedback()
+{
+    sub_force = node->subscribe("force_feedback", 1, &OmniBase::forceFeedbackCallback, this);
+}
+
+void OmniBase::forceFeedbackCallback(const geometry_msgs::Vector3& force)
+{
+    Eigen::Vector3d force_vector(force.x, force.y, force.z);
+    Eigen::Vector3d joint_torques = OmniBase::calculateTorqueFeedback(force_vector, force_feedback_gain);
+    std::vector<double> torque_input(3);
+    std::copy(joint_torques.data(), joint_torques.data() + 3, torque_input.begin());
+    this->setTorque(torque_input);
 }
 
 void OmniBase::teleoperationSlave()
