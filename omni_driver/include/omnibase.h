@@ -25,6 +25,20 @@
 class OmniBase
 {
 private:
+
+    struct Links {
+        std::string base = "base";
+        std::string torso = "torso";
+        std::string upper_arm = "upper_arm";
+        std::string lower_arm = "lower_arm";
+        std::string wrist = "wrist";
+        std::string tip = "tip";
+        std::string stylus = "stylus";
+        std::string end_effector = "end_effector";
+    };
+
+    Links links;
+
     double last_published_joint5_velocity;
 
     unsigned int teleop_sensitivity;

@@ -83,7 +83,7 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
         // TODO - quit program
     }
     state.joint_names = joint_model_group->getJointModelNames();
-    end_effector_link_model = kinematic_state->getLinkModel("end_effector");
+    end_effector_link_model = kinematic_state->getLinkModel(links.end_effector);
     //
     const int n = state.joint_names.size();
     joint_state.name.resize(n);
@@ -124,7 +124,7 @@ void OmniBase::fwdKin()
 {
     
     Eigen::Affine3d end_effector_state;
-    end_effector_state = kinematic_state->getGlobalLinkTransform("end_effector");
+    end_effector_state = kinematic_state->getGlobalLinkTransform(links.end_effector);
     Eigen::Quaterniond quat(end_effector_state.rotation());
     Eigen::Vector3d pos = end_effector_state.translation();
 
