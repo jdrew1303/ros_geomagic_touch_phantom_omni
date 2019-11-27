@@ -2,7 +2,17 @@ cmake_minimum_required(VERSION 2.8.3)
 project(omni_driver)
 
 set (CMAKE_CXX_FLAGS "--std=c++0x ${CMAKE_CXX_FLAGS} -Wall")
-set(CMAKE_BUILD_TYPE "Debug")
+
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+endif ()
+
+if (CMAKE_BUILD_TYPE MATCHES Release OR CMAKE_BUILD_TYPE MATCHES RELEASE)
+    # release mode options
+    add_compile_options(-O3)
+else ()
+    # options for any other modes
+endif ()
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -14,6 +24,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   urdf
   moveit_ros_planning
+  moveit_ros_move_group
 )
 
 find_package(Boost REQUIRED COMPONENTS thread)
@@ -65,7 +76,15 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES raw_omni
-#  CATKIN_DEPENDS geometry_msgs omni_description roscpp std_msgs tf urdf
+  CATKIN_DEPENDS
+    geometry_msgs
+    omni_description
+    roscpp
+    std_msgs
+    tf
+    urdf
+    moveit_ros_planning
+    moveit_ros_move_group
 #  DEPENDS system_lib
 )
 
