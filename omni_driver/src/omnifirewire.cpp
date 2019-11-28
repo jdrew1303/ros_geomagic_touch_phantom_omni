@@ -1,5 +1,7 @@
 #include "../include/omnifirewire.h"
 
+#include <numeric>
+
 #include <boost/bind.hpp>
 
 

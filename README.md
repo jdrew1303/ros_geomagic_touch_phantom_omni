@@ -131,7 +131,7 @@ By default, both username and password on this image is omni.
 After downloading or building the image, you can run it using the
 following command:
 ```sh 
-$ sudo docker run -ti --rm --privileged -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --net=host gscar:PhantomOmni
+$ sudo docker run -ti --rm --privileged -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --net=host --env QT_X11_NO_MITSHM=1 gscar:PhantomOmni
 ```
 
 
