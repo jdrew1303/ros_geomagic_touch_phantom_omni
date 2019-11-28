@@ -66,13 +66,13 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
 
     // Get the link names
     ros::param::param<std::string>("~link_base",         links.base.name, "base");
-    ros::param::param<std::string>("~link_torso",        links.base.name, "torso");
-    ros::param::param<std::string>("~link_upper_arm",    links.base.name, "upper_arm");
-    ros::param::param<std::string>("~link_lower_arm",    links.base.name, "lower_arm");
-    ros::param::param<std::string>("~link_wrist",        links.base.name, "wrist");
-    ros::param::param<std::string>("~link_tip",          links.base.name, "tip");
-    ros::param::param<std::string>("~link_stylus",       links.base.name, "stylus");
-    ros::param::param<std::string>("~link_end_effector", links.base.name, "end_effector");
+    ros::param::param<std::string>("~link_torso",        links.torso.name, "torso");
+    ros::param::param<std::string>("~link_upper_arm",    links.upper_arm.name, "upper_arm");
+    ros::param::param<std::string>("~link_lower_arm",    links.lower_arm.name, "lower_arm");
+    ros::param::param<std::string>("~link_wrist",        links.wrist.name, "wrist");
+    ros::param::param<std::string>("~link_tip",          links.tip.name, "tip");
+    ros::param::param<std::string>("~link_stylus",       links.stylus.name, "stylus");
+    ros::param::param<std::string>("~link_end_effector", links.end_effector.name, "end_effector");
     
     // Get link to teleop rotation
     std::vector<double> rot_data;
