@@ -25,6 +25,7 @@ find_package(catkin REQUIRED COMPONENTS
   urdf
   moveit_ros_planning
   moveit_ros_move_group
+  omni_controller
 )
 
 find_package(Boost REQUIRED COMPONENTS thread)
@@ -85,6 +86,7 @@ catkin_package(
     urdf
     moveit_ros_planning
     moveit_ros_move_group
+    omni_controller
 #  DEPENDS system_lib
 )
 
@@ -99,8 +101,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   include
-  "/usr/include/eigen3"
-  ../omni_controller/include
+  "${EIGEN3_INCLUDE_DIR}"
 )
 
 ## Declare a cpp library

@@ -20,6 +20,7 @@
             <param name="path_urdf" value="$(arg robot_urdf)" />
             <param name="path_srdf" value="$(arg robot_srdf)" />
             <param name="force_feedback_gain" type="double" value="1.0" />
+            <rosparam param="rot_link_to_teleop_colwise">[0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0]</rosparam>
 
             <remap from="/teleop" to="$(arg teleop_remap)" />
 		</node>

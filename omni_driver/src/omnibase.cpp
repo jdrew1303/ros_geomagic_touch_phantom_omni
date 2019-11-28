@@ -73,10 +73,10 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
     ros::param::param<std::string>("~link_tip",          links.base.name, "tip");
     ros::param::param<std::string>("~link_stylus",       links.base.name, "stylus");
     ros::param::param<std::string>("~link_end_effector", links.base.name, "end_effector");
-
+    
     // Get link to teleop rotation
     std::vector<double> rot_data;
-    ros::param::param<std::vector<double>>("~rot_link_to_teleop_colwise", rot_data, rot_data);
+    ros::param::get("~rot_link_to_teleop_colwise", rot_data);
     if (rot_data.empty())
         rot_link_to_teleop.setIdentity();
     else if (rot_data.size() == 9)
@@ -117,8 +117,6 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
     {
         joint_state.name[k] = name + state.joint_names[k];
     }
-
-
 }
 
 
@@ -176,14 +174,12 @@ Eigen::Vector3d OmniBase::calculateTorqueFeedback(const Eigen::Vector3d& force, 
     kinematic_state->getJacobian(joint_model_group, link_model, origin, jacobian, false);
 
     // Rotate the force vector from the desired frame to the base frame
-    Eigen::Vector3d force_on_link_frame = rot_link_to_teleop.transpose() * force;
+    Eigen::Vector3d force_on_link_frame = rot_link_to_teleop * force;
     //
     auto quat_base_link = kinematic_state->getGlobalLinkTransform(frame).rotation();
     force_on_link_frame = quat_base_link.conjugate() * force_on_link_frame;
 
     auto ret = feedback_gain * jacobian.block<3,3>(0,0).transpose() * force_on_link_frame;
-    std::cout << ret.transpose() << std::endl;
-    std::cout << "--" << std::endl;
     return ret.block<3,1>(0,0);
 }
 
