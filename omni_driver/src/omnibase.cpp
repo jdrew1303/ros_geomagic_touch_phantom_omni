@@ -62,8 +62,13 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
     else
         this->teleoperationForceFeedback();
 
-    // Get the force feedback gain
-    ros::param::param<double>("~force_feedback_gain", force_feedback_gain, 0);
+    // Get the force feedback gain, twist gain, joint states gain and joint states offset
+    ros::param::param<double>("~force_feedback_gain", force_feedback_gain, 1);
+    ros::param::param<double>("~twist_gain", twist_gain, 1);
+    ros::param::param<double>("~joint_states_gain", joint_states_gain, 1);
+    ros::param::get("~joint_states_offsets", joint_states_offsets);
+    if (joint_states_offsets.size() != 6)
+        throw std::logic_error("Joint states offset is represented as 6 elements vector.");
 
     // Get the link names
     ros::param::param<std::string>("~link_base",         links.base.name, "base");
@@ -83,7 +88,7 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
     else if (rot_data.size() == 9)
         rot_link_to_teleop = Eigen::Matrix3d(rot_data.data());
     else
-        throw std::logic_error("rotation matrix is represented by a 9 element array");
+        throw std::logic_error("Rotation matrix is represented by a 9 element array");
 
     // Initialize teleop_control message fields
     teleop_control.vel_joint.resize(6);
@@ -356,8 +361,8 @@ void OmniBase::publishOmniState()
 
     for (int i = 0; i < 6; ++i)
     {
-        joint_state.position[i] = joint_angles[i];
-        joint_state.velocity[i] = joint_velocities[i];
+        joint_state.position[i] = joint_states_gain * joint_angles[i] + joint_states_offsets[i];
+        joint_state.velocity[i] = joint_states_gain * joint_velocities[i];
     }
 
     // Publish the joint state;
@@ -375,12 +380,12 @@ void OmniBase::publishOmniState()
     pub_pose.publish(pose_stamped);
 
     // Publish the twist.
-    twist.linear.x = state.twist[0];
-    twist.linear.y = state.twist[1];
-    twist.linear.z = state.twist[2];
-    twist.angular.x = state.twist[3];
-    twist.angular.y = state.twist[4];
-    twist.angular.z = state.twist[5];
+    twist.linear.x = twist_gain * state.twist[0];
+    twist.linear.y = twist_gain * state.twist[1];
+    twist.linear.z = twist_gain * state.twist[2];
+    twist.angular.x = twist_gain * state.twist[3];
+    twist.angular.y = twist_gain * state.twist[4];
+    twist.angular.z = twist_gain * state.twist[5];
     pub_twist.publish(twist);
 
     // Publish the button event.

@@ -51,6 +51,12 @@ private:
 
     double force_feedback_gain;
 
+    std::vector<double> joint_states_offsets;
+
+    double joint_states_gain;
+
+    double twist_gain;
+
     double last_published_joint5_velocity;
 
     unsigned int teleop_sensitivity;
