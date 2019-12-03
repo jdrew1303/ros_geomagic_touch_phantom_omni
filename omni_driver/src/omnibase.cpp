@@ -25,9 +25,6 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
 {
     node = ros::NodeHandlePtr( new ros::NodeHandle("") );
 
-
-    std::cerr << "VSCODE FUNFANDO !!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-
     // Prepare joint state publisher.
     topic_name = name + "joint_states";
     pub_joint = node->advertise<sensor_msgs::JointState>(topic_name, 10);
