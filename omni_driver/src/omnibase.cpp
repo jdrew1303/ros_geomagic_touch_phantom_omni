@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+
 typedef boost::shared_ptr<urdf::Model> URDFModelPtr;
 typedef boost::shared_ptr<srdf::Model> SRDFModelPtr;
 
@@ -23,6 +24,9 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
     velocity_filter_minimum_dt(velocity_filter_minimum_dt)
 {
     node = ros::NodeHandlePtr( new ros::NodeHandle("") );
+
+
+    std::cerr << "VSCODE FUNFANDO !!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 
     // Prepare joint state publisher.
     topic_name = name + "joint_states";
@@ -265,9 +269,9 @@ void OmniBase::teleoperationForceFeedback()
     sub_force = node->subscribe("force_feedback", 1, &OmniBase::forceFeedbackCallback, this);
 }
 
-void OmniBase::forceFeedbackCallback(const geometry_msgs::Vector3& force)
+void OmniBase::forceFeedbackCallback(const std_msgs::Float64MultiArray::ConstPtr& force)
 {
-    Eigen::Vector3d force_vector(force.x, force.y, force.z);
+    Eigen::Vector3d force_vector(force->data[0], force->data[1], force->data[2]);
     Eigen::Vector3d joint_torques = OmniBase::calculateTorqueFeedback(force_vector, force_feedback_gain);
     std::vector<double> torque_input(3);
     std::copy(joint_torques.data(), joint_torques.data() + 3, torque_input.begin());

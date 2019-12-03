@@ -10,7 +10,7 @@
 #include <geometry_msgs/Vector3.h>
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/PoseStamped.h>
-
+#include <std_msgs/Float64MultiArray.h>
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit/move_group_interface/move_group.h>
@@ -440,7 +440,7 @@ public:
 
     void teleoperationForceFeedback();
 
-    void forceFeedbackCallback(const geometry_msgs::Vector3& force);
+    void forceFeedbackCallback(const std_msgs::Float64MultiArray::ConstPtr& force);
 
     void teleoperationSlave();
 
