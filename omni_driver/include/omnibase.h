@@ -168,6 +168,7 @@ protected:
     ros::Subscriber sub_moveit;                 ///< Enable button subscriber for moveit.
 
     ros::Publisher pub_joint;                   ///< Joint ROS publisher.
+    ros::Publisher pub_delta;                   ///< Joint deltas ROS publisher.
     sensor_msgs::JointState joint_state;
 
     ros::Publisher pub_pose;                    ///< Pose ROS publisher.

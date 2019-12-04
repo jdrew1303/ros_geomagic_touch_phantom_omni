@@ -29,6 +29,10 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
     topic_name = name + "joint_states";
     pub_joint = node->advertise<sensor_msgs::JointState>(topic_name, 10);
 
+    // Prepare joint delta publisher.
+    topic_name = name + "joint_delta";
+    pub_delta = node->advertise<std_msgs::Float64MultiArray>(topic_name, 10);
+
     // Prepare pose publisher.
     topic_name = name + "pose";
     pub_pose = node->advertise<geometry_msgs::PoseStamped>(topic_name, 10);
@@ -314,21 +318,20 @@ void OmniBase::buttonCallback(const omni_driver::OmniButtonEvent::ConstPtr &msg)
 {
     if (teleop_master)
     {
+        // if (msg->grey_button_clicked)
+        // {
+        //     ++teleop_sensitivity;
 
-        if (msg->grey_button_clicked)
-        {
-            ++teleop_sensitivity;
+        //     ROS_INFO_STREAM(teleop_sensitivity);
+        // }
+        // if (msg->white_button_clicked)
+        // {
+        //     if (teleop_sensitivity-- > 0);
+        //     else
+        //         teleop_sensitivity = 0;
 
-            ROS_INFO_STREAM(teleop_sensitivity);
-        }
-        if (msg->white_button_clicked)
-        {
-            if (teleop_sensitivity-- > 0);
-            else
-                teleop_sensitivity = 0;
-
-            ROS_INFO_STREAM(teleop_sensitivity);
-        }
+        //     ROS_INFO_STREAM(teleop_sensitivity);
+        // }
     }
     else
     {
@@ -404,6 +407,17 @@ void OmniBase::publishOmniState()
     // Publish the teleoperation data.
     if (teleop_master)
     {
+        std_msgs::Float64MultiArray joint_delta;
+        joint_delta.data.resize(6);
+        //Publish deltas when a button is pushed and omni is master, 0 otherwise.
+        if (button_state[0] || button_state[1]) {
+            joint_delta.data = joint_state.velocity;
+            pub_delta.publish(joint_delta);
+        }
+        else {
+            pub_delta.publish(joint_delta);
+        }
+
         const double sensitivity_step = 0.001;
         for (unsigned int k = 0; k < state.velocities.size(); ++k)
         {
