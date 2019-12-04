@@ -65,7 +65,9 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
     // Get the force feedback gain, twist gain, joint states gain and joint states offset
     ros::param::param<double>("~force_feedback_gain", force_feedback_gain, 1);
     ros::param::param<double>("~twist_gain", twist_gain, 1);
-    ros::param::param<double>("~joint_states_gain", joint_states_gain, 1);
+    ros::param::get("~joint_states_gain", joint_states_gain);
+    if (joint_states_gain.size() != 6)
+        throw std::logic_error("Joint states gain is represented as 6 elements vector.");
     ros::param::get("~joint_states_offsets", joint_states_offsets);
     if (joint_states_offsets.size() != 6)
         throw std::logic_error("Joint states offset is represented as 6 elements vector.");
@@ -361,8 +363,8 @@ void OmniBase::publishOmniState()
 
     for (int i = 0; i < 6; ++i)
     {
-        joint_state.position[i] = joint_states_gain * joint_angles[i] + joint_states_offsets[i];
-        joint_state.velocity[i] = joint_states_gain * joint_velocities[i];
+        joint_state.position[i] = joint_states_gain[i] * joint_angles[i] + joint_states_offsets[i];
+        joint_state.velocity[i] = joint_states_gain[i] * joint_velocities[i];
     }
 
     // Publish the joint state;

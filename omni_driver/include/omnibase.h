@@ -53,7 +53,7 @@ private:
 
     std::vector<double> joint_states_offsets;
 
-    double joint_states_gain;
+    std::vector<double> joint_states_gain;
 
     double twist_gain;
 
