@@ -97,6 +97,16 @@ private:
         }
     }
     
+    /**
+     * @brief As long as no Omni's button is pressed, current joint state is saved under joint_delta_ref.
+     *        Whenever any of the Omni's button is pressed, joint_delta_ref is no longer updated and serves as reference 
+     *        for calculating the joint deltas in the formula below:
+     *          joint_delta = current_joint_state - joint_delta_ref
+     *        The return of this method should always be [0, 0, 0, 0, 0, 0] if no button is being pressed.
+     * @param button_state Current Omni button state.
+     * @param joint_state Current Omni joint state.
+     * @return the calculated 6 element vector of joint deltas.
+     */
     std::vector<double> calculateJointDeltas(std::vector<bool> button_state, sensor_msgs::JointState joint_state){
         std::vector<double> joint_deltas;
         joint_deltas.resize(6);
