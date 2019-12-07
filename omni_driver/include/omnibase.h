@@ -51,6 +51,8 @@ private:
 
     double force_feedback_gain;
 
+    std::vector<double> joint_delta_ref;
+
     std::vector<double> joint_states_offsets;
 
     std::vector<double> joint_states_gain;
@@ -93,6 +95,22 @@ private:
         {
             checkLimits(*iter, min, max);
         }
+    }
+    
+    std::vector<double> calculateJointDeltas(std::vector<bool> button_state, sensor_msgs::JointState joint_state){
+        std::vector<double> joint_deltas;
+        joint_deltas.resize(6);
+        if (button_state[0] || button_state[1]) {
+            for (int i = 0; i < 6; ++i) {
+                joint_deltas[i] = joint_state.position[i] - joint_delta_ref[i];
+            }
+            return joint_deltas;
+        }
+        else {
+            joint_delta_ref = joint_state.position;
+            return joint_deltas;
+        }
+
     }
 
     void fwdKin();

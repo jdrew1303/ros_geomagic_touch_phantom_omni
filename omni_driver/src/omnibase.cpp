@@ -407,17 +407,12 @@ void OmniBase::publishOmniState()
     // Publish the teleoperation data.
     if (teleop_master)
     {
+        // Publish the joint delta.
         std_msgs::Float64MultiArray joint_delta;
-        joint_delta.data.resize(6);
-        //Publish deltas when a button is pushed and omni is master, 0 otherwise.
-        if (button_state[0] || button_state[1]) {
-            joint_delta.data = joint_state.velocity;
-            pub_delta.publish(joint_delta);
-        }
-        else {
-            pub_delta.publish(joint_delta);
-        }
+        joint_delta.data = calculateJointDeltas(button_state, joint_state);
+        pub_delta.publish(joint_delta);
 
+        // Publish teleop data for other omni.
         const double sensitivity_step = 0.001;
         for (unsigned int k = 0; k < state.velocities.size(); ++k)
         {
