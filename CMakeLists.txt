@@ -1,0 +1,264 @@
+cmake_minimum_required(VERSION 3.14)
+project(PhantomOmni)
+
+set(CMAKE_CXX_STANDARD 14)
+
+include_directories(.)
+include_directories(omni)
+include_directories(omni_controller)
+include_directories(omni_controller/cfg)
+include_directories(omni_controller/include)
+include_directories(omni_controller/include/node)
+include_directories(omni_controller/include/RobotBase)
+include_directories(omni_controller/launch)
+include_directories(omni_controller/msg)
+include_directories(omni_controller/src)
+include_directories(omni_description)
+include_directories(omni_description/meshes)
+include_directories(omni_description/resources)
+include_directories(omni_description/urdf)
+include_directories(omni_driver)
+include_directories(omni_driver/cfg)
+include_directories(omni_driver/doc)
+include_directories(omni_driver/doc/html)
+include_directories(omni_driver/doc/latex)
+include_directories(omni_driver/include)
+include_directories(omni_driver/launch)
+include_directories(omni_driver/msg)
+include_directories(omni_driver/src)
+include_directories(omni_moveit)
+include_directories(omni_moveit/config)
+include_directories(omni_moveit/launch)
+
+add_executable(PhantomOmni
+        omni/CMakeLists.txt
+        omni/package.xml
+        omni_controller/cfg/omni.rviz
+        omni_controller/include/node/Omni.h
+        omni_controller/include/node/omni_controller.h
+        omni_controller/include/RobotBase/RobotBase.h
+        omni_controller/launch/omni_controller.launch
+        omni_controller/msg/Key.msg
+        omni_controller/src/node/Omni.cpp
+        omni_controller/src/node/omni_controller.cpp
+        omni_controller/src/RobotBase/RobotBase.cpp
+        omni_controller/src/test/main.cpp
+        omni_controller/CMakeLists.txt
+        omni_controller/package.xml
+        omni_description/meshes/base.stl
+        omni_description/meshes/lower_arm.stl
+        omni_description/meshes/pen.stl
+        omni_description/meshes/tip.stl
+        omni_description/meshes/torso.stl
+        omni_description/meshes/upper_arm.stl
+        omni_description/meshes/wrist.stl
+        omni_description/resources/OmniRviz.png
+        omni_description/urdf/omni.dae
+        omni_description/urdf/omni.robot.xml
+        omni_description/urdf/omni.urdf
+        omni_description/CHANGELOG.rst
+        omni_description/CMakeLists.txt
+        omni_description/package.xml
+        omni_driver/cfg/doxygen_omni_driver.cfg
+        omni_driver/cfg/multi_omni.rviz
+        omni_driver/cfg/omni.rviz
+        omni_driver/cfg/single_omni.rviz
+        omni_driver/cfg/uncrustify.cfg
+        omni_driver/doc/html/search/all_0.html
+        omni_driver/doc/html/search/all_0.js
+        omni_driver/doc/html/search/all_1.html
+        omni_driver/doc/html/search/all_1.js
+        omni_driver/doc/html/search/all_2.html
+        omni_driver/doc/html/search/all_2.js
+        omni_driver/doc/html/search/all_3.html
+        omni_driver/doc/html/search/all_3.js
+        omni_driver/doc/html/search/all_4.html
+        omni_driver/doc/html/search/all_4.js
+        omni_driver/doc/html/search/all_5.html
+        omni_driver/doc/html/search/all_5.js
+        omni_driver/doc/html/search/all_6.html
+        omni_driver/doc/html/search/all_6.js
+        omni_driver/doc/html/search/all_7.html
+        omni_driver/doc/html/search/all_7.js
+        omni_driver/doc/html/search/all_8.html
+        omni_driver/doc/html/search/all_8.js
+        omni_driver/doc/html/search/all_9.html
+        omni_driver/doc/html/search/all_9.js
+        omni_driver/doc/html/search/all_a.html
+        omni_driver/doc/html/search/all_a.js
+        omni_driver/doc/html/search/classes_0.html
+        omni_driver/doc/html/search/classes_0.js
+        omni_driver/doc/html/search/close.png
+        omni_driver/doc/html/search/functions_0.html
+        omni_driver/doc/html/search/functions_0.js
+        omni_driver/doc/html/search/functions_1.html
+        omni_driver/doc/html/search/functions_1.js
+        omni_driver/doc/html/search/functions_2.html
+        omni_driver/doc/html/search/functions_2.js
+        omni_driver/doc/html/search/functions_3.html
+        omni_driver/doc/html/search/functions_3.js
+        omni_driver/doc/html/search/functions_4.html
+        omni_driver/doc/html/search/functions_4.js
+        omni_driver/doc/html/search/functions_5.html
+        omni_driver/doc/html/search/functions_5.js
+        omni_driver/doc/html/search/functions_6.html
+        omni_driver/doc/html/search/functions_6.js
+        omni_driver/doc/html/search/functions_7.html
+        omni_driver/doc/html/search/functions_7.js
+        omni_driver/doc/html/search/functions_8.html
+        omni_driver/doc/html/search/functions_8.js
+        omni_driver/doc/html/search/mag_sel.png
+        omni_driver/doc/html/search/nomatches.html
+        omni_driver/doc/html/search/pages_0.html
+        omni_driver/doc/html/search/pages_0.js
+        omni_driver/doc/html/search/search.css
+        omni_driver/doc/html/search/search.js
+        omni_driver/doc/html/search/search_l.png
+        omni_driver/doc/html/search/search_m.png
+        omni_driver/doc/html/search/search_r.png
+        omni_driver/doc/html/search/typedefs_0.html
+        omni_driver/doc/html/search/typedefs_0.js
+        omni_driver/doc/html/search/variables_0.html
+        omni_driver/doc/html/search/variables_0.js
+        omni_driver/doc/html/search/variables_1.html
+        omni_driver/doc/html/search/variables_1.js
+        omni_driver/doc/html/search/variables_2.html
+        omni_driver/doc/html/search/variables_2.js
+        omni_driver/doc/html/search/variables_3.html
+        omni_driver/doc/html/search/variables_3.js
+        omni_driver/doc/html/search/variables_4.html
+        omni_driver/doc/html/search/variables_4.js
+        omni_driver/doc/html/search/variables_5.html
+        omni_driver/doc/html/search/variables_5.js
+        omni_driver/doc/html/annotated.html
+        omni_driver/doc/html/bc_s.png
+        omni_driver/doc/html/bdwn.png
+        omni_driver/doc/html/classes.html
+        omni_driver/doc/html/classOmniBase-members.html
+        omni_driver/doc/html/classOmniBase.html
+        omni_driver/doc/html/classOmniBase.png
+        omni_driver/doc/html/classOmniEthernet-members.html
+        omni_driver/doc/html/classOmniEthernet.html
+        omni_driver/doc/html/classOmniEthernet.png
+        omni_driver/doc/html/classOmniFirewire-members.html
+        omni_driver/doc/html/classOmniFirewire.html
+        omni_driver/doc/html/classOmniFirewire.png
+        omni_driver/doc/html/closed.png
+        omni_driver/doc/html/dir_68267d1309a1af8e8297ef4c3efbcdba.html
+        omni_driver/doc/html/dir_d44c64559bbebec7f509842c48db8b23.html
+        omni_driver/doc/html/doxygen.css
+        omni_driver/doc/html/doxygen.png
+        omni_driver/doc/html/dynsections.js
+        omni_driver/doc/html/files.html
+        omni_driver/doc/html/ftv2blank.png
+        omni_driver/doc/html/ftv2cl.png
+        omni_driver/doc/html/ftv2doc.png
+        omni_driver/doc/html/ftv2folderclosed.png
+        omni_driver/doc/html/ftv2folderopen.png
+        omni_driver/doc/html/ftv2lastnode.png
+        omni_driver/doc/html/ftv2link.png
+        omni_driver/doc/html/ftv2mlastnode.png
+        omni_driver/doc/html/ftv2mnode.png
+        omni_driver/doc/html/ftv2mo.png
+        omni_driver/doc/html/ftv2node.png
+        omni_driver/doc/html/ftv2ns.png
+        omni_driver/doc/html/ftv2plastnode.png
+        omni_driver/doc/html/ftv2pnode.png
+        omni_driver/doc/html/ftv2splitbar.png
+        omni_driver/doc/html/ftv2vertline.png
+        omni_driver/doc/html/functions.html
+        omni_driver/doc/html/functions_func.html
+        omni_driver/doc/html/functions_type.html
+        omni_driver/doc/html/functions_vars.html
+        omni_driver/doc/html/hierarchy.html
+        omni_driver/doc/html/index.html
+        omni_driver/doc/html/jquery.js
+        omni_driver/doc/html/md_LICENSE.html
+        omni_driver/doc/html/nav_f.png
+        omni_driver/doc/html/nav_g.png
+        omni_driver/doc/html/nav_h.png
+        omni_driver/doc/html/omnibase_8h_source.html
+        omni_driver/doc/html/omniethernet_8h_source.html
+        omni_driver/doc/html/omnifirewire_8h_source.html
+        omni_driver/doc/html/open.png
+        omni_driver/doc/html/pages.html
+        omni_driver/doc/html/structOmniBase_1_1OmniState-members.html
+        omni_driver/doc/html/structOmniBase_1_1OmniState.html
+        omni_driver/doc/html/structOmniFirewire_1_1OmniInfo-members.html
+        omni_driver/doc/html/structOmniFirewire_1_1OmniInfo.html
+        omni_driver/doc/html/sync_off.png
+        omni_driver/doc/html/sync_on.png
+        omni_driver/doc/html/tab_a.png
+        omni_driver/doc/html/tab_b.png
+        omni_driver/doc/html/tab_h.png
+        omni_driver/doc/html/tab_s.png
+        omni_driver/doc/html/tabs.css
+        omni_driver/doc/latex/annotated.tex
+        omni_driver/doc/latex/classOmniBase.eps
+        omni_driver/doc/latex/classOmniBase.tex
+        omni_driver/doc/latex/classOmniEthernet.eps
+        omni_driver/doc/latex/classOmniEthernet.tex
+        omni_driver/doc/latex/classOmniFirewire.eps
+        omni_driver/doc/latex/classOmniFirewire.tex
+        omni_driver/doc/latex/dir_68267d1309a1af8e8297ef4c3efbcdba.tex
+        omni_driver/doc/latex/dir_d44c64559bbebec7f509842c48db8b23.tex
+        omni_driver/doc/latex/doxygen.sty
+        omni_driver/doc/latex/hierarchy.tex
+        omni_driver/doc/latex/Makefile
+        omni_driver/doc/latex/md_LICENSE.tex
+        omni_driver/doc/latex/refman.tex
+        omni_driver/doc/latex/structOmniBase_1_1OmniState.tex
+        omni_driver/doc/latex/structOmniFirewire_1_1OmniInfo.tex
+        omni_driver/include/omnibase.h
+        omni_driver/include/omniethernet.h
+        omni_driver/include/omnifirewire.h
+        omni_driver/include/raw1394msg.h
+        omni_driver/launch/ethernet.launch
+        omni_driver/launch/ethernet_rviz.launch
+        omni_driver/launch/ethernet_slave.launch
+        omni_driver/launch/firewire.launch
+        omni_driver/launch/firewire_rviz.launch
+        omni_driver/launch/firewire_slave.launch
+        omni_driver/launch/omni.launch
+        omni_driver/launch/omni_manual.launch
+        omni_driver/msg/OmniButtonEvent.msg
+        omni_driver/msg/OmniFeedback.msg
+        omni_driver/msg/OmniState.msg
+        omni_driver/msg/TeleopControl.msg
+        omni_driver/src/omnibase.cpp
+        omni_driver/src/omniethernet.cpp
+        omni_driver/src/omnifirewire.cpp
+        omni_driver/src/omninode.cpp
+        omni_driver/src/raw1394msg.cpp
+        omni_driver/CMakeLists.txt
+        omni_driver/LICENSE.md
+        omni_driver/package.xml
+        omni_moveit/config/controllers.yaml
+        omni_moveit/config/fake_controllers.yaml
+        omni_moveit/config/joint_limits.yaml
+        omni_moveit/config/kinematics.yaml
+        omni_moveit/config/ompl_planning.yaml
+        omni_moveit/config/phantom_omni.srdf
+        omni_moveit/launch/default_warehouse_db.launch
+        omni_moveit/launch/demo.launch
+        omni_moveit/launch/fake_moveit_controller_manager.launch.xml
+        omni_moveit/launch/joystick_control.launch
+        omni_moveit/launch/move_group.launch
+        omni_moveit/launch/moveit.rviz
+        omni_moveit/launch/moveit_rviz.launch
+        omni_moveit/launch/omni_moveit_controller_manager.launch
+        omni_moveit/launch/ompl_planning_pipeline.launch.xml
+        omni_moveit/launch/phantom_omni_moveit_controller_manager.launch.xml
+        omni_moveit/launch/phantom_omni_moveit_sensor_manager.launch.xml
+        omni_moveit/launch/planning_context.launch
+        omni_moveit/launch/planning_pipeline.launch.xml
+        omni_moveit/launch/run_benchmark_ompl.launch
+        omni_moveit/launch/sensor_manager.launch.xml
+        omni_moveit/launch/setup_assistant.launch
+        omni_moveit/launch/trajectory_execution.launch.xml
+        omni_moveit/launch/warehouse.launch
+        omni_moveit/launch/warehouse_settings.launch.xml
+        omni_moveit/CMakeLists.txt
+        omni_moveit/package.xml
+        LICENSE.txt
+        README.md)

@@ -63,7 +63,7 @@ int main(int argc, char **argv)
     while (ros::ok())
     {
         ros::spinOnce();
-
+        
         omni->publishOmniState();
 
         // Force a reconnection if connection was lost
