@@ -59,6 +59,16 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
     topic_name = name + "enable_control";
     sub_enable_control = node->subscribe(topic_name, 1, &OmniBase::enableControlCallback, this);
 
+    // Subscribe and initialize teleoperated joint states.
+    topic_name = name + "teleop_joint_states";
+    sub_enable_control = node->subscribe(topic_name, 1, &OmniBase::teleopJointStatesCallback, this);
+    teleoperated_joint_states.name.resize(4);
+    teleoperated_joint_states.position.resize(4);
+    teleoperated_joint_states.velocity.resize(4);
+    joint_delta_ref.resize(6);
+    teleop_joint_delta_ref.resize(4);
+
+
     // Subscribe to teleop topic if this omni is a slave
     ros::param::param<bool>("~teleop_master", teleop_master, true);
     if (!teleop_master)
@@ -445,4 +455,13 @@ void OmniBase::torqueCallback(const geometry_msgs::Vector3::ConstPtr & msg)
 {
     std::vector<double> input = {msg->x, msg->y, msg->z};
     setTorque(input);
+}
+
+void OmniBase::teleopJointStatesCallback(const sensor_msgs::JointState::ConstPtr& msg)
+{
+    for (int i = 0; i < 4; ++i) {
+        teleoperated_joint_states.name[i] = msg->name[i];
+        teleoperated_joint_states.position[i] = msg->position[i];
+        teleoperated_joint_states.velocity[i] = msg->velocity[i];
+    }
 }
