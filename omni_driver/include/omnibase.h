@@ -53,6 +53,8 @@ private:
 
     std::vector<double> joint_delta_ref;
 
+    std::vector<double> teleop_joint_delta_ref;
+
     std::vector<double> joint_states_offsets;
 
     std::vector<double> joint_states_gain;
@@ -72,6 +74,8 @@ private:
     std::vector<std::vector<double>> velocities_filter;
 
     static const unsigned int MAX_FREEZE_COUNT = 100;
+
+    sensor_msgs::JointState teleoperated_joint_states;
 
     boost::shared_mutex mutex_state;                        ///< Mutex state returned by @link getMutexState().
 
@@ -108,17 +112,20 @@ private:
      * @return the calculated 6 element vector of joint deltas.
      */
     std::vector<double> calculateJointDeltas(std::vector<bool> button_state, sensor_msgs::JointState joint_state){
-        std::vector<double> joint_deltas;
-        joint_deltas.resize(6);
         if (button_state[0] || button_state[1]) {
+            std::vector<double> joint_deltas;
+            joint_deltas.resize(6);
             for (int i = 0; i < 6; ++i) {
-                joint_deltas[i] = joint_state.position[i] - joint_delta_ref[i];
+                joint_deltas[i] = (joint_state.position[i] - joint_delta_ref[i]) + teleop_joint_delta_ref[i];
             }
             return joint_deltas;
         }
         else {
             joint_delta_ref = joint_state.position;
-            return joint_deltas;
+            for (int i = 0; i < 4; ++i) {
+                teleop_joint_delta_ref[i] = teleoperated_joint_states.position[i];
+            }
+            return teleop_joint_delta_ref;
         }
 
     }
@@ -130,6 +137,8 @@ private:
     void filterVelocities(std::vector<double> &filtered_velocities);
 
     void getEffectorVelocity();
+
+    void teleopJointStatesCallback(const sensor_msgs::JointState::ConstPtr& msg);
 
 protected:
     typedef boost::posix_time::microsec_clock Clock;
@@ -194,6 +203,7 @@ protected:
     ros::Subscriber sub_enable_control;         ///< Enable control ROS subscriber.
     ros::Subscriber sub_haptic;                 ///< Enable haptic ROS subscriber.
     ros::Subscriber sub_moveit;                 ///< Enable button subscriber for moveit.
+    ros::Subscriber sub_slave_joint_states;     ///< Enable slave joint states ROS subscriber.
 
     ros::Publisher pub_joint;                   ///< Joint ROS publisher.
     ros::Publisher pub_delta;                   ///< Joint deltas ROS publisher.

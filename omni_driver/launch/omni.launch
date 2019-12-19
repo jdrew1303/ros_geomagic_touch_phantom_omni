@@ -26,6 +26,7 @@
             <rosparam param="rot_link_to_teleop_colwise">[0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0]</rosparam>
 
             <remap from="/teleop" to="$(arg teleop_remap)" />
+            <remap from="/$(arg namespace)/teleop_joint_states" to="/doris/manipulator_controller/joint_states" />
 		</node>
 
         <node name="state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">

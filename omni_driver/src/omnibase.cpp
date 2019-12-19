@@ -31,7 +31,7 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
 
     // Prepare joint delta publisher.
     topic_name = name + "joint_delta";
-    pub_delta = node->advertise<std_msgs::Float64MultiArray>(topic_name, 10);
+    pub_delta = node->advertise<sensor_msgs::JointState>(topic_name, 10);
 
     // Prepare pose publisher.
     topic_name = name + "pose";
@@ -58,6 +58,16 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
     // Subscribe enable_control topic.
     topic_name = name + "enable_control";
     sub_enable_control = node->subscribe(topic_name, 1, &OmniBase::enableControlCallback, this);
+
+    // Subscribe and initialize teleoperated joint states.
+    topic_name = name + "teleop_joint_states";
+    sub_slave_joint_states = node->subscribe(topic_name, 1, &OmniBase::teleopJointStatesCallback, this);
+    teleoperated_joint_states.name.resize(4);
+    teleoperated_joint_states.position.resize(4);
+    teleoperated_joint_states.velocity.resize(4);
+    joint_delta_ref.resize(6);
+    teleop_joint_delta_ref.resize(4);
+
 
     // Subscribe to teleop topic if this omni is a slave
     ros::param::param<bool>("~teleop_master", teleop_master, true);
@@ -410,8 +420,14 @@ void OmniBase::publishOmniState()
         // Publish the joint delta.
         std_msgs::Float64MultiArray joint_delta;
         joint_delta.data = calculateJointDeltas(button_state, joint_state);
-        pub_delta.publish(joint_delta);
-
+        sensor_msgs::JointState joint_state_delta;
+        joint_state_delta.name.resize(6);
+        joint_state_delta.position.resize(6);
+        joint_state_delta.velocity.resize(6);
+        for (int i = 0; i < 6; ++i) {
+            joint_state_delta.position[i] = joint_delta.data[i];
+        }
+        pub_delta.publish(joint_state_delta);
         // Publish teleop data for other omni.
         const double sensitivity_step = 0.001;
         for (unsigned int k = 0; k < state.velocities.size(); ++k)
@@ -445,4 +461,11 @@ void OmniBase::torqueCallback(const geometry_msgs::Vector3::ConstPtr & msg)
 {
     std::vector<double> input = {msg->x, msg->y, msg->z};
     setTorque(input);
+}
+
+void OmniBase::teleopJointStatesCallback(const sensor_msgs::JointState::ConstPtr& msg)
+{
+    for (int i = 0; i < 4; ++i) {
+        teleoperated_joint_states.position[i] = msg->position[i];
+    }
 }
