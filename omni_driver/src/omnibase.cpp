@@ -467,5 +467,6 @@ void OmniBase::teleopJointStatesCallback(const sensor_msgs::JointState::ConstPtr
 {
     for (int i = 0; i < 4; ++i) {
         teleoperated_joint_states.position[i] = msg->position[i];
+        
     }
 }
