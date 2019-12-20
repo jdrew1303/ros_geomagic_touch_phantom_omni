@@ -51,6 +51,12 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
     topic_name = name + "teleop";
     pub_teleop_control = node->advertise<omni_driver::TeleopControl>(topic_name, 1);
 
+    topic_name = name + "zero_force";
+    pub_teleop_control = node->advertise<std_msgs::Bool>(topic_name, 1);
+
+    //Calibrate tetis optoforce.
+    calibrateTetisOptoForce();
+
     // Subscribe omni_control topic.
     topic_name = name + "control";
     sub_torque = node->subscribe(topic_name, 1, &OmniBase::torqueCallback, this);
@@ -468,4 +474,12 @@ void OmniBase::teleopJointStatesCallback(const sensor_msgs::JointState::ConstPtr
     for (int i = 0; i < 4; ++i) {
         teleoperated_joint_states.position[i] = msg->position[i];
     }
+}
+
+//Calibrate tetis optoforce sensor.
+void OmniBase::calibrateTetisOptoForce()
+{
+    std_msgs::Bool zero_force_calibration;
+    zero_force_calibration.data = true;
+    pub_teleop_control.publish(zero_force_calibration);
 }
