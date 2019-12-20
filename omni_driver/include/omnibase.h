@@ -53,7 +53,7 @@ private:
 
     std::vector<double> joint_delta_ref;
 
-    std::vector<double> teleop_joint_delta_ref;
+    std::vector<double> teleoperated_joint_delta_ref;
 
     std::vector<double> joint_states_offsets;
 
@@ -113,19 +113,29 @@ private:
      */
     std::vector<double> calculateJointDeltas(std::vector<bool> button_state, sensor_msgs::JointState joint_state){
         if (button_state[0] || button_state[1]) {
-            std::vector<double> joint_deltas;
-            joint_deltas.resize(6);
-            for (int i = 0; i < 6; ++i) {
-                joint_deltas[i] = (joint_state.position[i] - joint_delta_ref[i]) + teleop_joint_delta_ref[i];
-            }
-            return joint_deltas;
+            std::vector<double> joint_delta(6);
+
+            /**
+             * Commented for recursion because Tetis joint 4 is mapping Omni joint 5
+             */
+            // joint_delta.resize(6);
+            // for (int i = 0; i < 6; ++i) {
+            //     joint_delta[i] = (joint_state.position[i] - joint_delta_ref[i]) + teleoperated_joint_delta_ref[i];
+            // }
+            
+            joint_delta[0] = (joint_state.position[0] - joint_delta_ref[0]) + teleoperated_joint_delta_ref[0];
+            joint_delta[1] = (joint_state.position[1] - joint_delta_ref[1]) + teleoperated_joint_delta_ref[1];
+            joint_delta[2] = (joint_state.position[2] - joint_delta_ref[2]) + teleoperated_joint_delta_ref[2];
+            joint_delta[4] = (joint_state.position[4] - joint_delta_ref[4]) + teleoperated_joint_delta_ref[3];
+            
+            return joint_delta;
         }
         else {
             joint_delta_ref = joint_state.position;
             for (int i = 0; i < 4; ++i) {
-                teleop_joint_delta_ref[i] = teleoperated_joint_states.position[i];
+                teleoperated_joint_delta_ref[i] = teleoperated_joint_states.position[i];
             }
-            return teleop_joint_delta_ref;
+            return teleoperated_joint_delta_ref;
         }
 
     }

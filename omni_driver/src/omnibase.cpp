@@ -62,11 +62,11 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
     // Subscribe and initialize teleoperated joint states.
     topic_name = name + "teleop_joint_states";
     sub_slave_joint_states = node->subscribe(topic_name, 1, &OmniBase::teleopJointStatesCallback, this);
-    teleoperated_joint_states.name.resize(4);
-    teleoperated_joint_states.position.resize(4);
-    teleoperated_joint_states.velocity.resize(4);
+    teleoperated_joint_states.name.resize(6);
+    teleoperated_joint_states.position.resize(6);
+    teleoperated_joint_states.velocity.resize(6);
     joint_delta_ref.resize(6);
-    teleop_joint_delta_ref.resize(4);
+    teleoperated_joint_delta_ref.resize(6);
 
 
     // Subscribe to teleop topic if this omni is a slave
@@ -467,6 +467,5 @@ void OmniBase::teleopJointStatesCallback(const sensor_msgs::JointState::ConstPtr
 {
     for (int i = 0; i < 4; ++i) {
         teleoperated_joint_states.position[i] = msg->position[i];
-        
     }
 }
