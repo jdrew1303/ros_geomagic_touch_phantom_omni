@@ -59,7 +59,7 @@ int main(int argc, char **argv)
     omni->connect();
 
     // ROS Mainloop
-    ros::Rate rate(100);
+    ros::Rate rate(50);
     while (ros::ok())
     {
         ros::spinOnce();
