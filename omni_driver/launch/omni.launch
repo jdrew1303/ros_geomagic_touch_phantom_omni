@@ -27,6 +27,8 @@
 
             <remap from="/teleop" to="$(arg teleop_remap)" />
             <remap from="/$(arg namespace)/teleop_joint_states" to="/doris/manipulator_controller/joint_states" />
+            <remap from="/$(arg namespace)/force_feedback" to="/doris/manipulator_controller/force" />
+            
 		</node>
 
         <node name="state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
