@@ -123,10 +123,10 @@ private:
             //     joint_delta[i] = (joint_state.position[i] - joint_delta_ref[i]) + teleoperated_joint_delta_ref[i];
             // }
             
-            joint_delta[0] = (joint_state.position[0] - joint_delta_ref[0]) + teleoperated_joint_delta_ref[0];
-            joint_delta[1] = (joint_state.position[1] - joint_delta_ref[1]) + teleoperated_joint_delta_ref[1];
-            joint_delta[2] = (joint_state.position[2] - joint_delta_ref[2]) + teleoperated_joint_delta_ref[2];
-            joint_delta[4] = (joint_state.position[4] - joint_delta_ref[4]) + teleoperated_joint_delta_ref[3];
+            joint_delta[0] = joint_states_gain * (joint_state.position[0] - joint_delta_ref[0]) + teleoperated_joint_delta_ref[0];
+            joint_delta[1] = joint_states_gain * (joint_state.position[1] - joint_delta_ref[1]) + teleoperated_joint_delta_ref[1];
+            joint_delta[2] = joint_states_gain * (joint_state.position[2] - joint_delta_ref[2]) + teleoperated_joint_delta_ref[2];
+            joint_delta[4] = joint_states_gain * (joint_state.position[4] - joint_delta_ref[4]) + teleoperated_joint_delta_ref[3];
             
             return joint_delta;
         }
@@ -135,7 +135,7 @@ private:
             for (int i = 0; i < 4; ++i) {
                 teleoperated_joint_delta_ref[i] = teleoperated_joint_states.position[i];
             }
-            return teleoperated_joint_delta_ref;
+            return teleoperated_joint_states.position;
         }
 
     }
