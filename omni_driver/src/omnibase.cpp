@@ -51,9 +51,6 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
     topic_name = name + "teleop";
     pub_teleop_control = node->advertise<omni_driver::TeleopControl>(topic_name, 1);
 
-    //Calibrate tetis optoforce.
-    calibrateTetisOptoForce();
-
     // Subscribe omni_control topic.
     topic_name = name + "control";
     sub_torque = node->subscribe(topic_name, 1, &OmniBase::torqueCallback, this);
@@ -165,6 +162,34 @@ void OmniBase::updateRobotState()
     std::vector<double> filtered_velocities;
     filterVelocities(filtered_velocities);
     getEffectorVelocity();
+}
+
+
+std::vector<double> OmniBase::calculateJointDeltas(std::vector<bool> button_state, sensor_msgs::JointState joint_state){
+    if (button_state[0] || button_state[1]) {
+        std::vector<double> joint_delta(6);
+        /**
+         * Commented for recursion because Tetis joint 4 is mapping Omni joint 5
+         */
+        // joint_delta.resize(6);
+        // for (int i = 0; i < 6; ++i) {
+        //     joint_delta[i] = (joint_state.position[i] - joint_delta_ref[i]) + teleoperated_joint_delta_ref[i];
+        // }
+        
+        joint_delta[0] = joint_states_gain[0] * (joint_state.position[0] - joint_delta_ref[0]) + teleoperated_joint_delta_ref[0];
+        joint_delta[1] = joint_states_gain[1] * (joint_state.position[1] - joint_delta_ref[1]) + teleoperated_joint_delta_ref[1];
+        joint_delta[2] = joint_states_gain[2] * (joint_state.position[2] - joint_delta_ref[2]) + teleoperated_joint_delta_ref[2];
+        joint_delta[3] = joint_states_gain[4] * (joint_state.position[4] - joint_delta_ref[4]) + teleoperated_joint_delta_ref[3];
+        
+        return joint_delta;
+    }
+    else {
+        joint_delta_ref = joint_state.position;
+        for (int i = 0; i < 4; ++i) {
+            teleoperated_joint_delta_ref[i] = teleoperated_joint_states.position[i];
+        }
+        return teleoperated_joint_states.position;
+    }
 }
 
 void OmniBase::fwdKin()
