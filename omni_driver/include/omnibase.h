@@ -217,7 +217,6 @@ protected:
 
     ros::Publisher pub_joint;                   ///< Joint ROS publisher.
     ros::Publisher pub_delta;                   ///< Joint deltas ROS publisher.
-    ros::Publisher pub_zero_force;              ///< ROS publisher to calibrate tetis force sensor.
     sensor_msgs::JointState joint_state;
 
     ros::Publisher pub_pose;                    ///< Pose ROS publisher.
