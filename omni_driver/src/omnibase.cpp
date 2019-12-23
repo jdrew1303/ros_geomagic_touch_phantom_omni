@@ -9,16 +9,16 @@ typedef boost::shared_ptr<urdf::Model> URDFModelPtr;
 typedef boost::shared_ptr<srdf::Model> SRDFModelPtr;
 
 OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const std::string &path_srdf)
-    : OmniBase::OmniBase(name, path_urdf , path_srdf , 1000)
+    : OmniBase::OmniBase(name, path_urdf , path_srdf , 1000, 5)
 {
 }
 
-OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const std::string &path_srdf, double velocity_filter_minimum_dt)
+OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const std::string &path_srdf, double velocity_filter_minimum_dt, unsigned int velocity_filter_lenght)
     : force_feedback_gain(0),
     last_published_joint5_velocity(0),
     teleop_sensitivity(0),
     teleop_master(true),
-    vel_filter_counter(VELOCITIES_FILTER_SIZE),
+    velocities_filter_size(velocity_filter_lenght),
     name(name),
     enable_force_flag(false),
     velocity_filter_minimum_dt(velocity_filter_minimum_dt)
@@ -249,21 +249,22 @@ void OmniBase::calculateVelocities()
 
 void OmniBase::filterVelocities(std::vector<double> &filtered_velocities)
 {
-    if (vel_filter_counter <= 0)
+    if (velocities_filter_size <= 2)
     {
         velocities_filter.insert(velocities_filter.begin(), state.velocities);
-        velocities_filter.resize(VELOCITIES_FILTER_SIZE);
+        velocities_filter.resize(velocities_filter_size);
         double velocities_mean = 0;
 
         for (unsigned int i =0; i < state.velocities.size(); i++)
         {
-            for (unsigned int j =0; j < VELOCITIES_FILTER_SIZE; j++)
+            for (unsigned int j =0; j < velocities_filter_size; j++)
             {
                 velocities_mean += velocities_filter[i][j];
             }
-            velocities_mean = velocities_mean/VELOCITIES_FILTER_SIZE;
-            filtered_velocities[velocities_mean];
+            velocities_mean = velocities_mean/velocities_filter_size;
+            filtered_velocities[i] = velocities_mean;
         }
+        state.velocities = filtered_velocities;
     }
 }
 

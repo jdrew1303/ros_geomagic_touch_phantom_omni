@@ -28,7 +28,7 @@
             <remap from="/teleop" to="$(arg teleop_remap)" />
             <remap from="/$(arg namespace)/teleop_joint_states" to="/doris/manipulator_controller/joint_states" />
             <remap from="/$(arg namespace)/force_feedback" to="/doris/manipulator_controller/force" />
-            <remap from="/$(arg namespace)/zero_force" to="/doris/manipulator_controller/zero_force" />
+            <!-- <remap from="/$(arg namespace)/zero_force" to="/doris/manipulator_controller/zero_force" /> -->
             
 		</node>
 

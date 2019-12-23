@@ -67,9 +67,7 @@ private:
 
     bool teleop_master;
 
-    static const unsigned int VELOCITIES_FILTER_SIZE = 5;
-
-    int vel_filter_counter;
+    const unsigned int velocities_filter_size;
 
     std::vector<std::vector<double>> velocities_filter;
 
@@ -123,10 +121,10 @@ private:
             //     joint_delta[i] = (joint_state.position[i] - joint_delta_ref[i]) + teleoperated_joint_delta_ref[i];
             // }
             
-            joint_delta[0] = joint_states_gain * (joint_state.position[0] - joint_delta_ref[0]) + teleoperated_joint_delta_ref[0];
-            joint_delta[1] = joint_states_gain * (joint_state.position[1] - joint_delta_ref[1]) + teleoperated_joint_delta_ref[1];
-            joint_delta[2] = joint_states_gain * (joint_state.position[2] - joint_delta_ref[2]) + teleoperated_joint_delta_ref[2];
-            joint_delta[4] = joint_states_gain * (joint_state.position[4] - joint_delta_ref[4]) + teleoperated_joint_delta_ref[3];
+            joint_delta[0] = joint_states_gain[0] * (joint_state.position[0] - joint_delta_ref[0]) + teleoperated_joint_delta_ref[0];
+            joint_delta[1] = joint_states_gain[1] * (joint_state.position[1] - joint_delta_ref[1]) + teleoperated_joint_delta_ref[1];
+            joint_delta[2] = joint_states_gain[2] * (joint_state.position[2] - joint_delta_ref[2]) + teleoperated_joint_delta_ref[2];
+            joint_delta[3] = joint_states_gain[4] * (joint_state.position[4] - joint_delta_ref[4]) + teleoperated_joint_delta_ref[3];
             
             return joint_delta;
         }
@@ -290,7 +288,7 @@ public:
      * @param name Reference to string of omni name.
      * @param velocity_filter_minimum_dt Minimum amount of time that should have passed to compute the robot velocity.
      */
-    OmniBase(const std::string &name,  const std::string &path_urdf, const std::string &path_srdf, double velocity_filter_minimum_dt);
+    OmniBase(const std::string &name,  const std::string &path_urdf, const std::string &path_srdf, double velocity_filter_minimum_dt, unsigned int intvelocity_filter_size);
 
     /**
      * @brief Publishes the current robot's state.
