@@ -55,8 +55,6 @@ enum raw1394_iso_disposition OmniFirewire::callbackRead(raw1394handle_t handle, 
         omni->tx_iso_buffer_.status.dock_led0 = 1;
         omni->tx_iso_buffer_.status.dock_led1 = 1;
         omni->state.calibrated = true;
-        //Calibrate tetis optoforce.
-        omni->calibrateTetisOptoForce();
     }
 
     // Getting time difference between two consecutive readings.

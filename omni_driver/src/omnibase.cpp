@@ -50,12 +50,6 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
     topic_name = name + "teleop";
     pub_teleop_control = node->advertise<omni_driver::TeleopControl>(topic_name, 1);
 
-    topic_name = name + "zero_force";
-    pub_teleop_control = node->advertise<std_msgs::Bool>(topic_name, 1);
-
-    //Calibrate tetis optoforce.
-    calibrateTetisOptoForce();
-
     // Subscribe omni_control topic.
     topic_name = name + "control";
     sub_torque = node->subscribe(topic_name, 1, &OmniBase::torqueCallback, this);
@@ -169,6 +163,34 @@ void OmniBase::updateRobotState()
     getEffectorVelocity();
 }
 
+
+std::vector<double> OmniBase::calculateJointDeltas(std::vector<bool> button_state, sensor_msgs::JointState joint_state){
+    if (button_state[0] || button_state[1]) {
+        std::vector<double> joint_delta(6);
+        /**
+         * Commented for recursion because Tetis joint 4 is mapping Omni joint 5
+         */
+        // joint_delta.resize(6);
+        // for (int i = 0; i < 6; ++i) {
+        //     joint_delta[i] = (joint_state.position[i] - joint_delta_ref[i]) + teleoperated_joint_delta_ref[i];
+        // }
+        
+        joint_delta[0] = joint_states_gain[0] * (joint_state.position[0] - joint_delta_ref[0]) + teleoperated_joint_delta_ref[0];
+        joint_delta[1] = joint_states_gain[1] * (joint_state.position[1] - joint_delta_ref[1]) + teleoperated_joint_delta_ref[1];
+        joint_delta[2] = joint_states_gain[2] * (joint_state.position[2] - joint_delta_ref[2]) + teleoperated_joint_delta_ref[2];
+        joint_delta[3] = joint_states_gain[4] * (joint_state.position[4] - joint_delta_ref[4]) + teleoperated_joint_delta_ref[3];
+        
+        return joint_delta;
+    }
+    else {
+        joint_delta_ref = joint_state.position;
+        for (int i = 0; i < 4; ++i) {
+            teleoperated_joint_delta_ref[i] = teleoperated_joint_states.position[i];
+        }
+        return teleoperated_joint_states.position;
+    }
+}
+
 void OmniBase::fwdKin()
 {
     Eigen::Affine3d end_effector_state;
@@ -200,12 +222,13 @@ Eigen::Vector3d OmniBase::calculateTorqueFeedback(const Eigen::Vector3d& force, 
     auto link_model = kinematic_state->getLinkModel(frame);
     kinematic_state->getJacobian(joint_model_group, link_model, origin, jacobian, false);
 
-    // Rotate the force vector from the desired frame to the base frame
-    Eigen::Vector3d force_on_link_frame = rot_link_to_teleop * force;
-    //
-    auto quat_base_link = kinematic_state->getGlobalLinkTransform(frame).rotation();
-    force_on_link_frame = quat_base_link.conjugate() * force_on_link_frame;
+    // // Rotate the force vector from the desired frame to the base frame
+    // Eigen::Vector3d force_on_link_frame = rot_link_to_teleop * force;
+    // //
+    // auto quat_base_link = kinematic_state->getGlobalLinkTransform(frame).rotation();
+    // force_on_link_frame = quat_base_link.conjugate() * force_on_link_frame;
 
+    Eigen::Vector3d force_on_link_frame = force;
     auto ret = feedback_gain * jacobian.block<3,3>(0,0).transpose() * force_on_link_frame;
     return ret.block<3,1>(0,0);
 }
@@ -318,7 +341,8 @@ void OmniBase::teleoperationForceFeedback()
 
 void OmniBase::forceFeedbackCallback(const std_msgs::Float64MultiArray::ConstPtr& force)
 {
-    Eigen::Vector3d force_vector(force->data[0], force->data[1], force->data[2]);
+    // Optoforce is not precise enough on all axis.
+    Eigen::Vector3d force_vector(0, force->data[0], 0);
     Eigen::Vector3d joint_torques = OmniBase::calculateTorqueFeedback(force_vector, force_feedback_gain);
     std::vector<double> torque_input(3);
     std::copy(joint_torques.data(), joint_torques.data() + 3, torque_input.begin());
@@ -497,12 +521,4 @@ void OmniBase::teleopJointStatesCallback(const sensor_msgs::JointState::ConstPtr
     for (int i = 0; i < 4; ++i) {
         teleoperated_joint_states.position[i] = msg->position[i];
     }
-}
-
-//Calibrate tetis optoforce sensor.
-void OmniBase::calibrateTetisOptoForce()
-{
-    std_msgs::Bool zero_force_calibration;
-    zero_force_calibration.data = true;
-    pub_teleop_control.publish(zero_force_calibration);
 }

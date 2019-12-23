@@ -81,7 +81,6 @@ void OmniEthernet::autoCalibration()
     {
         ROS_INFO("Please place the device into the inkwell for calibration.");
     }
-    this->calibrateTetisOptoForce();
 }
 
 void OmniEthernet::forceCallback(const omni_driver::OmniFeedback::ConstPtr &omnifeed)
