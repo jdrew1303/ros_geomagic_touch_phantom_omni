@@ -9,19 +9,18 @@ typedef boost::shared_ptr<urdf::Model> URDFModelPtr;
 typedef boost::shared_ptr<srdf::Model> SRDFModelPtr;
 
 OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const std::string &path_srdf)
-    : OmniBase::OmniBase(name, path_urdf , path_srdf , 1000, 5)
+    : OmniBase::OmniBase(name, path_urdf , path_srdf , 20)
 {
 }
 
-OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const std::string &path_srdf, double velocity_filter_minimum_dt, unsigned int velocity_filter_lenght)
+OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const std::string &path_srdf, double vel_filter_wc)
     : force_feedback_gain(0),
     last_published_joint5_velocity(0),
     teleop_sensitivity(0),
     teleop_master(true),
-    velocities_filter_size(velocity_filter_lenght),
+    velocity_filter_wc(vel_filter_wc),
     name(name),
-    enable_force_flag(false),
-    velocity_filter_minimum_dt(velocity_filter_minimum_dt)
+    enable_force_flag(false)
 {
     node = ros::NodeHandlePtr( new ros::NodeHandle("") );
 
@@ -166,7 +165,7 @@ void OmniBase::updateRobotState()
     fwdKin();
     calculateVelocities();
     std::vector<double> filtered_velocities;
-    filterVelocities(filtered_velocities);
+    // filterVelocities(filtered_velocities);
     getEffectorVelocity();
 }
 
@@ -213,29 +212,14 @@ Eigen::Vector3d OmniBase::calculateTorqueFeedback(const Eigen::Vector3d& force, 
 
 void OmniBase::calculateVelocities()
 {
-    double deltaAngle;
-    TimeDuration time = state.time_current_angle_acquisition
-            - state.time_last_angle_acquisition;
-    double dt = time.total_microseconds();
-
-    if (dt >= velocity_filter_minimum_dt)
-    {
-        double tol_dvel = 3; // This is empirical. Deal with it.
+    double dt = 1/1000.0;
         for (int i = 0; i < 6; ++i)
         {
-            deltaAngle = state.angles[i] - state.angles_hist1[i];
-
-            double vel = deltaAngle * 1000000 / dt;
-
-            if ( std::abs(vel - state.vel_hist1[i]) < tol_dvel )
-            {
-                state.velocities[i] = vel;
-            }
-            state.vel_hist1[i] = vel;
+            state.vel_error[i] = state.position[i] - state.vel_z[i];
+            state.velocities[i] = velocity_filter_wc * state.vel_error[i];
+            state.vel_z[i] += dt * velocity_filter_wc * state.vel_error[i];
         }
 
-        state.angles_hist1 = state.angles;
-        state.time_last_angle_acquisition = state.time_current_angle_acquisition;
         Eigen::VectorXd joint_velocities(6);
         joint_velocities << state.velocities[0],
                 state.velocities[1],
@@ -244,29 +228,67 @@ void OmniBase::calculateVelocities()
                 state.velocities[4],
                 state.velocities[5];
         kinematic_state->setJointGroupVelocities(joint_model_group,joint_velocities);
-    }
 }
 
-void OmniBase::filterVelocities(std::vector<double> &filtered_velocities)
-{
-    if (velocities_filter_size <= 2)
-    {
-        velocities_filter.insert(velocities_filter.begin(), state.velocities);
-        velocities_filter.resize(velocities_filter_size);
-        double velocities_mean = 0;
+// void OmniBase::calculateVelocities()
+// {
 
-        for (unsigned int i =0; i < state.velocities.size(); i++)
-        {
-            for (unsigned int j =0; j < velocities_filter_size; j++)
-            {
-                velocities_mean += velocities_filter[i][j];
-            }
-            velocities_mean = velocities_mean/velocities_filter_size;
-            filtered_velocities[i] = velocities_mean;
-        }
-        state.velocities = filtered_velocities;
-    }
-}
+
+//     double deltaAngle;
+//     TimeDuration time = state.time_current_angle_acquisition
+//             - state.time_last_angle_acquisition;
+//     double dt = time.total_microseconds();
+
+//     if (dt >= velocity_filter_minimum_dt)
+//     {
+//         double tol_dvel = 3; // This is empirical. Deal with it.
+//         for (int i = 0; i < 6; ++i)
+//         {
+//             deltaAngle = state.angles[i] - state.angles_hist1[i];
+
+//             double vel = deltaAngle * 1000000 / dt;
+
+//             if ( std::abs(vel - state.vel_hist1[i]) < tol_dvel )
+//             {
+//                 state.velocities[i] = vel;
+//             }
+//             state.vel_hist1[i] = vel;
+//         }
+
+//         state.angles_hist1 = state.angles;
+//         state.time_last_angle_acquisition = state.time_current_angle_acquisition;
+//         Eigen::VectorXd joint_velocities(6);
+//         joint_velocities << state.velocities[0],
+//                 state.velocities[1],
+//                 state.velocities[2],
+//                 state.velocities[3],
+//                 state.velocities[4],
+//                 state.velocities[5];
+//         kinematic_state->setJointGroupVelocities(joint_model_group,joint_velocities);
+//     }
+// }
+
+// void OmniBase::filterVelocities(std::vector<double> &filtered_velocities)
+// {
+
+//     if (velocities_filter_size <= 2)
+//     {
+//         velocities_filter.insert(velocities_filter.begin(), state.velocities);
+//         velocities_filter.resize(velocities_filter_size);
+//         double velocities_mean = 0;
+
+//         for (unsigned int i =0; i < state.velocities.size(); i++)
+//         {
+//             for (unsigned int j =0; j < velocities_filter_size; j++)
+//             {
+//                 velocities_mean += velocities_filter[i][j];
+//             }
+//             velocities_mean = velocities_mean/velocities_filter_size;
+//             filtered_velocities[i] = velocities_mean;
+//         }
+//         state.velocities = filtered_velocities;
+//     }
+// }
 
 void OmniBase::getEffectorVelocity()
 {

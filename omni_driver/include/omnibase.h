@@ -67,9 +67,7 @@ private:
 
     bool teleop_master;
 
-    const unsigned int velocities_filter_size;
-
-    std::vector<std::vector<double>> velocities_filter;
+    double velocity_filter_wc;
 
     static const unsigned int MAX_FREEZE_COUNT = 100;
 
@@ -142,7 +140,7 @@ private:
 
     void calculateVelocities();
 
-    void filterVelocities(std::vector<double> &filtered_velocities);
+    // void filterVelocities(std::vector<double> &filtered_velocities);
 
     void getEffectorVelocity();
 
@@ -166,6 +164,8 @@ protected:
         std::vector<double> position;
         std::vector<double> velocities;
         std::vector<double> vel_hist1;
+        std::vector<double> vel_error;
+        std::vector<double> vel_z;
         std::vector<double> twist;
         std::vector<bool>   buttons;
         std::vector<std::string> joint_names;
@@ -185,9 +185,11 @@ protected:
             angles.resize(6);
             angles_docked.resize(6);
             velocities.resize(6);
+            vel_hist1.resize(6);
+            vel_error.resize(6);
+            vel_z.resize(6);
             joint_names.resize(6);
             angles_hist1.resize(6);
-            vel_hist1.resize(6);
             twist.resize(6);
 
             // Buttons
@@ -242,7 +244,6 @@ protected:
 
     bool last_buttons[2];                       ///< Needed for "Button Clicked" logic.
     bool enable_force_flag;                     ///< Needed for resetting the internal enable control.
-    double velocity_filter_minimum_dt;          ///< TODO value in milliseconds
 
     typedef boost::unique_lock<boost::shared_mutex>            LockUnique;          ///< The unique lock, used to protect data while writing.
     typedef boost::shared_lock<boost::shared_mutex>            LockShared;          ///< The shared lock, used to protect data while reading.
@@ -288,7 +289,7 @@ public:
      * @param name Reference to string of omni name.
      * @param velocity_filter_minimum_dt Minimum amount of time that should have passed to compute the robot velocity.
      */
-    OmniBase(const std::string &name,  const std::string &path_urdf, const std::string &path_srdf, double velocity_filter_minimum_dt, unsigned int intvelocity_filter_size);
+    OmniBase(const std::string &name,  const std::string &path_urdf, const std::string &path_srdf, double velocity_filter_wc);
 
     /**
      * @brief Publishes the current robot's state.
