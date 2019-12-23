@@ -9,7 +9,7 @@ typedef boost::shared_ptr<urdf::Model> URDFModelPtr;
 typedef boost::shared_ptr<srdf::Model> SRDFModelPtr;
 
 OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const std::string &path_srdf)
-    : OmniBase::OmniBase(name, path_urdf , path_srdf , 20)
+    : OmniBase::OmniBase(name, path_urdf , path_srdf , 120)
 {
 }
 
@@ -326,6 +326,7 @@ void OmniBase::getEffectorVelocity()
     thetaDot(3) = state.velocities[3];
     thetaDot(4) = state.velocities[4];
     thetaDot(5) = state.velocities[5];
+
     Eigen::VectorXd xDot(6);
     xDot = jacobian * thetaDot;
     for (int i=0; i<6; ++i)
@@ -447,15 +448,6 @@ void OmniBase::publishOmniState()
     pose_stamped.pose.orientation.z = state.orientation[3];
     pub_pose.publish(pose_stamped);
 
-    // Publish the twist.
-    twist.linear.x = twist_gain * state.twist[0];
-    twist.linear.y = twist_gain * state.twist[1];
-    twist.linear.z = twist_gain * state.twist[2];
-    twist.angular.x = twist_gain * state.twist[3];
-    twist.angular.y = twist_gain * state.twist[4];
-    twist.angular.z = twist_gain * state.twist[5];
-    pub_twist.publish(twist);
-
     // Publish the button event.
     std::vector<bool> button_state;
     this->getButtonsState(button_state);
@@ -466,6 +458,25 @@ void OmniBase::publishOmniState()
     last_buttons[0] = button_state[0];
     last_buttons[1] = button_state[1];
     pub_button.publish(button_event);
+
+    // Publish the twist.
+    if (button_state[0] || button_state[1]) {
+        twist.linear.x = twist_gain * state.twist[0];
+        twist.linear.y = twist_gain * state.twist[1];
+        twist.linear.z = twist_gain * state.twist[2];
+        twist.angular.x = twist_gain * state.twist[3];
+        twist.angular.y = twist_gain * state.twist[4];
+        twist.angular.z = twist_gain * state.twist[5];    
+    }
+    else {
+        twist.linear.x = 0;
+        twist.linear.y = 0;
+        twist.linear.z = 0;
+        twist.angular.x = 0;
+        twist.angular.y = 0;
+        twist.angular.z = 0;
+    }
+    pub_twist.publish(twist);
 
     // Publish the teleoperation data.
     if (teleop_master)
