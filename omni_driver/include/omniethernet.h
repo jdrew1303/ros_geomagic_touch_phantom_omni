@@ -40,13 +40,7 @@ private:
      * @brief Calibrates the device using one of the supported styles.
      */
     void autoCalibration();
-
-    /**
-     * @brief ROS subsricber callback to set the device's haptic feedback.
-     * @param omnifeed Receives a ROS message.
-     */
-    void forceCallback(const omni_driver::OmniFeedback::ConstPtr& omnifeed);
-
+    
     /**
      * @brief Gets the angles from the encoder and sets them to OmniState.
      */

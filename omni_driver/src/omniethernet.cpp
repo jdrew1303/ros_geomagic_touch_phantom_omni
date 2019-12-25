@@ -83,21 +83,6 @@ void OmniEthernet::autoCalibration()
     }
 }
 
-void OmniEthernet::forceCallback(const omni_driver::OmniFeedback::ConstPtr &omnifeed)
-{
-    ////////////////////Some people might not like this extra damping, but it
-    ////////////////////helps to stabilize the overall force feedback. It isn't
-    ////////////////////like we are getting direct impedance matching from the
-    ////////////////////omni anyway
-    this->state.control[0] = omnifeed->force.x - 0.001 * this->state.velocities[0];
-    this->state.control[1] = omnifeed->force.y - 0.001 * this->state.velocities[1];
-    this->state.control[2] = omnifeed->force.z - 0.001 * this->state.velocities[2];
-
-    this->state.lock_pos[0] = omnifeed->position.x;
-    this->state.lock_pos[1] = omnifeed->position.y;
-    this->state.lock_pos[2] = omnifeed->position.z;
-}
-
 bool OmniEthernet::connect()
 {
 
