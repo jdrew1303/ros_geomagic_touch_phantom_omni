@@ -157,10 +157,10 @@ void OmniBase::updateRobotState()
             state.angles[5];
     kinematic_state->setJointGroupPositions(joint_model_group, joint_angles);
     fwdKin();
-    calculateVelocities();
+    calculateJointVelocities();
     std::vector<double> filtered_velocities;
     // filterVelocities(filtered_velocities);
-    getEffectorVelocity();
+    calculateEffectorVelocities();
 }
 
 
@@ -233,7 +233,7 @@ Eigen::Vector3d OmniBase::calculateTorqueFeedback(const Eigen::Vector3d& force, 
     return ret.block<3,1>(0,0);
 }
 
-void OmniBase::calculateVelocities()
+void OmniBase::calculateJointVelocities()
 {
     double dt = 1/1000.0;
         for (int i = 0; i < 6; ++i)
@@ -313,7 +313,7 @@ void OmniBase::calculateVelocities()
 //     }
 // }
 
-void OmniBase::getEffectorVelocity()
+void OmniBase::calculateEffectorVelocities()
 {
     Eigen::Vector3d origin(0,0,0);
     Eigen::MatrixXd jacobian(6,6);

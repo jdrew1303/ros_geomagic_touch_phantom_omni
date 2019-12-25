@@ -111,11 +111,11 @@ private:
 
     void fwdKin();
 
-    void calculateVelocities();
+    void calculateJointVelocities();
 
     // void filterVelocities(std::vector<double> &filtered_velocities);
 
-    void getEffectorVelocity();
+    void calculateEffectorVelocities();
 
     void teleopJointStatesCallback(const sensor_msgs::JointState::ConstPtr& msg);
 
