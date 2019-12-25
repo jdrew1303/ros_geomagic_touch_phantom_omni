@@ -382,19 +382,6 @@ bool OmniFirewire::startIsochronousTransmission()
         return false;
     }
 
-    // Find a free isochronous channel number for Tx.
-    for (unsigned int ch = 0; ch < 63; ch++) {
-        if (raw1394_channel_modify(handle_, ch, RAW1394_MODIFY_ALLOC) == 0) {
-            msg_rx_iso_channel = ch;
-            break;
-        }
-    }
-    if (msg_rx_iso_channel == (quadlet_t) -1) {
-        // Channel not found. Abort.
-        stopIsochronousTransmission();
-        return false;
-    }
-
     // Set the Tx isochronous channel.
     msg_tx_iso_channel.write(handle_, node_);
 
