@@ -317,7 +317,8 @@ void OmniBase::calculateEffectorVelocities()
 {
     Eigen::Vector3d origin(0,0,0);
     Eigen::MatrixXd jacobian(6,6);
-    kinematic_state->getJacobian(joint_model_group, end_effector_link_model, origin, jacobian, false);
+    auto current_end_effector_link_model = kinematic_state->getLinkModel(links.end_effector.name);
+    kinematic_state->getJacobian(joint_model_group, current_end_effector_link_model, origin, jacobian, false);
     Eigen::VectorXd thetaDot(6);
 
     thetaDot(0) = state.velocities[0];
