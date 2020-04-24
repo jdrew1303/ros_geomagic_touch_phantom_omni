@@ -19,7 +19,7 @@
             <param name="teleop_master" type="boolean" value="$(arg teleop_master)" />
             <param name="path_urdf" value="$(arg robot_urdf)" />
             <param name="path_srdf" value="$(arg robot_srdf)" />
-            <param name="force_feedback_gain" type="double" value="0.01" />
+            <param name="force_feedback_gain" type="double" value="0.0" />
             <param name="twist_gain" type="double" value="1.0" />
             <rosparam param="joint_states_gain">[1.0, 1.0, 1.0, 1.0, 1.0, 1.0]</rosparam>
             <rosparam param="joint_states_offsets">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</rosparam>

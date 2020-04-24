@@ -157,10 +157,10 @@ void OmniBase::updateRobotState()
             state.angles[5];
     kinematic_state->setJointGroupPositions(joint_model_group, joint_angles);
     fwdKin();
-    calculateJointVelocities();
-    std::vector<double> filtered_velocities;
-    // filterVelocities(filtered_velocities);
-    calculateEffectorVelocities();
+//    calculateJointVelocities();   // No need to update the jointvelocity at high rate
+//    std::vector<double> filtered_velocities;
+//    filterVelocities(filtered_velocities);
+//    calculateEffectorVelocities();
 }
 
 
@@ -235,12 +235,15 @@ Eigen::Vector3d OmniBase::calculateTorqueFeedback(const Eigen::Vector3d& force, 
 
 void OmniBase::calculateJointVelocities()
 {
-    double dt = 1/1000.0;
+    double dt = 1/50.0;  // Now run at 50 hz
+
         for (int i = 0; i < 6; ++i)
         {
-            state.vel_error[i] = state.position[i] - state.vel_z[i];
-            state.velocities[i] = velocity_filter_wc * state.vel_error[i];
-            state.vel_z[i] += dt * velocity_filter_wc * state.vel_error[i];
+            state.vel_error[i] = state.angles[i] - state.vel_z[i];
+ //           state.velocities[i] = velocity_filter_wc * state.vel_error[i];    // not sure where wc is set, so i hard coded  30 rad/s
+ //           state.vel_z[i] += dt * velocity_filter_wc * state.vel_error[i];
+            state.velocities[i] = 30.0 * state.vel_error[i];
+            state.vel_z[i] += dt * 30.0 * state.vel_error[i];
         }
 
         Eigen::VectorXd joint_velocities(6);
@@ -317,8 +320,11 @@ void OmniBase::calculateEffectorVelocities()
 {
     Eigen::Vector3d origin(0,0,0);
     Eigen::MatrixXd jacobian(6,6);
-    auto current_end_effector_link_model = kinematic_state->getLinkModel(links.end_effector.name);
+
+    // To use the pen position  use links.end_effector.name   instead of wrist position   links.tip.name 
+    auto current_end_effector_link_model = kinematic_state->getLinkModel(links.tip.name);  // Consider the wrist frame (intersection of joint 4-5-6)
     kinematic_state->getJacobian(joint_model_group, current_end_effector_link_model, origin, jacobian, false);
+
     Eigen::VectorXd thetaDot(6);
 
     thetaDot(0) = state.velocities[0];
@@ -329,7 +335,9 @@ void OmniBase::calculateEffectorVelocities()
     thetaDot(5) = state.velocities[5];
 
     Eigen::VectorXd xDot(6);
+
     xDot = jacobian * thetaDot;
+
     for (int i=0; i<6; ++i)
     {
         state.twist[i] = xDot(i);
@@ -425,6 +433,10 @@ void OmniBase::publishOmniState()
     std::vector<double> joint_angles, joint_velocities;
     this->getJointAngles(joint_angles);
     this->getJointVelocities(joint_velocities);
+
+    // Calculate velocity at 50 hz
+    calculateJointVelocities();
+    calculateEffectorVelocities();
 
     // Publish the joint state.
     joint_state.header.stamp = ros::Time::now();
