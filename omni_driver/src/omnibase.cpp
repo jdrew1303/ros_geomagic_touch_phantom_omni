@@ -443,7 +443,7 @@ void OmniBase::publishOmniState()
 
     for (int i = 0; i < 6; ++i)
     {
-        joint_state.position[i] = joint_states_gain[i] * joint_angles[i] + joint_states_offsets[i];
+        joint_state.position[i] = joint_angles[i] + joint_states_offsets[i];
         joint_state.velocity[i] = joint_states_gain[i] * joint_velocities[i];
     }
 
@@ -498,6 +498,8 @@ void OmniBase::publishOmniState()
         std_msgs::Float64MultiArray joint_delta;
         joint_delta.data = calculateJointDeltas(button_state, joint_state);
         sensor_msgs::JointState joint_state_delta;
+
+        joint_state_delta.header.stamp = ros::Time::now();
         joint_state_delta.name.resize(6);
         joint_state_delta.position.resize(6);
         joint_state_delta.velocity.resize(6);
