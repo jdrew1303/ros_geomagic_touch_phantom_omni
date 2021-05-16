@@ -16,11 +16,14 @@ endif ()
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED
+    roscpp
     geometry_msgs
     std_msgs
     joy)
 
 find_package(Eigen3 REQUIRED)
+
+set(EIGEN3_INCLUDE_DIR /usr/include/eigen3)
 
 ###################################
 ## catkin specific configuration ##
@@ -80,5 +83,5 @@ target_link_libraries(omni_controller ${catkin_LIBRARIES} robot_kinematics)
 
 ## Create test program
 add_executable(robot_test ${PROJECT_SOURCE_DIR}/src/test/main.cpp ${PROJECT_SOURCE_DIR}/src/node/Omni.cpp)
-target_link_libraries(robot_test robot_kinematics)
+target_link_libraries(robot_test robot_kinematics  ${catkin_LIBRARIES})
 

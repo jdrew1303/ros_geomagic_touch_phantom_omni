@@ -2,6 +2,13 @@
 
 int OmniEthernet::calibrationStyle = 0;
 
+/**
+ * TODO: This class can be renamed to be a generic driver for the Geomagic Touch 
+ * devices. Eithernet and USB share a single driver and a unified interface in 
+ * OpenHaptics. Once the device is configured in the Touch_Setup it is then 
+ * referenced by name from then on. Further work will be undertaken to improve 
+ * the ability to used names other than the default.
+ **/
 OmniEthernet::OmniEthernet(const std::string &name, const std::string &path_urdf, const std::string &path_srdf) :
     OmniBase(name, path_urdf, path_srdf)
 {
@@ -24,7 +31,7 @@ void OmniEthernet::getJointAnglesFromDriver()
     double gimbal2deg2rad = 0.0735 * M_PI / 180;
 
     // Getting time difference between two consecutive reading.
-//    state.time_last_angle_acquisition = state.time_current_angle_acquisition;
+    // state.time_last_angle_acquisition = state.time_current_angle_acquisition;
     Clock clock;
     state.time_current_angle_acquisition = clock.local_time();
 
@@ -87,10 +94,11 @@ void OmniEthernet::autoCalibration()
 
 void OmniEthernet::forceCallback(const omni_driver::OmniFeedback::ConstPtr &omnifeed)
 {
-    ////////////////////Some people might not like this extra damping, but it
-    ////////////////////helps to stabilize the overall force feedback. It isn't
-    ////////////////////like we are getting direct impedance matching from the
-    ////////////////////omni anyway
+    /**
+     * Some people might not like this extra damping, but it helps to stabilize 
+     * the overall force feedback. It isn't like we are getting direct impedance 
+     * matching from the omni anyway
+     **/
     this->state.control[0] = omnifeed->force.x - 0.001 * this->state.velocities[0];
     this->state.control[1] = omnifeed->force.y - 0.001 * this->state.velocities[1];
     this->state.control[2] = omnifeed->force.z - 0.001 * this->state.velocities[2];
@@ -103,11 +111,15 @@ void OmniEthernet::forceCallback(const omni_driver::OmniFeedback::ConstPtr &omni
 bool OmniEthernet::connect()
 {
 
-/*######################################################################################
-             The name must be the same configured in the geomagic software!
-  ######################################################################################*/
-    hHD = hdInitDevice("Phantom Omni");
-/*######################################################################################*/
+    /**
+     * This is the device name that is configured in the Touch_Setup. It currently 
+     * uses the default name.
+     * 
+     * TODO: This needs to used the name passed into the constructor to look for 
+     * the device. This will allow for multiple Geomagic Touch devices to be 
+     * connected to a single machine without clashes.
+     **/
+    hHD = hdInitDevice(HD_DEFAULT_DEVICE);
 
     if (HD_DEVICE_ERROR(error = hdGetError()))
     {

@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "omnibase.h"
 #include "ros/ros.h"
 #include "raw1394msg.h"

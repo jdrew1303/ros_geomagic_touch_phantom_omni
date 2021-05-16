@@ -13,7 +13,7 @@
 #include <std_msgs/Float64MultiArray.h>
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
-#include <moveit/move_group_interface/move_group.h>
+// #include <moveit/move_group_interface/move_group.h>
 #include <moveit_msgs/DisplayTrajectory.h>
 #include <moveit/robot_state/robot_state.h>
 #include <moveit/robot_model/robot_model.h>
