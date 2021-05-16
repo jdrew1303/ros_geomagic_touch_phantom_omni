@@ -9,9 +9,28 @@
 
 # About
 This is a ROS metapackage for both Sensable Phantom Omni (IEEE1394 connection) 
-and Geomagic Touch (Ethernet connection). Included in this metapackage is the
-omni_driver package, which contains the omni_driver node. If you don't know or don't have ROS, you
-should first go to http://www.ros.org/.
+and Geomagic Touch (Ethernet/USB connection). As of this moment it has not been tested with the parallel port version of the Sensable Phantom Omni. Work is welcome to help support this feature. Included in this metapackage is the omni_driver package, which contains the omni_driver node. If you don't know or don't have ROS, you should first go to http://www.ros.org/. This repository is based off a number of other repositories. Many of the above repositories are evolutions of each other or are good descriptors of interacting with the various versions of the Pahntom Omni/Geomagic Touch. 
+
+The heritage of the current driver is:
+
+```
+Dane Powell's Driver -> 
+Francisco Suárez-Ruiz Driver -> 
+Grupo de Sistemas de Controle em Automação e Robótica Driver -> 
+This repository
+```
+ Thanks go to:
+- [https://gitlab.com/gscar-coppe-ufrj/ros/PhantomOmni](https://gitlab.com/gscar-coppe-ufrj/ros/PhantomOmni)
+- [https://github.com/JimAdara/Touch_ROS_Driver](https://github.com/JimAdara/Touch_ROS_Driver)
+- [https://github.com/sunghowoo/Control-of-two-UR5s-by-two-phantom-omnies-](https://github.com/sunghowoo/Control-of-two-UR5s-by-two-phantom-omnies-)
+- [https://github.com/bharatm11/Geomagic_Touch_ROS_Drivers](https://github.com/bharatm11/Geomagic_Touch_ROS_Drivers)
+- [https://github.com/fsuarez6/phantom_omni](https://github.com/fsuarez6/phantom_omni)
+- [https://github.com/HumaRobotics/geomagic_touch](https://github.com/HumaRobotics/geomagic_touch)
+- [https://github.com/iyerkritika/modular_teleop](https://github.com/iyerkritika/modular_teleop)
+- [https://github.com/stephanniec/baxter_telehaptics](https://github.com/stephanniec/baxter_telehaptics)
+- [https://github.com/ytsutano/raw_omni](https://github.com/ytsutano/raw_omni)
+- [https://github.com/danepowell/phantom_omni](https://github.com/danepowell/phantom_omni)
+- [https://github.com/danepowell/omni_description](https://github.com/danepowell/omni_description)
 
 # Usage
 
@@ -49,7 +68,7 @@ If you want to use a FireWire device, run:
 ```sh 
 $ roslaunch omni_driver firewire.launch
 ```
-Additionally, you need to update the serial number on the omni.launch file so that it matches yours. The Ethernet version doesn't need this step.
+Additionally, you need to update the serial number on the omni.launch file so that it matches yours. The Ethernet/USB version doesn't need this step.
 Go to omni_driver/launch/omni.launch and look for this line:
 ```sh
 $ <param name="omni_type" type="string" value="$(arg type)" />
@@ -57,7 +76,7 @@ $ <param name="omni_type" type="string" value="$(arg type)" />
 ```
 Then change the value to match your device's serial number.
 
-If Ethernet is the one you're using, then:
+If Ethernet/USB is the one you're using, then:
 ```sh 
 $ roslaunch omni_driver ethernet.launch
 ```
@@ -69,6 +88,8 @@ $ roslaunch omni_driver ethernet_slave.launch
 ```
 
 # Dependencies
+> This is a work in progress. The docker image descrbed below does not contain the latest code from this repository. I am working on adding a Github Action to generate builds for multiple ROS versions and Ubuntu versions. This will take a little time. The first version that will be supported is ROS Melodic on Ubuntu 18.04 as this is the current version I am working on. Please be patient or feel free to create a PR for review. Different versions of the drivers and ROS will require loading of different libraries.
+
 The list of dependencies is quite large, so we decided to provide a Docker image with
 everything ready to run. Therefore, using this Software through Docker is recommended because very little
 setting up is needed to get the program up and running. If Docker is your way to go, skip 

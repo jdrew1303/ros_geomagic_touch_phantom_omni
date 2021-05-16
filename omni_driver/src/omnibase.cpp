@@ -5,8 +5,8 @@
 #include <iostream>
 
 
-typedef boost::shared_ptr<urdf::Model> URDFModelPtr;
-typedef boost::shared_ptr<srdf::Model> SRDFModelPtr;
+typedef std::shared_ptr<urdf::Model> URDFModelPtr;
+typedef std::shared_ptr<srdf::Model> SRDFModelPtr;
 
 OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const std::string &path_srdf)
     : OmniBase::OmniBase(name, path_urdf , path_srdf , 1000)
