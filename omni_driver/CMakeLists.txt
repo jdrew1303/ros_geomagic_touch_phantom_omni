@@ -114,7 +114,7 @@ add_custom_target(omni_driver_files_for_ide SOURCES
     "cfg/uncrustify.cfg")
 
 ## Declare a cpp executable
-add_executable(omni_driver src/omnibase.cpp src/omnifirewire.cpp src/omninode.cpp src/omniethernet.cpp src/raw1394msg.cpp)
+add_executable(omni_driver src/omnibase.cpp src/omnifirewire.cpp src/omninode.cpp src/omniethernet.cpp src/omniusb.cpp src/raw1394msg.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes

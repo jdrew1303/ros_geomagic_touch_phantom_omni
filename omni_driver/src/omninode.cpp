@@ -1,5 +1,6 @@
 #include "../include/omnifirewire.h"
 #include "../include/omniethernet.h"
+#include "../include/omniusb.h"
 
 
 int main(int argc, char **argv)
@@ -53,6 +54,11 @@ int main(int argc, char **argv)
     {
         // Init the ethernet driver
         omni = OmniBasePtr( new OmniEthernet( omni_name, path_urdf, path_srdf ) );
+    }
+    if (omni_type == "usb")
+    {
+        // Init the usb driver
+        omni = OmniBasePtr( new OmniUsb( omni_name, path_urdf, path_srdf ) );
     }
 
     // Connect
