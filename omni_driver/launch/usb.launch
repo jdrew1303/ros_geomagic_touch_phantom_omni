@@ -1,0 +1,8 @@
+<launch>
+    <arg name="prefix" default=""/>
+    <arg name="namespace" default="omniUsb" />
+    <arg name="type" default="usb" />
+
+    <include file="$(find omni_driver)/launch/omni.launch" pass_all_args="true" />
+
+</launch>

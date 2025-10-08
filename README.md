@@ -9,7 +9,7 @@
 
 # About
 This is a ROS metapackage for both Sensable Phantom Omni (IEEE1394 connection) 
-and Geomagic Touch (Ethernet connection). Included in this metapackage is the
+and Geomagic Touch (Ethernet or USB connection). Included in this metapackage is the
 omni_driver package, which contains the omni_driver node. If you don't know or don't have ROS, you
 should first go to http://www.ros.org/.
 
@@ -38,7 +38,7 @@ As you should have notices by now, most of the topics can be prefixed. This is d
 | Parameter Name  |  Type  |      Options       | Default Value | Description |
 | :-------------- | :----: | :----------------: | :-----------: | :---------- |
 | `~omni_name`    | string | any                | omni          | Prefix that is put before many of the topics names |
-| `~omni_type`    | string | FireWire, Ethernet | FireWire      | The communication type |
+| `~omni_type`    | string | FireWire, Ethernet, USB | FireWire      | The communication type |
 | `~omni_serial`  | string | any                |               | The serial number printed below the device |
 | `~teleop_master`|  bool  | true, false        | true          | The teleoperation mode (true for master, false for slave) |
 | `~path_urdf`    | string | any                |               | Path to the URDF location |
@@ -60,6 +60,11 @@ Then change the value to match your device's serial number.
 If Ethernet is the one you're using, then:
 ```sh 
 $ roslaunch omni_driver ethernet.launch
+```
+
+If you have a Geomagic Touch, run:
+```sh
+$ roslaunch omni_driver usb.launch
 ```
 If you want to teleoperate one of them, start the Master as you would normally
 then run the slave i.e:
@@ -181,6 +186,21 @@ If your device is not listed here, check the device communication running
 /opt/geomagic_touch_device_driver/Geomagic_Touch_Diagnostic . Most of the times, this happens because the IPV4 isn't
 a link-local only connection. 
 
+## USB
+You need to generate your config files for GTDD. This
+works the same if you're doing the normal or Docker way. However, if running the program through Docker **make sure you run the following command from the virtual machine (aka container)**
+```sh
+$ cd /opt/geomagic_touch_device_driver
+$ ./Geomagic_Touch_Setup
+```
+A GUI appears and you should select the Geomagic Touch as the device model.
+Then, click the "Add..." button and give your device the following name: Geomagic Touch. Just like that, starting with Geomagic, separated with a blank space and
+finishing with Touch. If the name is different, the ROS Driver won't be able to
+find the device. Next, you have to pair your device, selecting available devices
+and clicking the " Pairing" button first on the GUI, then on the device itself.
+If your device is not listed here, check the device communication running
+/opt/geomagic_touch_device_driver/Geomagic_Touch_Diagnostic.
+
 Now everything is ready to go, but if you're using
 Docker you'll have to generate config files everytime you exit and rerun the 
 image, as this is the Docker way. If you want to commit the changes done in the 
@@ -203,6 +223,9 @@ as to avoid confusion with created images.
 
 ## Ethernet
  - **[ERROR] [timestamp]: Failed to initialize haptic device** -- Check the config files on "/opt/geomagic_touch_device_driver/config". Please make sure the device was properly configured as explained on above. Please note that any name other than "Phantom Omni" will not work. If using the Docker Way, please make sure you committed the changes on the container after configuring the device before exiting, as changes are not automatically saved on Docker.
+
+## USB
+ - **[ERROR] [timestamp]: Failed to initialize haptic device** -- Check the config files on "/opt/geomagic_touch_device_driver/config". Please make sure the device was properly configured as explained on above. Please note that any name other than "Geomagic Touch" will not work. If using the Docker Way, please make sure you committed the changes on the container after configuring the device before exiting, as changes are not automatically saved on Docker.
 
 # License
 This Software is distributed under the [MIT License](https://opensource.org/licenses/MIT).
