@@ -4,3 +4,8 @@ CMakeLists.txt.*
 .idea*
 .vscode
 .vscode*
+build/
+devel/
+logs/
+.catkin_tools/
+catkin/

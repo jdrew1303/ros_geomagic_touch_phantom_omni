@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(omni_controller)
 
+set(CMAKE_CXX_FLAGS "-std=c++14 ${CMAKE_CXX_FLAGS} -Wall")
+
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif ()
@@ -32,7 +34,7 @@ find_package(Eigen3 REQUIRED)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES omni_controller
    CATKIN_DEPENDS std_msgs geometry_msgs joy
 #  DEPENDS system_lib
@@ -64,11 +66,11 @@ file(GLOB_RECURSE PROJECT_HEADERS "include/*.h")
 add_custom_target(omni_controller_files_for_ide SOURCES ${PROJECT_HEADERS})
 
 ## Create robot_kinematics library
-file(GLOB_RECURSE ROBOT_LIB_CPP ${PROJECT_SOURCE_DIR} src/RobotBase/*.cpp)
+file(GLOB_RECURSE ROBOT_LIB_CPP "src/RobotBase/*.cpp")
 add_library(robot_kinematics STATIC ${ROBOT_LIB_CPP})
 
 ## Declare a C++ ros node executable
-file(GLOB_RECURSE ROS_NODE_CPP ${PROJECT_SOURCE_DIR} src/node/*.cpp)
+file(GLOB_RECURSE ROS_NODE_CPP "src/node/*.cpp")
 add_executable(omni_controller ${ROS_NODE_CPP})
 
 ## Add cmake target dependencies of the executable
