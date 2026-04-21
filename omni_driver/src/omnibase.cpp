@@ -101,7 +101,7 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
     if (rot_data.empty())
         rot_link_to_teleop.setIdentity();
     else if (rot_data.size() == 9)
-        rot_link_to_teleop = Eigen::Matrix3d(rot_data.data());
+        rot_link_to_teleop = Eigen::Map<Eigen::Matrix3d>(rot_data.data());
     else
         throw std::logic_error("Rotation matrix is represented by a 9 element array");
 
