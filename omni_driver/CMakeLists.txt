@@ -114,18 +114,36 @@ add_custom_target(omni_driver_files_for_ide SOURCES
     ${PROJECT_HEADERS}
     "cfg/uncrustify.cfg")
 
+## Declare a cpp library
+add_library(omni_driver_lib src/omnibase.cpp src/omnifirewire.cpp src/omniethernet.cpp src/omniusb.cpp src/raw1394msg.cpp)
+add_dependencies(omni_driver_lib omni_driver_generate_messages_cpp)
+
 ## Declare a cpp executable
-add_executable(omni_driver src/omnibase.cpp src/omnifirewire.cpp src/omninode.cpp src/omniethernet.cpp src/omniusb.cpp src/raw1394msg.cpp)
+add_executable(omni_driver src/omninode.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(omni_driver omni_driver_generate_messages_cpp )
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(omni_driver
+target_link_libraries(omni_driver_lib
   raw1394
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
   HD
   HDU
 )
+
+target_link_libraries(omni_driver
+  omni_driver_lib
+  ${catkin_LIBRARIES}
+)
+
+if (CATKIN_ENABLE_TESTING)
+  catkin_add_gtest(test_omnibase src/test_omnibase.cpp)
+  target_link_libraries(test_omnibase
+    omni_driver_lib
+    ${catkin_LIBRARIES}
+    ${Boost_LIBRARIES}
+  )
+endif()

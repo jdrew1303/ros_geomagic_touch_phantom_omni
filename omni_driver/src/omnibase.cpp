@@ -222,13 +222,11 @@ Eigen::Vector3d OmniBase::calculateTorqueFeedback(const Eigen::Vector3d& force, 
     auto link_model = kinematic_state->getLinkModel(frame);
     kinematic_state->getJacobian(joint_model_group, link_model, origin, jacobian, false);
 
-    // // Rotate the force vector from the desired frame to the base frame
-    // Eigen::Vector3d force_on_link_frame = rot_link_to_teleop * force;
-    // //
-    // auto quat_base_link = kinematic_state->getGlobalLinkTransform(frame).rotation();
-    // force_on_link_frame = quat_base_link.conjugate() * force_on_link_frame;
-
-    Eigen::Vector3d force_on_link_frame = force;
+    // Rotate the force vector from the desired frame to the base frame
+    Eigen::Vector3d force_on_link_frame = rot_link_to_teleop * force;
+    //
+    Eigen::Quaterniond quat_base_link(kinematic_state->getGlobalLinkTransform(frame).rotation());
+    force_on_link_frame = quat_base_link * force_on_link_frame;
     auto ret = feedback_gain * jacobian.block<3,3>(0,0).transpose() * force_on_link_frame;
     return ret.block<3,1>(0,0);
 }
@@ -240,10 +238,8 @@ void OmniBase::calculateJointVelocities()
         for (int i = 0; i < 6; ++i)
         {
             state.vel_error[i] = state.angles[i] - state.vel_z[i];
- //           state.velocities[i] = velocity_filter_wc * state.vel_error[i];    // not sure where wc is set, so i hard coded  30 rad/s
- //           state.vel_z[i] += dt * velocity_filter_wc * state.vel_error[i];
-            state.velocities[i] = 30.0 * state.vel_error[i];
-            state.vel_z[i] += dt * 30.0 * state.vel_error[i];
+            state.velocities[i] = velocity_filter_wc * state.vel_error[i];
+            state.vel_z[i] += dt * velocity_filter_wc * state.vel_error[i];
         }
 
         Eigen::VectorXd joint_velocities(6);
