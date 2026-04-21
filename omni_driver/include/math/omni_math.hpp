@@ -9,11 +9,12 @@
 #include <moveit/robot_model/robot_model.h>
 
 #include "../include/util/typedefs.hpp"
+#include "moving_average.hpp"
 
 class OmniMath {
     private:
 
-    MovingAverage moving_average(5,6);
+    MovingAverage moving_average;
 
     const bool enable_moving_average;
 
@@ -86,7 +87,7 @@ class OmniMath {
                     saturated_velocities[i] = previous_calculated_velocities[i];
                 }
             }
-            Eigen::VectorXd eigen_vector = Eigen::Map<Eigen::VectorXd>(saturated_velocities.data(), saturated_velocities.size());
+            Eigen::Map<Eigen::VectorXd> eigen_vector(saturated_velocities.data(), saturated_velocities.size());
             return eigen_vector;
         }
 
@@ -99,17 +100,17 @@ class OmniMath {
             double delta_t = (current_measurement_time - previous_measurement_time).total_microseconds();
             std::vector<double> calculated_velocities(6);
             for (int i = 0; i < 6; ++i) {
-                double deltaAngle = current_measurement[i] - previous_measurement[i];
-                calculated_velocities[i] = deltaAngle * 1000000 / delta_t;
+                double delta_angle = current_measurement[i] - previous_measurement[i];
+                calculated_velocities[i] = delta_angle * 1000000 / delta_t;
             }
             if (enable_moving_average) {
                 moving_average.input(calculated_velocities);
                 auto mean_vals = moving_average.mean();
-                Eigen::VectorXd joint_velocities = Eigen::Map<Eigen::VectorXd>(mean_vals.data(), mean_vals.size());
+                Eigen::Map<Eigen::VectorXd> joint_velocities(mean_vals.data(), mean_vals.size());
                 return joint_velocities;
             }
             else {
-                Eigen::VectorXd joint_velocities = Eigen::Map<Eigen::VectorXd>(calculated_velocities.data(), calculated_velocities.size());
+                Eigen::Map<Eigen::VectorXd> joint_velocities(calculated_velocities.data(), calculated_velocities.size());
                 return joint_velocities;
             }
         }
