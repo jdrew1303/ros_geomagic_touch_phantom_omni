@@ -20,6 +20,8 @@ class OmniMath {
 
     public:
 
+    explicit OmniMath(const bool enable_moving_average);
+
     template <typename Type>
     Type saturate(Type value, Type min, Type max) {
         if (value < min) {
@@ -49,7 +51,6 @@ class OmniMath {
     Eigen::Vector3d calculateTorqueFeedback(
         robot_state::RobotStatePtr kinematic_state,
         robot_state::JointModelGroup* joint_model_group, 
-        //const Eigen::Vector3d& force,
         const Eigen::Vector3d force,
         Eigen::Matrix3d rot_link_to_teleop,
         double feedback_gain,
@@ -126,11 +127,4 @@ class OmniMath {
         kinematic_state->getJacobian(joint_model_group, end_effector_link_model, origin, jacobian, false);
         return jacobian * current_joint_velocities;
     }
-
-public:
-    /**
-     * @brief OmniBase constructor, sets some members and prepares ros topics and publishers.
-     * @param name Reference to string of omni name.
-     */
-    explicit OmniMath(const bool enable_moving_average);
 };
