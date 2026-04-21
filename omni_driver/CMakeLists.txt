@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(omni_driver)
 
-set (CMAKE_CXX_FLAGS "--std=c++0x ${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "-std=c++14 ${CMAKE_CXX_FLAGS} -Wall")
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "RelWithDebInfo")
@@ -26,6 +26,7 @@ find_package(catkin REQUIRED COMPONENTS
   moveit_ros_planning
   moveit_ros_move_group
   omni_controller
+  message_generation
 )
 
 find_package(Boost REQUIRED COMPONENTS thread)
@@ -79,7 +80,6 @@ catkin_package(
 #  LIBRARIES raw_omni
   CATKIN_DEPENDS
     geometry_msgs
-    omni_description
     roscpp
     std_msgs
     tf
@@ -87,6 +87,7 @@ catkin_package(
     moveit_ros_planning
     moveit_ros_move_group
     omni_controller
+    message_runtime
 #  DEPENDS system_lib
 )
 

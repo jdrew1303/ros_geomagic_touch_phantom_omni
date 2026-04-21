@@ -80,7 +80,7 @@ setting up is needed to get the program up and running. If Docker is your way to
 to **The Docker way** session. Otherwise, you may choose to install the dependencies and compile the program
 from source. Once all dependencies are stored you may proceed to **Final steps**.
 
-The following command will install the required dependencies to compile the program from source:
+The following command will install the required dependencies to compile the program from source. Note that the C++ standard has been updated to C++14 to support modern compilers:
 ```sh
 $ sudo apt-get update
 $ sudo apt-get install build-essential libncurses5-dev freeglut3 dh-autoreconf \
