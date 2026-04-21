@@ -349,7 +349,7 @@ void OmniBase::forceFeedbackCallback(const std_msgs::Float64MultiArray::ConstPtr
 {
     // Optoforce is not precise enough on all axis.
     Eigen::Vector3d force_vector(0, force->data[0], 0);
-    Eigen::Vector3d joint_torques = OmniBase::calculateTorqueFeedback(force_vector, force_feedback_gain);
+    Eigen::Vector3d joint_torques = calculateTorqueFeedback(force_vector, force_feedback_gain);
     std::vector<double> torque_input(3);
     std::copy(joint_torques.data(), joint_torques.data() + 3, torque_input.begin());
     this->setTorque(torque_input);

@@ -8,7 +8,7 @@
 #include <moveit/robot_state/robot_state.h>
 #include <moveit/robot_model/robot_model.h>
 
-#include "../include/util/typedefs.hpp"
+#include "../util/typedefs.hpp"
 #include "moving_average.hpp"
 
 class OmniMath {
