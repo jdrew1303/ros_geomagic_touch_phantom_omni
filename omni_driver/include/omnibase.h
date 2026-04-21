@@ -111,6 +111,8 @@ private:
 
     void fwdKin();
 
+protected:
+
     void calculateJointVelocities();
 
     // void filterVelocities(std::vector<double> &filtered_velocities);

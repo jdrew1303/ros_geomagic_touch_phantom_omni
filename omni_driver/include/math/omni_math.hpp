@@ -32,7 +32,7 @@ class OmniMath {
 
     template <typename Type>
     std::vector<Type> saturate(std::vector<Type> values, Type min, Type max) {
-        std::vector<Type> s(values.size())
+        std::vector<Type> s(values.size());
         for (auto iter = values.begin(); iter < values.end(); ++iter) {
             s[iter-values.begin()] = saturate(*iter, min, max);
         }
@@ -45,7 +45,7 @@ class OmniMath {
             return kinematic_state->getGlobalLinkTransform(link_name);
     }
 
-    Eigen::Vector3d OmniBase::calculateTorqueFeedback(
+    Eigen::Vector3d calculateTorqueFeedback(
         robot_state::RobotStatePtr kinematic_state,
         robot_state::JointModelGroup* joint_model_group, 
         //const Eigen::Vector3d& force,
@@ -66,8 +66,8 @@ class OmniMath {
             // Rotate the force vector from the desired frame to the base frame
             Eigen::Vector3d force_on_link_frame = rot_link_to_teleop * force;
             //
-            auto quat_base_link = fowardKinematics(kinematic_state, end_effector_name)
-            force_on_link_frame = quat_base_link.conjugate() * force_on_link_frame;
+            Eigen::Quaterniond quat_base_link(kinematic_state->getGlobalLinkTransform(end_effector_name).rotation());
+            force_on_link_frame = quat_base_link * force_on_link_frame;
 
             auto ret = feedback_gain * jacobian.block<3,3>(0,0).transpose() * force_on_link_frame;
             return ret.block<3,1>(0,0);
@@ -77,16 +77,16 @@ class OmniMath {
         Eigen::VectorXd previous_calculated_velocities,
         Eigen::VectorXd current_calculated_velocities,
         double max_jerk) {
-            std:vector<double> saturated_velocities(6);
+            std::vector<double> saturated_velocities(6);
             for (int i = 0; i < 6; ++i) {
-                if ( std::abs(current_calculated_velocities[i] - previous_calculated_velocites[i]) < max_jerk ) {
+                if ( std::abs(current_calculated_velocities[i] - previous_calculated_velocities[i]) < max_jerk ) {
                     saturated_velocities[i] = current_calculated_velocities[i];
                 }
                 else {
                     saturated_velocities[i] = previous_calculated_velocities[i];
                 }
             }
-            Eigen::VectorXd eigen_vector(saturated_velocities.data());
+            Eigen::VectorXd eigen_vector = Eigen::Map<Eigen::VectorXd>(saturated_velocities.data(), saturated_velocities.size());
             return eigen_vector;
         }
 
@@ -94,21 +94,24 @@ class OmniMath {
         Time previous_measurement_time,
         Time current_measurement_time,
         Eigen::VectorXd previous_measurement,
-        Eigen::VecotrXd current_measurement,
+        Eigen::VectorXd current_measurement,
         bool enable_moving_average) {
-            double delta_angle;
             double delta_t = (current_measurement_time - previous_measurement_time).total_microseconds();
             std::vector<double> calculated_velocities(6);
             for (int i = 0; i < 6; ++i) {
-                deltaAngle = current_measurement[i] - previous_measurement[i];
-                calculated_velocities[i] = deltaAngle * 1000000 / dt;
+                double deltaAngle = current_measurement[i] - previous_measurement[i];
+                calculated_velocities[i] = deltaAngle * 1000000 / delta_t;
             }
             if (enable_moving_average) {
                 moving_average.input(calculated_velocities);
-                Eigen::VectorXd joint_velocities(moving_average.mean.data());
+                auto mean_vals = moving_average.mean();
+                Eigen::VectorXd joint_velocities = Eigen::Map<Eigen::VectorXd>(mean_vals.data(), mean_vals.size());
+                return joint_velocities;
             }
-            else Eigen::VectorXd joint_velocities(calculated_velocities.data());
-            return joint_velocities(6);
+            else {
+                Eigen::VectorXd joint_velocities = Eigen::Map<Eigen::VectorXd>(calculated_velocities.data(), calculated_velocities.size());
+                return joint_velocities;
+            }
         }
 
     Eigen::VectorXd calculateTwist(
