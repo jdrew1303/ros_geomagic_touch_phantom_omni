@@ -115,7 +115,7 @@ add_custom_target(omni_driver_files_for_ide SOURCES
     "cfg/uncrustify.cfg")
 
 ## Declare a cpp library
-add_library(omni_driver_lib src/omnibase.cpp src/omnifirewire.cpp src/omniethernet.cpp src/omniusb.cpp src/raw1394msg.cpp)
+add_library(omni_driver_lib src/omnibase.cpp src/omnifirewire.cpp src/omniethernet.cpp src/omniusb.cpp src/raw1394msg.cpp src/math/omni_math.cpp src/math/moving_average.cpp)
 add_dependencies(omni_driver_lib omni_driver_generate_messages_cpp)
 
 ## Declare a cpp executable

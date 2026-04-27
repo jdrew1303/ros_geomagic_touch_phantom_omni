@@ -101,7 +101,7 @@ OmniBase::OmniBase(const std::string &name, const std::string &path_urdf, const 
     if (rot_data.empty())
         rot_link_to_teleop.setIdentity();
     else if (rot_data.size() == 9)
-        rot_link_to_teleop = Eigen::Matrix3d(rot_data.data());
+        rot_link_to_teleop = Eigen::Map<Eigen::Matrix3d>(rot_data.data());
     else
         throw std::logic_error("Rotation matrix is represented by a 9 element array");
 
@@ -349,7 +349,7 @@ void OmniBase::forceFeedbackCallback(const std_msgs::Float64MultiArray::ConstPtr
 {
     // Optoforce is not precise enough on all axis.
     Eigen::Vector3d force_vector(0, force->data[0], 0);
-    Eigen::Vector3d joint_torques = OmniBase::calculateTorqueFeedback(force_vector, force_feedback_gain);
+    Eigen::Vector3d joint_torques = calculateTorqueFeedback(force_vector, force_feedback_gain);
     std::vector<double> torque_input(3);
     std::copy(joint_torques.data(), joint_torques.data() + 3, torque_input.begin());
     this->setTorque(torque_input);
