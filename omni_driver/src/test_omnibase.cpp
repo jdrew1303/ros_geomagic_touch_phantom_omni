@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "omnibase.h"
+#include "math/omni_math.hpp"
 #include <ros/ros.h>
 #include <Eigen/Geometry>
 
@@ -84,6 +85,24 @@ TEST_F(OmniBaseTest, TorqueFeedbackRotation) {
 
     // For this test, I'll just check it's non-zero and later I could add more specific values if I had a reference.
     EXPECT_GT(torques.norm(), 0);
+}
+
+TEST(OmniMathTest, JerkSaturationFilter) {
+    OmniMath omni_math(false);
+    Eigen::VectorXd prev_vel(6);
+    prev_vel << 1.0, 1.0, 1.0, 1.0, 1.0, 1.0;
+    Eigen::VectorXd curr_vel(6);
+    curr_vel << 1.1, 2.5, 0.9, 1.0, 3.0, 1.0;
+    double max_jerk = 0.5;
+
+    Eigen::VectorXd saturated = omni_math.jerkSaturationFilter(prev_vel, curr_vel, max_jerk);
+
+    EXPECT_DOUBLE_EQ(saturated[0], 1.1); // 1.1 - 1.0 = 0.1 < 0.5
+    EXPECT_DOUBLE_EQ(saturated[1], 1.0); // 2.5 - 1.0 = 1.5 > 0.5 -> prev
+    EXPECT_DOUBLE_EQ(saturated[2], 0.9); // 0.9 - 1.0 = -0.1 -> abs(0.1) < 0.5
+    EXPECT_DOUBLE_EQ(saturated[3], 1.0); // 1.0 - 1.0 = 0 < 0.5
+    EXPECT_DOUBLE_EQ(saturated[4], 1.0); // 3.0 - 1.0 = 2.0 > 0.5 -> prev
+    EXPECT_DOUBLE_EQ(saturated[5], 1.0); // 1.0 - 1.0 = 0 < 0.5
 }
 
 int main(int argc, char **argv) {
